@@ -1,4 +1,5 @@
 import datetime
+from decimal import Decimal
 from dateutil.relativedelta import relativedelta
 
 from django import forms
