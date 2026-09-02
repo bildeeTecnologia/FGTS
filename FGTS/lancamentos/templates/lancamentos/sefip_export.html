@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+
+{% block title %}SEFIP.RE{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-lg">
+        <div class="card-header bg-dark text-white">Gerar SEFIP.RE</div>
+        <div class="card-body">
+            {% if feature_blocked %}
+            <div class="alert alert-warning">
+                Recurso SEFIP.RE nao habilitado para esta empresa.
+            </div>
+            {% endif %}
+            <form method="post" class="row g-3" autocomplete="off">
+                {% csrf_token %}
+                {% if form.non_field_errors %}
+                <div class="col-12">
+                    <div class="alert alert-warning">{{ form.non_field_errors }}</div>
+                </div>
+                {% endif %}
+                <div class="col-12 col-lg-4">
+                    <label class="form-label">Empresa</label>
+                    {{ form.empresa }}
+                    {% if form.empresa.errors %}<div class="text-danger small">{{ form.empresa.errors }}</div>{% endif %}
+                </div>
+                <div class="col-12 col-lg-4">
+                    <label class="form-label">Competencia unica</label>
+                    {{ form.competencia }}
+                    <div class="form-text text-muted">{{ form.competencia.help_text }}</div>
+                    {% if form.competencia.errors %}<div class="text-danger small">{{ form.competencia.errors }}</div>{% endif %}
+                </div>
+                <div class="col-12"></div>
+                <div class="col-12 col-lg-4">
+                    <label class="form-label">Funcionario de</label>
+                    <div class="autocomplete-wrapper position-relative">
+                        <input type="text" id="func_de_display" class="form-control"
+                               placeholder="Selecione uma empresa primeiro" autocomplete="off" disabled>
+                        {{ form.funcionario_de }}
+                        <div id="func_de_dropdown" class="autocomplete-dropdown list-group position-absolute d-none"
+                             style="z-index:1050;max-height:220px;overflow-y:auto;width:100%;top:100%;left:0;"></div>
+                    </div>
+                    {% if form.funcionario_de.errors %}<div class="text-danger small">{{ form.funcionario_de.errors }}</div>{% endif %}
+                </div>
+                <div class="col-12 col-lg-4">
+                    <label class="form-label">Funcionario ate</label>
+                    <div class="autocomplete-wrapper position-relative">
+                        <input type="text" id="func_ate_display" class="form-control"
+                               placeholder="Selecione uma empresa primeiro" autocomplete="off" disabled>
+                        {{ form.funcionario_ate }}
+                        <div id="func_ate_dropdown" class="autocomplete-dropdown list-group position-absolute d-none"
+                             style="z-index:1050;max-height:220px;overflow-y:auto;width:100%;top:100%;left:0;"></div>
+                    </div>
+                    {% if form.funcionario_ate.errors %}<div class="text-danger small">{{ form.funcionario_ate.errors }}</div>{% endif %}
+                </div>
+                <div class="col-12">
+                    <button class="btn btn-primary" type="submit">
+                        <i class="bi bi-file-earmark-arrow-down"></i> Gerar SEFIP.RE
+                    </button>
+                </div>
+            </form>
+            <div class="alert alert-info mt-3 border-0" role="alert">
+                <i class="bi bi-info-circle-fill me-2"></i>
+                O arquivo sera gerado exatamente com as regras do legado e baixado como <strong>SEFIP.RE</strong>.
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Autocomplete empresa → funcionário de / até (sefip)
+(function () {
+  var AUTOCOMPLETE_URL = '{% url "funcionarios-autocomplete" %}';
+  var empresaEl = document.getElementById('id_empresa');
+  var funcDeEl  = document.getElementById('id_funcionario_de');
+  var funcAteEl = document.getElementById('id_funcionario_ate');
+  var deDisplay  = document.getElementById('func_de_display');
+  var atDisplay  = document.getElementById('func_ate_display');
+  var deDrop     = document.getElementById('func_de_dropdown');
+  var ateDrop    = document.getElementById('func_ate_dropdown');
+  if (!empresaEl || !funcDeEl || !funcAteEl) return;
+
+  funcDeEl.style.display  = 'none';
+  funcAteEl.style.display = 'none';
+
+  function setPlaceholders() {
+    var ph = empresaEl.value ? 'Digite para buscar...' : 'Selecione uma empresa primeiro';
+    var dis = !empresaEl.value;
+    [deDisplay, atDisplay].forEach(function (el) {
+      if (!el) return;
+      el.placeholder = ph;
+      el.disabled = dis;
+    });
+  }
+
+  function hide(dropEl) { if (dropEl) { dropEl.classList.add('d-none'); dropEl.innerHTML = ''; } }
+
+  function buildAutocomplete(displayEl, hiddenEl, dropEl) {
+    if (!displayEl || !hiddenEl || !dropEl) return;
+    var debounce = null;
+
+    function show(results) {
+      dropEl.innerHTML = '';
+      if (!results || !results.length) {
+        var el = document.createElement('div');
+        el.className = 'list-group-item text-muted small';
+        el.textContent = 'Nenhum funcionário encontrado';
+        dropEl.appendChild(el);
+      } else {
+        results.forEach(function (r) {
+          var btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'list-group-item list-group-item-action small py-2';
+          btn.textContent = r.label;
+          btn.addEventListener('mousedown', function (e) {
+            e.preventDefault();
+            displayEl.value = r.label;
+            hiddenEl.value = r.id;
+            hide(dropEl);
+          });
+          dropEl.appendChild(btn);
+        });
+      }
+      dropEl.classList.remove('d-none');
+    }
+
+    displayEl.addEventListener('input', function () {
+      hiddenEl.value = '';
+      var q = this.value.trim();
+      clearTimeout(debounce);
+      if (q.length < 2) { hide(dropEl); return; }
+      debounce = setTimeout(function () {
+        var url = AUTOCOMPLETE_URL + '?q=' + encodeURIComponent(q);
+        if (empresaEl.value) url += '&empresa_id=' + encodeURIComponent(empresaEl.value);
+        fetch(url)
+          .then(function (r) { if (!r.ok) { show([]); return null; } return r.json(); })
+          .then(function (d) { if (d !== null) show(d); })
+          .catch(function (err) { console.error('[Autocomplete]', err); show([]); });
+      }, 150);
+    });
+
+    displayEl.addEventListener('blur', function () { setTimeout(function () { hide(dropEl); }, 300); });
+  }
+
+  buildAutocomplete(deDisplay, funcDeEl, deDrop);
+  buildAutocomplete(atDisplay, funcAteEl, ateDrop);
+
+  empresaEl.addEventListener('change', function () {
+    [deDisplay, atDisplay].forEach(function (el) { if (el) el.value = ''; });
+    funcDeEl.value  = '';
+    funcAteEl.value = '';
+    hide(deDrop);
+    hide(ateDrop);
+    setPlaceholders();
+  });
+
+  setPlaceholders();
+})();
+</script>
+{% endblock %}

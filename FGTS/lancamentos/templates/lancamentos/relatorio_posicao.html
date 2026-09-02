@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Relatório de Posição FGTS{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="mb-3">
+                <h1 class="h4 fw-bold text-dark">
+                    <i class="bi bi-file-earmark-spreadsheet text-primary me-2"></i>
+                    Relatório de Posição FGTS
+                </h1>
+                <p class="text-muted small mb-0">
+                    Exporta todos os lançamentos (pagos e em aberto) com o Valor Atualizado calculado até o último índice disponível.
+                </p>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-header text-white py-3 border-0" style="background: linear-gradient(135deg, #005CA9 0%, #003A78 100%);">
+                    <h2 class="h6 mb-0"><i class="bi bi-funnel me-2"></i>Filtros</h2>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger small">
+                            {% for err in form.non_field_errors %}{{ err }}{% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">{{ form.empresa.label }}</label>
+                            {{ form.empresa }}
+                            {% if form.empresa.errors %}
+                            <div class="text-danger small mt-1">{{ form.empresa.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-6">
+                                <label class="form-label fw-semibold">{{ form.competencia_inicio.label }}</label>
+                                {{ form.competencia_inicio }}
+                                {% if form.competencia_inicio.errors %}
+                                <div class="text-danger small mt-1">{{ form.competencia_inicio.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label fw-semibold">{{ form.competencia_fim.label }}</label>
+                                {{ form.competencia_fim }}
+                                {% if form.competencia_fim.errors %}
+                                <div class="text-danger small mt-1">{{ form.competencia_fim.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info border-0 small mb-4">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Para lançamentos <strong>em aberto</strong>, o Valor Atualizado é calculado pelo índice FGTS até a última data de referência disponível. Para lançamentos <strong>pagos</strong>, usa o valor registrado no campo <em>Valor Pago</em>.
+                        </div>
+
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary rounded-3">
+                                <i class="bi bi-arrow-right-circle me-1"></i>
+                                Gerar Relatório
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Configurações{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2>⚙️ Configurações do Sistema</h2>
+            <p class="text-muted">Parâmetros de cálculo e comportamento da aplicação</p>
+        </div>
+    </div>
+
+    {% if configuracoes %}
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>Chave</th>
+                    <th>Valor</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for config in configuracoes %}
+                <tr>
+                    <td><code>{{ config.chave }}</code></td>
+                    <td>{{ config.valor }}</td>
+                    <td>
+                        <a href="#" class="btn btn-sm btn-warning">Editar</a>
+                        <a href="#" class="btn btn-sm btn-danger">Deletar</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% else %}
+    <div class="alert alert-info">
+        <strong>Nenhuma configuração encontrada.</strong> Acesse o admin para criar.
+    </div>
+    {% endif %}
+
+    <div class="mt-4">
+        <h4>Configurações Padrão</h4>
+        <div class="alert alert-secondary">
+            <ul>
+                <li><code>JUROS_TIPO</code>: Tipo de juros (MENSAL ou DIARIO)</li>
+                <li><code>JUROS_MENSAL_PERCENT</code>: Percentual de juros mensais</li>
+                <li><code>JUROS_DIARIO_PERCENT</code>: Percentual de juros diários</li>
+                <li><code>MULTA_PERCENT</code>: Percentual de multa por atraso</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

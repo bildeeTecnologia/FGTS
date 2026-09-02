@@ -1,0 +1,981 @@
+{% extends "base.html" %}
+{% load form_extras %}
+
+{% block title %}Novo Funcionário - FGTS Web{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-xl-12">
+            <!-- Abas de navegação -->
+            <ul class="nav nav-tabs mb-4 border-0" id="funcionarioTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="individual-tab" data-bs-toggle="tab" data-bs-target="#individual" type="button" role="tab" aria-controls="individual" aria-selected="true">
+                        <i class="bi bi-person-plus-fill me-2"></i>Adicionar Individual
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="importacao-tab" data-bs-toggle="tab" data-bs-target="#importacao" type="button" role="tab" aria-controls="importacao" aria-selected="false">
+                        <i class="bi bi-file-earmark-spreadsheet me-2"></i>Importar em Lote
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="atualizacao-tab" data-bs-toggle="tab" data-bs-target="#atualizacao" type="button" role="tab" aria-controls="atualizacao" aria-selected="false">
+                        <i class="bi bi-pencil-square me-2"></i>Atualizar Vínculos em Lote
+                    </button>
+                </li>
+            </ul>
+
+            <!-- Conteúdo das abas -->
+            <div class="tab-content" id="funcionarioTabContent">
+                <!-- TAB 1: Cadastro Individual -->
+                <div class="tab-pane fade show active" id="individual" role="tabpanel" aria-labelledby="individual-tab">
+                    <!-- Card Principal -->
+                    <div class="card border-0 shadow-lg">
+                        <!-- Header -->
+                        <div class="card-header bg-gradient-primary text-white py-4 border-0">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-person-plus-fill fs-4 me-3"></i>
+                                <div>
+                                    <h4 class="mb-0 fw-bold">Cadastrar Funcionário</h4>
+                                    <small class="opacity-75">Adicione um novo colaborador ao sistema</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Body -->
+                        <div class="card-body p-5">
+                            {% if messages %}
+                                {% for message in messages %}
+                                <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show border-0" role="alert">
+                                    <i class="bi bi-exclamation-circle me-2"></i>
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                                {% endfor %}
+                            {% endif %}
+
+                            <form method="post" novalidate id="form">
+                                {% csrf_token %}
+
+                                <!-- Seção 1: Dados Básicos -->
+                                <div class="mb-4">
+                                    <h6 class="text-uppercase fw-bold text-muted mb-3">
+                                        <i class="bi bi-info-circle me-2"></i>Dados Básicos
+                                    </h6>
+                                    <div class="row g-3">
+                                        <div class="col-md-8">
+                                            <label for="{{ form.nome.id_for_label }}" class="form-label fw-bold">
+                                                {{ form.nome.label }} <span class="text-danger">*</span>
+                                            </label>
+                                            {{ form.nome }}
+                                            <small class="form-text text-muted d-block">Usado na geracao do SEFIP.RE.</small>
+                                            {% if form.nome.errors %}
+                                                <div class="invalid-feedback d-block">{{ form.nome.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label for="{{ form.matricula.id_for_label }}" class="form-label fw-bold">
+                                                {{ form.matricula.label }}
+                                            </label>
+                                            {{ form.matricula }}
+                                        </div>
+                                    </div>
+
+                                    <div class="row g-3 mt-1">
+                                        <div class="col-md-4">
+                                            <label for="{{ form.empresa.id_for_label }}" class="form-label fw-bold">
+                                                {{ form.empresa.label }} <span class="text-danger">*</span>
+                                            </label>
+                                            {{ form.empresa }}
+                                            {% if form.empresa.errors %}
+                                                <div class="invalid-feedback d-block">{{ form.empresa.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label for="{{ form.data_admissao.id_for_label }}" class="form-label fw-bold">
+                                                {{ form.data_admissao.label }} <span class="text-danger">*</span>
+                                            </label>
+                                            {{ form.data_admissao }}
+                                            <small class="form-text text-muted d-block">Usado na geracao do SEFIP.RE.</small>
+                                            {% if form.data_admissao.errors %}
+                                                <div class="invalid-feedback d-block">{{ form.data_admissao.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label for="{{ form.cargo.id_for_label }}" class="form-label fw-bold">
+                                                {{ form.cargo.label }}
+                                            </label>
+                                            {{ form.cargo }}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <hr class="my-4 opacity-20">
+
+                                <!-- Seção 2: Documentação -->
+                                <div class="mb-4">
+                                    <h6 class="text-uppercase fw-bold text-muted mb-3">
+                                        <i class="bi bi-file-earmark-text me-2"></i>Documentação
+                                    </h6>
+                                    <div class="row g-3">
+                                        <div class="col-md-4">
+                                            <label for="{{ form.cpf.id_for_label }}" class="form-label fw-bold">
+                                                {{ form.cpf.label }} <span class="text-danger">*</span>
+                                            </label>
+                                            {% if form.cpf.errors %}
+                                                {{ form.cpf|add_class:"is-invalid" }}
+                                            {% else %}
+                                                {{ form.cpf }}
+                                            {% endif %}
+                                            {% if form.cpf.errors %}
+                                                <div class="invalid-feedback d-block">{{ form.cpf.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label for="{{ form.pis.id_for_label }}" class="form-label fw-bold">
+                                                {{ form.pis.label }}
+                                            </label>
+                                            {{ form.pis }}
+                                            <small class="form-text text-muted d-block">Usado na geracao do SEFIP.RE.</small>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label for="{{ form.cbo.id_for_label }}" class="form-label fw-bold">
+                                                {{ form.cbo.label }}
+                                            </label>
+                                            {{ form.cbo }}
+                                            <small class="form-text text-muted d-block">Usado na geracao do SEFIP.RE.</small>
+                                        </div>
+                                    </div>
+
+                                    <div class="row g-3 mt-1">
+                                        <div class="col-md-6">
+                                            <label for="{{ form.carteira_profissional.id_for_label }}" class="form-label fw-bold">
+                                                {{ form.carteira_profissional.label }}
+                                            </label>
+                                            {{ form.carteira_profissional }}
+                                            <small class="form-text text-muted d-block">Usado na geracao do SEFIP.RE.</small>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="{{ form.serie_carteira.id_for_label }}" class="form-label fw-bold">
+                                                {{ form.serie_carteira.label }}
+                                            </label>
+                                            {{ form.serie_carteira }}
+                                            <small class="form-text text-muted d-block">Usado na geracao do SEFIP.RE.</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <hr class="my-4 opacity-20">
+
+                                <!-- Seção 3: Datas -->
+                                <div class="mb-4">
+                                    <h6 class="text-uppercase fw-bold text-muted mb-3">
+                                        <i class="bi bi-calendar-event me-2"></i>Datas
+                                    </h6>
+                                    <div class="row g-3">
+                                        <div class="col-md-4">
+                                            <label for="{{ form.data_nascimento.id_for_label }}" class="form-label fw-bold">
+                                                {{ form.data_nascimento.label }}
+                                            </label>
+                                            {{ form.data_nascimento }}
+                                            <div class="invalid-feedback d-block" id="{{ form.data_nascimento.id_for_label }}-error" style="display: none;"></div>
+                                            <small class="form-text text-muted d-block">Usado na geracao do SEFIP.RE.</small>
+                                            {% if form.data_nascimento.errors %}
+                                                <div class="invalid-feedback d-block">{{ form.data_nascimento.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label for="{{ form.data_demissao.id_for_label }}" class="form-label fw-bold">
+                                                {{ form.data_demissao.label }}
+                                            </label>
+                                            {{ form.data_demissao }}
+                                        </div>
+                                        <div class="col-md-4" id="motivo-saida-wrapper" style="display: none;">
+                                            <label for="{{ form.motivo_saida.id_for_label }}" class="form-label fw-bold">
+                                                {{ form.motivo_saida.label }}
+                                            </label>
+                                            {{ form.motivo_saida }}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Tipo de Vínculo -->
+                                <div class="mb-4">
+                                    <h6 class="text-uppercase fw-bold text-muted mb-3">
+                                        <i class="bi bi-person-badge me-2"></i>Tipo de Vínculo
+                                    </h6>
+                                    <div class="row g-3">
+                                        <div class="col-md-4">
+                                            <label for="{{ form.tipo_vinculo.id_for_label }}" class="form-label fw-bold">
+                                                {{ form.tipo_vinculo.label }}
+                                            </label>
+                                            {{ form.tipo_vinculo }}
+                                            {% if form.tipo_vinculo.errors %}
+                                                <div class="invalid-feedback d-block">{{ form.tipo_vinculo.errors.0 }}</div>
+                                            {% endif %}
+                                            <small class="form-text text-muted d-block mt-1">
+                                                Aprendiz: alíquota FGTS de 2%. Para efetivação de Aprendiz como CLT,
+                                                encerre este vínculo e crie um novo.
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <hr class="my-4 opacity-20">
+
+                                <!-- Seção 4: Observações -->
+                                <div class="mb-4">
+                                    <h6 class="text-uppercase fw-bold text-muted mb-3">
+                                        <i class="bi bi-chat-left-text me-2"></i>Observações
+                                    </h6>
+                                    <div>
+                                        <label for="{{ form.observacao.id_for_label }}" class="form-label fw-bold">
+                                            {{ form.observacao.label }}
+                                        </label>
+                                        {{ form.observacao }}
+                                        <small class="form-text text-muted d-block mt-2">Informações adicionais sobre o funcionário</small>
+                                    </div>
+                                </div>
+
+                                <!-- Erros Gerais -->
+                                {% if form.non_field_errors %}
+                                <div class="alert alert-danger border-0" role="alert">
+                                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                    <strong>Erro ao salvar:</strong>
+                                    {% for error in form.non_field_errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </form>
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="card-footer bg-light border-top py-4">
+                            <div class="d-flex gap-3 justify-content-end">
+                                <a href="{% url 'funcionario-list' %}" class="btn btn-outline-secondary btn-lg rounded-3">
+                                    <i class="bi bi-x-circle me-2"></i> Cancelar
+                                </a>
+                                <button type="submit" form="form" class="btn btn-primary btn-lg rounded-3">
+                                    <i class="bi bi-check-circle me-2"></i> Salvar Funcionário
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Info Card -->
+                    <div class="card border-0 bg-light mt-4">
+                        <div class="card-body py-3 px-4">
+                            <p class="mb-0">
+                                <i class="bi bi-lightbulb-fill text-warning me-2"></i>
+                                <strong>Dica:</strong> Campos marcados com <span class="text-danger">*</span> são obrigatórios.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 2: Importação em Lote -->
+                <div class="tab-pane fade" id="importacao" role="tabpanel" aria-labelledby="importacao-tab">
+                    <div class="card border-0 shadow-lg">
+                        <!-- Header -->
+                        <div class="card-header bg-gradient-success text-white py-4 border-0">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-file-earmark-spreadsheet fs-4 me-3"></i>
+                                <div>
+                                    <h4 class="mb-0 fw-bold">Importar Funcionários em Lote</h4>
+                                    <small class="opacity-75">Faça upload de múltiplos colaboradores através de um arquivo XLSX</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Body -->
+                        <div class="card-body p-5">
+                            <!-- Alert de Sucesso/Erro -->
+                            <div id="import-alert" style="display: none;"></div>
+
+                            <!-- Seção 1: Download do Modelo -->
+                            <div class="mb-5">
+                                <h6 class="text-uppercase fw-bold text-muted mb-3">
+                                    <i class="bi bi-download me-2"></i>1º Passo: Baixar Modelo
+                                </h6>
+                                <p class="text-muted mb-3">Clique no botão abaixo para baixar um arquivo XLSX com todas as colunas necessárias e um exemplo de preenchimento.</p>
+                                <a href="{% url 'funcionario-download-template' %}" class="btn btn-outline-primary btn-lg rounded-3">
+                                    <i class="bi bi-download me-2"></i> Baixar Modelo XLSX
+                                </a>
+                            </div>
+
+                            <hr class="my-5 opacity-20">
+
+                            <!-- Seção 2: Preenchimento do Arquivo -->
+                            <div class="mb-5">
+                                <h6 class="text-uppercase fw-bold text-muted mb-3">
+                                    <i class="bi bi-pencil-square me-2"></i>2º Passo: Preenchimento do Arquivo
+                                </h6>
+                                <div class="alert alert-info border-0">
+                                    <h6 class="fw-bold mb-3">
+                                        <i class="bi bi-info-circle me-2"></i>Campos Obrigatórios:
+                                    </h6>
+                                    <ul class="mb-2">
+                                        <li><strong>NOME</strong> - Nome completo do funcionário</li>
+                                        <li><strong>CPF</strong> - Formato: XXX.XXX.XXX-XX</li>
+                                        <li><strong>DATA_ADMISSAO</strong> - Data no formato YYYY-MM-DD (ex: 2023-01-15)</li>
+                                        <li><strong>EMPRESA</strong> - Use o CÓDIGO numérico da empresa (ex: 1, 2, 3...)</li>
+                                        <li><strong>MATRICULA</strong> - Opcional, mas recomendada para evitar vínculo ambíguo</li>
+                                    </ul>
+                                    {% if empresas_permitidas %}
+                                    <div class="d-flex justify-content-end mt-3">
+                                        <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#empresasModal">
+                                            <i class="bi bi-buildings me-2"></i>Ver empresas permitidas
+                                        </button>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <hr class="my-5 opacity-20">
+
+                            <!-- Seção 3: Upload do Arquivo -->
+                            <div class="mb-5">
+                                <h6 class="text-uppercase fw-bold text-muted mb-3">
+                                    <i class="bi bi-cloud-upload me-2"></i>3º Passo: Upload do Arquivo
+                                </h6>
+                                <form id="import-form" method="post" enctype="multipart/form-data">
+                                    {% csrf_token %}
+                                    <div class="mb-3">
+                                        <label for="import-file" class="form-label fw-bold">Selecione o arquivo XLSX</label>
+                                        <div class="input-group input-group-lg">
+                                            <input type="file" id="import-file" name="import_file" class="form-control" accept=".xlsx" required>
+                                            <button type="submit" class="btn btn-success" id="import-btn">
+                                                <i class="bi bi-upload me-2"></i>Importar
+                                            </button>
+                                        </div>
+                                        <small class="form-text text-muted d-block mt-2">Apenas arquivos .XLSX são permitidos</small>
+                                    </div>
+                                </form>
+
+                                <!-- Progresso -->
+                                <div id="import-progress" style="display: none;" class="mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="spinner-border spinner-border-sm text-primary me-2" role="status">
+                                            <span class="visually-hidden">Processando...</span>
+                                        </div>
+                                        <span id="progress-text">Processando arquivo...</span>
+                                    </div>
+                                </div>
+
+                                <!-- Resultados -->
+                                <div id="import-result" style="display: none;" class="mt-4">
+                                    <div class="alert alert-dismissible fade show" id="result-alert" role="alert">
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                        <h5 class="mb-3" id="result-title"></h5>
+                                        <div id="result-stats" class="mb-3"></div>
+                                        <div id="result-errors"></div>
+                                        <div id="success-actions" style="display: none;" class="mt-4">
+                                            <a href="{% url 'funcionario-list' %}" class="btn btn-primary btn-lg">
+                                                <i class="bi bi-people-fill me-2"></i>Ver Todos os Funcionários
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="card-footer bg-light border-top py-4">
+                            <div class="d-flex gap-3 justify-content-end">
+                                <a href="{% url 'funcionario-list' %}" class="btn btn-outline-secondary btn-lg rounded-3">
+                                    <i class="bi bi-arrow-left me-2"></i> Voltar para Lista
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Info Card -->
+                    <div class="card border-0 bg-warning-light mt-4">
+                        <div class="card-body py-3 px-4">
+                            <p class="mb-0">
+                                <i class="bi bi-lightbulb-fill text-warning me-2"></i>
+                                <strong>Dica:</strong> Você pode importar até 1000 funcionários por vez. Se tiver mais, divida em múltiplos arquivos.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+                <!-- TAB 3: Atualizar Vínculos em Lote -->
+                <div class="tab-pane fade" id="atualizacao" role="tabpanel" aria-labelledby="atualizacao-tab">
+                    <div class="card border-0 shadow-lg">
+                        <!-- Header -->
+                        <div class="card-header text-white py-4 border-0" style="background: linear-gradient(135deg, #764ba2 0%, #4b2d7f 100%);">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-pencil-square fs-4 me-3"></i>
+                                <div>
+                                    <h4 class="mb-0 fw-bold">Atualizar Vínculos em Lote</h4>
+                                    <small class="opacity-75">Atualize cargo, motivo de saída, data de demissão e mais — via XLSX</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Body -->
+                        <div class="card-body p-5">
+                            <div id="update-alert" style="display: none;"></div>
+
+                            <!-- Passo 1: Download -->
+                            <div class="mb-5">
+                                <h6 class="text-uppercase fw-bold text-muted mb-3">
+                                    <i class="bi bi-download me-2"></i>1º Passo: Baixar Modelo
+                                </h6>
+                                <p class="text-muted mb-3">Baixe o modelo XLSX com as colunas corretas. Preencha com as informações a atualizar.</p>
+                                <a href="{% url 'vinculo-download-update-template' %}" class="btn btn-outline-primary btn-lg rounded-3">
+                                    <i class="bi bi-download me-2"></i> Baixar Modelo XLSX
+                                </a>
+                            </div>
+
+                            <hr class="my-5 opacity-20">
+
+                            <!-- Passo 2: Instruções -->
+                            <div class="mb-5">
+                                <h6 class="text-uppercase fw-bold text-muted mb-3">
+                                    <i class="bi bi-pencil-square me-2"></i>2º Passo: Preenchimento
+                                </h6>
+                                <div class="alert alert-info border-0">
+                                    <h6 class="fw-bold mb-3"><i class="bi bi-info-circle me-2"></i>Como funciona:</h6>
+                                    <ul class="mb-3">
+                                        <li><strong>EMPRESA</strong> — código folha da empresa (obrigatório)</li>
+                                        <li><strong>MATRICULA</strong> — identifica o vínculo (preferencial)</li>
+                                        <li><strong>CPF</strong> — usado como fallback quando não há matrícula</li>
+                                        <li><strong>Campos em branco são ignorados</strong> — preencha apenas o que deseja atualizar</li>
+                                    </ul>
+                                    <p class="mb-2 fw-bold">Campos atualizáveis:</p>
+                                    <div class="row g-2">
+                                        <div class="col-md-6">
+                                            <ul class="mb-0">
+                                                <li><strong>CARGO</strong> — texto livre</li>
+                                                <li><strong>MOTIVO_SAIDA</strong> — ver valores abaixo</li>
+                                                <li><strong>DATA_DEMISSAO</strong> — YYYY-MM-DD</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <ul class="mb-0">
+                                                <li><strong>SALARIO</strong> — ex: 3500.00</li>
+                                                <li><strong>OBSERVACOES</strong> — texto livre</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="mt-3 p-2 bg-white rounded border">
+                                        <small class="fw-bold text-muted d-block mb-1">Valores válidos para MOTIVO_SAIDA:</small>
+                                        <code class="small">transferencia &nbsp;|&nbsp; pedido_demissao &nbsp;|&nbsp; demissao_sem_justa_causa &nbsp;|&nbsp; demissao_justa_causa &nbsp;|&nbsp; outro</code>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="my-5 opacity-20">
+
+                            <!-- Passo 3: Upload -->
+                            <div class="mb-5">
+                                <h6 class="text-uppercase fw-bold text-muted mb-3">
+                                    <i class="bi bi-cloud-upload me-2"></i>3º Passo: Enviar Arquivo
+                                </h6>
+                                <form id="update-form" method="post" enctype="multipart/form-data">
+                                    {% csrf_token %}
+                                    <div class="mb-3">
+                                        <label for="update-file" class="form-label fw-bold">Selecione o arquivo XLSX</label>
+                                        <div class="input-group input-group-lg">
+                                            <input type="file" id="update-file" name="import_file" class="form-control" accept=".xlsx" required>
+                                            <button type="submit" class="btn btn-primary" id="update-btn" style="background: linear-gradient(135deg, #764ba2 0%, #4b2d7f 100%); border-color: #764ba2;">
+                                                <i class="bi bi-upload me-2"></i>Atualizar
+                                            </button>
+                                        </div>
+                                        <small class="form-text text-muted d-block mt-2">Apenas arquivos .XLSX são permitidos</small>
+                                    </div>
+                                </form>
+
+                                <!-- Progresso -->
+                                <div id="update-progress" style="display: none;" class="mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="spinner-border spinner-border-sm me-2" style="color: #764ba2;" role="status">
+                                            <span class="visually-hidden">Processando...</span>
+                                        </div>
+                                        <span>Processando arquivo...</span>
+                                    </div>
+                                </div>
+
+                                <!-- Resultados -->
+                                <div id="update-result" style="display: none;" class="mt-4">
+                                    <div class="alert alert-dismissible fade show" id="update-result-alert" role="alert">
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                        <h5 class="mb-3" id="update-result-title"></h5>
+                                        <div id="update-result-stats" class="mb-3"></div>
+                                        <div id="update-result-errors"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="card-footer bg-light border-top py-4">
+                            <div class="d-flex gap-3 justify-content-end">
+                                <a href="{% url 'funcionario-list' %}" class="btn btn-outline-secondary btn-lg rounded-3">
+                                    <i class="bi bi-arrow-left me-2"></i> Voltar para Lista
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Empresas Permitidas -->
+{% if empresas_permitidas %}
+<div class="modal fade" id="empresasModal" tabindex="-1" aria-labelledby="empresasModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="empresasModalLabel"><i class="bi bi-buildings me-2"></i>Empresas permitidas para você</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted">Consulte o código e o nome da empresa que você pode usar no arquivo de importação.</p>
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th style="width: 20%">Código</th>
+                                <th>Nome</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for empresa in empresas_permitidas %}
+                            <tr>
+                                <td class="fw-bold">{{ empresa.codigo_exibicao }}</td>
+                                <td>{{ empresa.nome }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="2" class="text-center text-muted py-3">Nenhuma empresa disponível para o seu usuário.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+    </div>
+{% endif %}
+
+<style>
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #005CA9 0%, #003A78 100%);
+    }
+
+    .bg-gradient-success {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    }
+    
+    .form-label {
+        color: #2c3e50;
+    }
+    
+    .form-control, .form-select {
+        border-radius: 0.5rem;
+        border: 1px solid #e0e0e0;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #005CA9;
+        box-shadow: 0 0 0 0.2rem rgba(0, 92, 169, 0.25);
+    }
+    
+    textarea.form-control {
+        min-height: 120px;
+        resize: vertical;
+    }
+
+    .nav-tabs {
+        border-bottom: 2px solid #e0e0e0;
+    }
+
+    .nav-tabs .nav-link {
+        color: #1a1a1a;
+        border-bottom: 3px solid transparent;
+        margin-bottom: -2px;
+        font-weight: 700;
+        background-color: #e9ecef;
+        border: 2px solid #ced4da;
+        border-bottom: none;
+        margin-right: 2px;
+    }
+
+    .nav-tabs .nav-link:hover {
+        color: #005CA9;
+        background-color: #e9ecef;
+        border-color: #dee2e6;
+    }
+
+    .nav-tabs .nav-link.active {
+        color: #fff;
+        background: linear-gradient(135deg, #005CA9 0%, #003A78 100%);
+        border-color: #005CA9;
+        border-bottom: none;
+    }
+
+    .bg-warning-light {
+        background-color: #fff8e1;
+    }
+
+    /* Estilos para botões com texto legível */
+    .btn-primary, .btn-success, .btn-danger, .btn-warning, .btn-info {
+        color: #fff !important;
+        font-weight: 600;
+    }
+
+    .btn-outline-primary {
+        color: #005CA9 !important;
+        border-color: #005CA9 !important;
+        font-weight: 600;
+    }
+
+    .btn-outline-primary:hover {
+        background-color: #005CA9 !important;
+        color: #fff !important;
+    }
+
+    .btn-outline-secondary {
+        color: #666 !important;
+        border-color: #666 !important;
+        font-weight: 600;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #666 !important;
+        color: #fff !important;
+    }
+
+    .btn-success {
+        background-color: #11998e !important;
+        border-color: #11998e !important;
+    }
+
+    .btn-success:hover {
+        background-color: #0e7566 !important;
+        border-color: #0e7566 !important;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Toggle motivo_saida visibility based on data_demissao
+        const demissaoInput = document.getElementById('{{ form.data_demissao.id_for_label }}');
+        const motivoWrapper = document.getElementById('motivo-saida-wrapper');
+        function toggleMotivo() {
+            if (demissaoInput && motivoWrapper) {
+                motivoWrapper.style.display = demissaoInput.value ? '' : 'none';
+            }
+        }
+        if (demissaoInput) {
+            demissaoInput.addEventListener('input', toggleMotivo);
+            toggleMotivo();
+        }
+
+        const form = document.getElementById('import-form');
+        const btn = document.getElementById('import-btn');
+        const progress = document.getElementById('import-progress');
+        const result = document.getElementById('import-result');
+        const alert = document.getElementById('import-alert');
+        const mainForm = document.getElementById('form');
+        const nascimentoInput = document.getElementById('{{ form.data_nascimento.id_for_label }}');
+        const nascimentoError = document.getElementById('{{ form.data_nascimento.id_for_label }}-error');
+
+        function showNascimentoError(message) {
+            if (!nascimentoInput) {
+                return;
+            }
+            nascimentoInput.classList.add('is-invalid');
+            if (nascimentoError) {
+                nascimentoError.textContent = message;
+                nascimentoError.style.display = 'block';
+            }
+        }
+
+        function clearNascimentoError() {
+            if (!nascimentoInput) {
+                return;
+            }
+            nascimentoInput.classList.remove('is-invalid');
+            if (nascimentoError) {
+                nascimentoError.textContent = '';
+                nascimentoError.style.display = 'none';
+            }
+        }
+
+        function validateNascimento() {
+            if (!nascimentoInput) {
+                return true;
+            }
+            const hasValue = Boolean(nascimentoInput.value);
+            const badInput = nascimentoInput.validity && nascimentoInput.validity.badInput;
+            const parsed = nascimentoInput.valueAsDate;
+
+            if (badInput || (hasValue && !parsed)) {
+                showNascimentoError('Data de nascimento invalida. Informe uma data real.');
+                return false;
+            }
+
+            clearNascimentoError();
+            return true;
+        }
+
+        if (nascimentoInput) {
+            nascimentoInput.addEventListener('input', clearNascimentoError);
+            nascimentoInput.addEventListener('blur', validateNascimento);
+        }
+
+        if (mainForm) {
+            mainForm.addEventListener('submit', function(e) {
+                if (!validateNascimento()) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            });
+        }
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const file = document.getElementById('import-file').files[0];
+            if (!file) {
+                alert.style.display = 'block';
+                alert.className = 'alert alert-danger alert-dismissible fade show border-0';
+                alert.innerHTML = '<button type="button" class="btn-close" data-bs-dismiss="alert"></button><i class="bi bi-exclamation-triangle me-2"></i>Por favor, selecione um arquivo.';
+                return;
+            }
+
+            // Mostrar progresso
+            progress.style.display = 'block';
+            result.style.display = 'none';
+            btn.disabled = true;
+
+            const formData = new FormData();
+            formData.append('import_file', file);
+            formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+
+            try {
+                const response = await fetch('{% url "funcionario-import" %}', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                // Verificar se a resposta é válida
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({ error: 'Erro desconhecido no servidor' }));
+                    throw new Error(errorData.error || `Erro HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                progress.style.display = 'none';
+
+                // Verificar se há dados válidos na resposta
+                if (!data) {
+                    throw new Error('Resposta inválida do servidor');
+                }
+
+                if (data.success) {
+                    showSuccessResult(data);
+                } else {
+                    showErrorResult(data);
+                }
+            } catch (error) {
+                progress.style.display = 'none';
+                alert.style.display = 'block';
+                alert.className = 'alert alert-danger alert-dismissible fade show border-0';
+                
+                // Mensagem de erro mais amigável
+                let errorMessage = 'Erro ao processar arquivo. ';
+                if (error.message) {
+                    errorMessage += error.message;
+                } else {
+                    errorMessage += 'Verifique se o arquivo está no formato correto e tente novamente.';
+                }
+                
+                alert.innerHTML = `
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    <h6 class="mb-2"><i class="bi bi-exclamation-triangle-fill me-2"></i>Erro na Importação</h6>
+                    <p class="mb-0">${errorMessage}</p>
+                    <small class="d-block mt-2 text-muted">Se o problema persistir, entre em contato com o suporte.</small>
+                `;
+            } finally {
+                btn.disabled = false;
+            }
+        });
+
+        function showSuccessResult(data) {
+            result.style.display = 'block';
+            const resultAlert = document.getElementById('result-alert');
+            const resultTitle = document.getElementById('result-title');
+            const resultStats = document.getElementById('result-stats');
+            const resultErrors = document.getElementById('result-errors');
+            const successActions = document.getElementById('success-actions');
+
+            resultAlert.className = 'alert alert-success alert-dismissible fade show border-0';
+            resultTitle.innerHTML = '<i class="bi bi-check-circle me-2"></i>' + data.message;
+
+            resultStats.innerHTML = `
+                <div class="row">
+                    <div class="col-md-3">
+                        <strong>Total de linhas:</strong> ${data.total}
+                    </div>
+                    <div class="col-md-3">
+                        <strong><span class="text-success">✓ Importados:</span></strong> ${data.success_count}
+                    </div>
+                    <div class="col-md-3">
+                        <strong><span class="text-danger">✗ Erros:</span></strong> ${data.error_count}
+                    </div>
+                </div>
+            `;
+
+            if (data.errors && data.errors.length > 0) {
+                resultErrors.innerHTML = '<h6 class="mt-3 mb-2">Erros encontrados:</h6><ul class="mb-0">' + 
+                    data.errors.map(e => '<li class="text-danger">' + e + '</li>').join('') + 
+                    '</ul>';
+            } else {
+                resultErrors.innerHTML = '';
+            }
+
+            // Mostrar botão de ação apenas se houver sucesso
+            if (data.success_count > 0) {
+                successActions.style.display = 'block';
+            }
+        }
+
+        function showErrorResult(data) {
+            result.style.display = 'block';
+            const resultAlert = document.getElementById('result-alert');
+            const resultTitle = document.getElementById('result-title');
+            const resultErrors = document.getElementById('result-errors');
+            const resultStats = document.getElementById('result-stats');
+
+            resultAlert.className = 'alert alert-danger alert-dismissible fade show border-0';
+            resultTitle.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-2"></i>Falha na Importação';
+            resultStats.innerHTML = '';
+            
+            // Melhorar a exibição de erros
+            let errorHtml = '';
+            if (data.error) {
+                errorHtml = `
+                    <div class="mb-3">
+                        <strong>Erro:</strong>
+                        <p class="mb-0 mt-2">${data.error}</p>
+                    </div>
+                `;
+            }
+            
+            if (data.errors && data.errors.length > 0) {
+                errorHtml += `
+                    <div class="mt-3">
+                        <strong>Detalhes dos erros:</strong>
+                        <ul class="mt-2 mb-0">
+                            ${data.errors.map(e => '<li class="text-danger">' + e + '</li>').join('')}
+                        </ul>
+                    </div>
+                `;
+            }
+            
+            if (!errorHtml) {
+                errorHtml = '<p class="mb-0">Erro desconhecido. Por favor, verifique o arquivo e tente novamente.</p>';
+            }
+            
+            resultErrors.innerHTML = errorHtml;
+        }
+        // ── Aba Atualizar Vínculos em Lote ──────────────────────────────────────
+        const updateForm = document.getElementById('update-form');
+        const updateBtn = document.getElementById('update-btn');
+        const updateProgress = document.getElementById('update-progress');
+        const updateResult = document.getElementById('update-result');
+        const updateAlert = document.getElementById('update-alert');
+
+        if (updateForm) {
+            updateForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const file = document.getElementById('update-file').files[0];
+                if (!file) {
+                    updateAlert.style.display = 'block';
+                    updateAlert.className = 'alert alert-danger alert-dismissible fade show border-0';
+                    updateAlert.innerHTML = '<button type="button" class="btn-close" data-bs-dismiss="alert"></button><i class="bi bi-exclamation-triangle me-2"></i>Por favor, selecione um arquivo.';
+                    return;
+                }
+                updateProgress.style.display = 'block';
+                updateResult.style.display = 'none';
+                updateBtn.disabled = true;
+
+                const formData = new FormData();
+                formData.append('import_file', file);
+                formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+
+                try {
+                    const response = await fetch('{% url "vinculo-bulk-update" %}', { method: 'POST', body: formData });
+                    updateProgress.style.display = 'none';
+                    if (!response.ok) {
+                        const err = await response.json().catch(() => ({ error: 'Erro desconhecido no servidor' }));
+                        throw new Error(err.error || `Erro HTTP ${response.status}`);
+                    }
+                    const data = await response.json();
+                    showUpdateResult(data);
+                } catch (error) {
+                    updateProgress.style.display = 'none';
+                    updateAlert.style.display = 'block';
+                    updateAlert.className = 'alert alert-danger alert-dismissible fade show border-0';
+                    updateAlert.innerHTML = `<button type="button" class="btn-close" data-bs-dismiss="alert"></button><h6 class="mb-2"><i class="bi bi-exclamation-triangle-fill me-2"></i>Erro</h6><p class="mb-0">${error.message}</p>`;
+                } finally {
+                    updateBtn.disabled = false;
+                }
+            });
+        }
+
+        function showUpdateResult(data) {
+            updateResult.style.display = 'block';
+            const resultAlert = document.getElementById('update-result-alert');
+            const resultTitle = document.getElementById('update-result-title');
+            const resultStats = document.getElementById('update-result-stats');
+            const resultErrors = document.getElementById('update-result-errors');
+
+            resultAlert.className = data.success
+                ? 'alert alert-success alert-dismissible fade show border-0'
+                : 'alert alert-warning alert-dismissible fade show border-0';
+            resultTitle.innerHTML = (data.success ? '<i class="bi bi-check-circle me-2"></i>' : '<i class="bi bi-exclamation-triangle me-2"></i>') + data.message;
+            resultStats.innerHTML = `
+                <div class="row">
+                    <div class="col-md-4"><strong>Total de linhas:</strong> ${data.total}</div>
+                    <div class="col-md-4"><strong><span class="text-success">✓ Atualizados:</span></strong> ${data.success_count}</div>
+                    <div class="col-md-4"><strong><span class="text-danger">✗ Erros:</span></strong> ${data.error_count}</div>
+                </div>`;
+            if (data.errors && data.errors.length > 0) {
+                resultErrors.innerHTML = '<h6 class="mt-3 mb-2">Detalhes dos erros:</h6><ul class="mb-0">'
+                    + data.errors.map(e => '<li class="text-danger">' + e + '</li>').join('')
+                    + '</ul>';
+            } else {
+                resultErrors.innerHTML = '';
+            }
+        }
+
+        // Abre aba correta via query string ?tab=atualizacao
+        const urlParams = new URLSearchParams(window.location.search);
+        const tabParam = urlParams.get('tab');
+        if (tabParam) {
+            const tabBtn = document.getElementById(tabParam + '-tab');
+            if (tabBtn) {
+                const bsTab = new bootstrap.Tab(tabBtn);
+                bsTab.show();
+            }
+        }
+    });
+</script>
+{% endblock %}

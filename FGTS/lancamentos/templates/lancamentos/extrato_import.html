@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Importar Extrato Analítico CEF{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+
+            <!-- Header -->
+            <div class="mb-3">
+                <h1 class="h4 fw-bold text-dark">
+                    <i class="bi bi-bank text-success me-2"></i>
+                    Importar Extrato Analítico — CEF
+                </h1>
+                <p class="text-muted mb-0 small">
+                    Confirme os depósitos de FGTS realizados pela empresa com base no Extrato Analítico emitido pela Caixa Econômica Federal.
+                </p>
+            </div>
+
+            <!-- Info -->
+            <div class="alert border-0 small py-2 mb-4" style="background:#E8F5E9; border-left:4px solid #388E3C !important; border-radius:6px;">
+                <strong>O que este importador faz:</strong>
+                <ul class="mb-0 mt-1">
+                    <li>Lê o arquivo XLSX do Extrato Analítico FGTS (CEF / Conectividade Social)</li>
+                    <li>Localiza os lançamentos correspondentes na plataforma (por PIS + CNPJ ou por Matrícula)</li>
+                    <li>Marca cada lançamento como <strong>Pago — confirmado pela CEF</strong></li>
+                </ul>
+                <p class="mb-0 mt-2">
+                    Lançamentos confirmados pelo Extrato exibem o badge
+                    <span class="badge bg-success-subtle text-success border border-success-subtle">✓ CEF</span>
+                    na lista de lançamentos.
+                </p>
+            </div>
+
+            {% if erro %}
+            <div class="alert alert-danger d-flex gap-2">
+                <i class="bi bi-x-circle-fill flex-shrink-0 mt-1"></i>
+                <div>{{ erro }}</div>
+            </div>
+            {% endif %}
+
+            <!-- Formulário -->
+            <div class="card border-0 shadow-lg">
+                <div class="card-header text-white py-3 border-0" style="background: linear-gradient(135deg, #2E7D32 0%, #1B5E20 100%);">
+                    <h2 class="h6 mb-0">
+                        <i class="bi bi-upload me-2"></i>
+                        Upload do Extrato Analítico
+                    </h2>
+                </div>
+
+                <form method="post" enctype="multipart/form-data" class="card-body p-4" id="extrato-form">
+                    {% csrf_token %}
+
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold">Arquivo XLSX do Extrato Analítico *</label>
+                        <div class="border border-2 border-dashed rounded-3 p-4 text-center bg-light" id="drop-zone">
+                            <i class="bi bi-file-earmark-spreadsheet fs-2 text-muted d-block mb-2"></i>
+                            <div class="text-muted small">
+                                <label for="file" class="fw-semibold text-success" style="cursor:pointer;">
+                                    Selecione o arquivo XLSX
+                                    <input id="file" name="file" type="file"
+                                           accept=".xlsx,.XLSX"
+                                           required class="d-none"
+                                           onchange="updateFileName(this)">
+                                </label>
+                                <span> ou arraste para esta área</span>
+                            </div>
+                            <p class="text-secondary mt-1 mb-0 small">Apenas arquivos .xlsx do Extrato Analítico da CEF</p>
+                            <p id="file-name" class="text-success fw-semibold mt-1 mb-0"></p>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                        <a href="{% url 'lancamento-list' %}" class="btn btn-outline-secondary rounded-3">
+                            <i class="bi bi-x-circle me-1"></i> Cancelar
+                        </a>
+                        <button type="submit" id="btn-submit" class="btn rounded-3 d-inline-flex align-items-center text-white"
+                                style="background:#2E7D32;">
+                            <i class="bi bi-upload me-2"></i>
+                            <span id="btn-text">Carregar e verificar</span>
+                        </button>
+                    </div>
+
+                    <div id="progress-container" class="mt-3 d-none">
+                        <div class="alert border-0 d-flex align-items-center" style="background:#E8F5E9;">
+                            <div class="spinner-border spinner-border-sm me-3" style="color:#2E7D32;" role="status"></div>
+                            <div>
+                                <strong>Analisando extrato...</strong>
+                                <p class="mb-0 small text-muted">Aguarde enquanto verificamos os depósitos.</p>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<style>.border-dashed { border-style: dashed !important; }</style>
+
+<script>
+function updateFileName(input) {
+    const name = input.files && input.files[0] ? input.files[0].name : '';
+    document.getElementById('file-name').textContent = name ? 'Arquivo: ' + name : '';
+}
+
+document.getElementById('extrato-form').addEventListener('submit', function () {
+    const btn = document.getElementById('btn-submit');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processando...';
+    document.getElementById('progress-container').classList.remove('d-none');
+});
+
+const zone = document.getElementById('drop-zone');
+const input = document.getElementById('file');
+zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('border-success'); });
+zone.addEventListener('dragleave', () => zone.classList.remove('border-success'));
+zone.addEventListener('drop', e => {
+    e.preventDefault();
+    zone.classList.remove('border-success');
+    if (e.dataTransfer.files.length) { input.files = e.dataTransfer.files; updateFileName(input); }
+});
+</script>
+{% endblock %}

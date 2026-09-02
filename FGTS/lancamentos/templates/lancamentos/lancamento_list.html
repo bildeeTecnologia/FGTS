@@ -1,0 +1,810 @@
+{% extends "base.html" %}
+{% load lancamento_extras %}
+{% block title %}Lançamentos - FGTS Web{% endblock %}
+
+{% block content %}
+<style>
+    /* Alinhamento e truncamento para coluna Funcionário */
+    th.col-funcionario, td.col-funcionario {
+        max-width: 220px;
+        min-width: 180px;
+        width: 220px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        vertical-align: middle;
+    }
+</style>
+<div class="container py-5">
+    <!-- Header Section -->
+    <div class="mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="fw-bold text-dark mb-1">
+                    <i class="bi bi-receipt text-primary"></i> Lançamentos Mensais
+                </h2>
+                <p class="text-muted mb-0">Controle de entradas mensais de FGTS por funcionário</p>
+            </div>
+            <div class="d-flex gap-2">
+                {% if pode_importar_re_sefip %}
+                <a href="{% url 're-import' %}" class="btn btn-outline-primary btn-lg rounded-3">
+                    <i class="bi bi-file-earmark-text me-2"></i> Importar RE/SEFIP
+                </a>
+                {% endif %}
+                {% if pode_importar_extrato_cef %}
+                <a href="{% url 'extrato-import' %}" class="btn btn-outline-success btn-lg rounded-3">
+                    <i class="bi bi-bank me-2"></i> Importar Extrato CEF
+                </a>
+                {% endif %}
+                <a href="{% url 'lancamento-import' %}" class="btn btn-success btn-lg rounded-3">
+                    <i class="bi bi-upload me-2"></i> Importar XLSX
+                </a>
+                <a href="{% url 'lancamento-create' %}" class="btn btn-primary btn-lg rounded-3">
+                    <i class="bi bi-plus-circle me-2"></i> Novo Lançamento
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row mb-4 g-3">
+        <div class="col-md-3">
+            <div class="card border-0 bg-light h-100">
+                <div class="card-body py-3 px-4">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-primary bg-opacity-10 rounded-3 p-3 me-3">
+                            <i class="bi bi-file-earmark text-primary fs-5"></i>
+                        </div>
+                        <div>
+                            <small class="text-muted">Total Lançamentos</small>
+                            <h5 class="mb-0 fw-bold">{{ lancamentos|length }}</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 bg-light h-100">
+                <div class="card-body py-3 px-4">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-success bg-opacity-10 rounded-3 p-3 me-3">
+                            <i class="bi bi-cash-coin text-success fs-5"></i>
+                        </div>
+                        <div>
+                            <small class="text-muted">Última Atualização</small>
+                            <h5 class="mb-0 fw-bold">
+                                {% if ultima_atualizacao_indices_fgts %}
+                                    {{ ultima_atualizacao_indices_fgts|date:'d/m/Y' }}
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 bg-light h-100">
+                <div class="card-body py-3 px-4">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-info bg-opacity-10 rounded-3 p-3 me-3">
+                            <i class="bi bi-calendar-event text-info fs-5"></i>
+                        </div>
+                        <div>
+                            <small class="text-muted">Mês em Processamento</small>
+                            <h5 class="mb-0 fw-bold">{{ mes_atual|default:"—" }}</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 bg-light h-100">
+                <div class="card-body py-3 px-4">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-warning bg-opacity-10 rounded-3 p-3 me-3">
+                            <i class="bi bi-exclamation-triangle text-warning fs-5"></i>
+                        </div>
+                        <div>
+                            <small class="text-muted">Pendentes</small>
+                            <h5 class="mb-0 fw-bold">{{ pendentes|default:0 }}</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Card -->
+    <div class="card border-0 shadow-lg">
+        <!-- Header -->
+        <div class="card-header bg-gradient-primary text-white py-4 border-0">
+            <h5 class="mb-0 fw-bold">
+                <i class="bi bi-list-ul me-2"></i>Listagem Completa
+            </h5>
+        </div>
+
+        <!-- Body -->
+        <div class="card-body p-4">
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show border-0" role="alert">
+                    <i class="bi bi-check-circle me-2"></i>
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endfor %}
+            {% endif %}
+
+            <!-- Filtros -->
+            <div class="card bg-light border-0 mb-4">
+                <div class="card-body p-3">
+                    <h6 class="card-title mb-3 fw-bold">
+                        <i class="bi bi-funnel me-2"></i>Filtros e Ordenação
+                    </h6>
+                    <form method="get" class="row g-3" id="filtrosLancamentoForm">
+                        <div class="col-md-3">
+                            <label for="empresa" class="form-label small fw-bold">Empresa</label>
+                            <select class="form-select form-select-sm" id="empresa" name="empresa">
+                                <option value="">-- Todas --</option>
+                                {% for e in empresas %}
+                                    <option value="{{ e.id }}" {% if e.id|stringformat:"s" == empresa_filtro %}selected{% endif %}>
+                                        {{ e.nome }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="matricula" class="form-label small fw-bold">Matrícula</label>
+                            <input type="text" class="form-control form-control-sm" id="matricula" name="matricula"
+                                   placeholder="Ex: 10293" value="{{ matricula_filtro }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="funcionario_display" class="form-label small fw-bold">Funcionário</label>
+                            <div class="autocomplete-wrapper position-relative">
+                                <input type="text" class="form-control form-control-sm" id="funcionario_display"
+                                       placeholder="Selecione uma empresa primeiro" autocomplete="off" disabled>
+                                <input type="hidden" id="funcionario" name="funcionario" value="{{ funcionario_filtro }}">
+                                <div id="funcionario_dropdown" class="autocomplete-dropdown list-group position-absolute d-none"
+                                     style="z-index:1050;max-height:220px;overflow-y:auto;width:100%;top:100%;left:0;"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="competencia" class="form-label small fw-bold">Competência</label>
+                            <input type="text" class="form-control form-control-sm" id="competencia" name="competencia"
+                                   placeholder="MM/YYYY" value="{{ competencia_filtro }}" maxlength="7">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="ano" class="form-label small fw-bold">Ano</label>
+                                <select class="form-select form-select-sm" id="ano" name="ano">
+                                    <option value="">-- Todos --</option>
+                                    {% for ano in anos_todos %}
+                                        <option value="{{ ano }}" {% if ano_filtro == ano %}selected{% endif %}>{{ ano }}</option>
+                                    {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="fonte_confirmacao" class="form-label small fw-bold">Fonte Pgto</label>
+                            <select class="form-select form-select-sm" id="fonte_confirmacao" name="fonte_confirmacao">
+                                <option value="">-- Todas --</option>
+                                <option value="nao_pago" {% if fonte_confirmacao_filtro == 'nao_pago' %}selected{% endif %}>Não Pago</option>
+                                <option value="manual" {% if fonte_confirmacao_filtro == 'manual' %}selected{% endif %}>Manual</option>
+                                <option value="extrato_analitico" {% if fonte_confirmacao_filtro == 'extrato_analitico' %}selected{% endif %}>✓ CEF</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="ordem" class="form-label small fw-bold">Ordenação</label>
+                            <select class="form-select form-select-sm" id="ordem" name="ordem">
+                                <option value="-competencia" {% if ordem_filtro == '-competencia' %}selected{% endif %}>Competência (↓)</option>
+                                <option value="competencia_asc" {% if ordem_filtro == 'competencia_asc' %}selected{% endif %}>Competência (↑)</option>
+                                <option value="ano_desc" {% if ordem_filtro == 'ano_desc' %}selected{% endif %}>Ano (↓)</option>
+                                <option value="ano_asc" {% if ordem_filtro == 'ano_asc' %}selected{% endif %}>Ano (↑)</option>
+                                <option value="funcionario_asc" {% if ordem_filtro == 'funcionario_asc' %}selected{% endif %}>Funcionário A-Z</option>
+                                <option value="funcionario_desc" {% if ordem_filtro == 'funcionario_desc' %}selected{% endif %}>Funcionário Z-A</option>
+                            </select>
+                        </div>
+                        <div class="col-12 d-flex gap-2 align-items-end">
+                            <button type="submit" class="btn btn-sm btn-primary">
+                                <i class="bi bi-search me-1"></i>Filtrar
+                            </button>
+                            <a href="{% url 'lancamento-list' %}" class="btn btn-sm btn-secondary">
+                                <i class="bi bi-arrow-clockwise me-1"></i>Limpar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            {% if lancamentos %}
+            <!-- Toolbar de ações em massa -->
+            {% if relatorio_bloqueado %}
+            <div class="alert alert-warning d-flex align-items-center mb-2" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <div>Relatório desabilitado: {{ relatorio_bloqueio_motivo|default:"Trial expirado e nenhum plano ativo. Assine um plano para gerar relatórios." }}</div>
+            </div>
+            {% endif %}
+            <!-- Toolbar de ações em massa deve ficar fora do <form> de filtros para evitar submit acidental -->
+            </div>
+            <div class="bg-light border-bottom p-3 d-flex justify-content-between align-items-center" id="toolbarLancamentoAcoes">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="selectAll">
+                    <label class="form-check-label fw-bold" for="selectAll">
+                        Selecionar Todos
+                    </label>
+                    <span class="badge bg-primary ms-2" id="selectedCount">0 selecionados</span>
+                </div>
+                <div class="d-flex gap-2">
+                    <button
+                        type="button"
+                        class="btn btn-success"
+                        id="gerarRelatorioBtn"
+                        data-bloqueado="{% if relatorio_bloqueado %}1{% else %}0{% endif %}"
+                        data-bloqueio-motivo="{{ relatorio_bloqueio_motivo|default:"Trial expirado e nenhum plano ativo. Assine um plano para gerar relatórios."|escape }}"
+                        {% if relatorio_bloqueado %}disabled{% endif %}
+                    >
+                        <i class="bi bi-file-earmark-bar-graph me-2"></i>Gerar Relatório
+                    </button>
+                    <button
+                        type="button"
+                        class="btn btn-danger"
+                        id="excluirSelecionadosBtn"
+                        disabled
+                    >
+                        <i class="bi bi-trash me-2"></i>Excluir Selecionados
+                    </button>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="bg-light border-bottom border-2">
+                        <tr>
+                            <th class="py-3 px-4 fw-bold text-dark" style="width: 40px;">
+                                <i class="bi bi-check-square"></i>
+                            </th>
+                            <th class="py-3 px-4 fw-bold text-dark" style="width: 110px;">Competência</th>
+                            <th class="py-3 px-4 fw-bold text-dark col-funcionario">Funcionário</th>
+                            <th class="py-3 px-4 fw-bold text-dark" style="width: 180px;">Empresa</th>
+                            <th class="py-3 px-4 fw-bold text-dark text-end" style="width: 120px;">Base FGTS</th>
+                            <th class="py-3 px-4 fw-bold text-dark" style="width: 110px;">Status Pgto</th>
+                            <th class="py-3 px-4 fw-bold text-dark" style="width: 110px;">Criado em</th>
+                            <th class="py-3 px-4 fw-bold text-dark" style="width: 120px;">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody class="border-top-0">
+                        {% for lancamento in lancamentos %}
+                        <tr class="align-middle">
+                            <td class="py-3 px-4">
+                                <div class="form-check">
+                                    <input class="form-check-input lancamento-checkbox" type="checkbox" 
+                                           value="{{ lancamento.id }}" 
+                                           data-empresa="{{ lancamento.empresa.pk }}"
+                                           data-competencia="{{ lancamento.competencia }}">
+                                </div>
+                            </td>
+                            <td class="py-3 px-4">
+                                <span class="badge bg-info text-dark fw-bold">{{ lancamento.competencia }}</span>
+                                {% if lancamento.is_duplicate %}
+                                    <span class="badge bg-danger ms-1">Duplicado</span>
+                                {% endif %}
+                                {% if lancamento.parcela_13 %}
+                                    <span class="badge bg-warning text-dark ms-1">
+                                        13º - {{ lancamento.parcela_13 }}ª parcela
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="py-3 px-4 col-funcionario">
+                                <div class="fw-bold text-dark">
+                                    {{ lancamento.funcionario.nome }}
+                                </div>
+                                <small class="text-muted">{{ lancamento.funcionario.cpf }}</small>
+                                {% if lancamento.vinculo %}
+                                    <small class="text-muted d-block">Matrícula: {{ lancamento.vinculo.matricula|default:lancamento.vinculo.id }}</small>
+                                {% endif %}
+                            </td>
+                            <td class="py-3 px-4" style="max-width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                <div class="fw-bold text-dark" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                    {{ lancamento.empresa.nome }}
+                                </div>
+                                <small class="text-muted">{{ lancamento.empresa.cnpj }}</small>
+                            </td>
+                            <td class="py-3 px-4 text-end">
+                                <span class="fw-bold text-success">R$ {{ lancamento.base_fgts|brl }}</span>
+                            </td>
+                            <td class="py-3 px-4">
+                                {% if lancamento.pago %}
+                                    <span class="badge bg-success rounded-pill" title="Pago em {{ lancamento.data_pagto|date:'d/m/Y'|default:'N/A' }}">
+                                        <i class="bi bi-check-circle me-1"></i>Pago
+                                    </span>
+                                    {% if lancamento.fonte_confirmacao_pagamento == 'extrato_analitico' %}
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle ms-1" title="Confirmado pelo Extrato Analítico CEF">✓ CEF</span>
+                                    {% elif lancamento.fonte_confirmacao_pagamento == 'manual' %}
+                                        <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle ms-1" title="Marcado manualmente">Manual</span>
+                                    {% endif %}
+                                    {% if lancamento.pago_em %}
+                                        <small class="text-muted d-block mt-1" style="font-size: 0.7rem;">
+                                            {{ lancamento.pago_em|date:"d/m/Y" }}
+                                        </small>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="badge bg-danger rounded-pill">
+                                        <i class="bi bi-x-circle me-1"></i>Não Pago
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="py-3 px-4 text-muted text-nowrap">
+                                {{ lancamento.criado_em|date:"d/m/Y" }}
+                            </td>
+                            <td class="py-3 px-4">
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="{% url 'lancamento-update' lancamento.id %}" class="btn btn-outline-primary" title="Editar" data-bs-toggle="tooltip">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form method="post" action="{% url 'lancamento-delete' lancamento.id %}" style="display: inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-outline-danger" title="Excluir" data-bs-toggle="tooltip" onclick="return confirm('Excluir lançamento {{ lancamento.competencia }} de {{ lancamento.funcionario.nome }}?');">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            {% if is_paginated %}
+            <nav class="mt-4" aria-label="Paginação">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?{% if empresa_filtro %}empresa={{ empresa_filtro }}&{% endif %}{% if funcionario_filtro %}funcionario={{ funcionario_filtro }}&{% endif %}{% if matricula_filtro %}matricula={{ matricula_filtro }}&{% endif %}{% if competencia_filtro %}competencia={{ competencia_filtro }}&{% endif %}{% if ano_filtro %}ano={{ ano_filtro }}&{% endif %}{% if fonte_confirmacao_filtro %}fonte_confirmacao={{ fonte_confirmacao_filtro }}&{% endif %}{% if ordem_filtro %}ordem={{ ordem_filtro }}&{% endif %}page=1">Primeira</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?{% if empresa_filtro %}empresa={{ empresa_filtro }}&{% endif %}{% if funcionario_filtro %}funcionario={{ funcionario_filtro }}&{% endif %}{% if matricula_filtro %}matricula={{ matricula_filtro }}&{% endif %}{% if competencia_filtro %}competencia={{ competencia_filtro }}&{% endif %}{% if ano_filtro %}ano={{ ano_filtro }}&{% endif %}{% if fonte_confirmacao_filtro %}fonte_confirmacao={{ fonte_confirmacao_filtro }}&{% endif %}{% if ordem_filtro %}ordem={{ ordem_filtro }}&{% endif %}page={{ page_obj.previous_page_number }}">Anterior</a>
+                        </li>
+                    {% endif %}
+
+                    <li class="page-item active">
+                        <span class="page-link">
+                            Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                        </span>
+                    </li>
+
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?{% if empresa_filtro %}empresa={{ empresa_filtro }}&{% endif %}{% if funcionario_filtro %}funcionario={{ funcionario_filtro }}&{% endif %}{% if matricula_filtro %}matricula={{ matricula_filtro }}&{% endif %}{% if competencia_filtro %}competencia={{ competencia_filtro }}&{% endif %}{% if ano_filtro %}ano={{ ano_filtro }}&{% endif %}{% if fonte_confirmacao_filtro %}fonte_confirmacao={{ fonte_confirmacao_filtro }}&{% endif %}{% if ordem_filtro %}ordem={{ ordem_filtro }}&{% endif %}page={{ page_obj.next_page_number }}">Próxima</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?{% if empresa_filtro %}empresa={{ empresa_filtro }}&{% endif %}{% if funcionario_filtro %}funcionario={{ funcionario_filtro }}&{% endif %}{% if matricula_filtro %}matricula={{ matricula_filtro }}&{% endif %}{% if competencia_filtro %}competencia={{ competencia_filtro }}&{% endif %}{% if ano_filtro %}ano={{ ano_filtro }}&{% endif %}{% if fonte_confirmacao_filtro %}fonte_confirmacao={{ fonte_confirmacao_filtro }}&{% endif %}{% if ordem_filtro %}ordem={{ ordem_filtro }}&{% endif %}page={{ page_obj.paginator.num_pages }}">Última</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+
+            {% else %}
+            <div class="text-center py-5">
+                <div class="mb-4">
+                    <i class="bi bi-inbox fs-1 text-muted"></i>
+                </div>
+                <h5 class="text-dark mb-2">Nenhum lançamento registrado</h5>
+                <p class="text-muted mb-2">
+                    Nenhum lançamento foi encontrado para os filtros selecionados.<br>
+                    <strong>Se você cadastrou lançamentos e eles não aparecem, verifique se o funcionário possui vínculo ativo na empresa para a competência do lançamento.</strong>
+                </p>
+                <a href="{% url 'lancamento-create' %}" class="btn btn-primary btn-lg rounded-3">
+                    <i class="bi bi-plus-circle me-2"></i> Registrar Primeiro Lançamento
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Help Section -->
+    <div class="card border-0 bg-light mt-4">
+        <div class="card-body py-3 px-4">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-0">
+                        <i class="bi bi-lightbulb-fill text-warning me-2"></i>
+                        <strong>Herança Automática:</strong> Se você deixar a base FGTS em branco, o sistema utilizará o valor do mês anterior.
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <p class="mb-0">
+                        <i class="bi bi-info-circle-fill text-info me-2"></i>
+                        <strong>Campos obrigatórios:</strong> Empresa, Vínculo/Matrícula e Competência (MM/YYYY).
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #005CA9 0%, #003A78 100%);
+    }
+
+    .table tbody tr {
+        transition: background-color 0.2s ease;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    .btn-group-sm .btn {
+        padding: 0.4rem 0.7rem;
+    }
+</style>
+
+<script>
+    // Inicializar tooltips
+    document.addEventListener('DOMContentLoaded', function() {
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function(tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+
+        // Funcionalidade de seleção múltipla e geração de relatório
+        const selectAllCheckbox = document.getElementById('selectAll');
+        const lancamentoCheckboxes = Array.from(document.querySelectorAll('.lancamento-checkbox'));
+        const gerarRelatorioBtn = document.getElementById('gerarRelatorioBtn');
+        const selectedCountBadge = document.getElementById('selectedCount');
+        const selectedIdsKey = 'lancamentosSelecionados';
+        // Remove 'page' da query para que a seleção persista entre páginas
+        const _qp = new URLSearchParams(window.location.search);
+        _qp.delete('page');
+        const currentQuery = _qp.toString();
+        const storedSelection = JSON.parse(sessionStorage.getItem(selectedIdsKey) || '{}');
+        let selectedIds = new Set(storedSelection.query === currentQuery ? storedSelection.ids || [] : []);
+        const relatorioBloqueado = gerarRelatorioBtn ? gerarRelatorioBtn.dataset.bloqueado === '1' : false;
+        const bloqueioMotivo = gerarRelatorioBtn ? gerarRelatorioBtn.dataset.bloqueioMotivo : '';
+
+        function persistSelection() {
+            sessionStorage.setItem(selectedIdsKey, JSON.stringify({ query: currentQuery, ids: Array.from(selectedIds) }));
+        }
+
+        function syncPageCheckboxes() {
+            lancamentoCheckboxes.forEach(cb => {
+                cb.checked = selectedIds.has(cb.value);
+            });
+            const allOnPageSelected = lancamentoCheckboxes.length > 0 && lancamentoCheckboxes.every(cb => cb.checked);
+            if (selectAllCheckbox) {
+                selectAllCheckbox.checked = allOnPageSelected && selectedIds.size > 0;
+            }
+        }
+
+        function updateSelectedCount() {
+            const count = selectedIds.size;
+            selectedCountBadge.textContent = count + ' selecionado' + (count !== 1 ? 's' : '');
+            if (gerarRelatorioBtn) {
+                gerarRelatorioBtn.disabled = relatorioBloqueado || count === 0;
+            }
+            const excluirBtn = document.getElementById('excluirSelecionadosBtn');
+            if (excluirBtn) {
+                excluirBtn.disabled = count === 0;
+            }
+        }
+
+        // Marca checkboxes conforme seleção persistida
+        syncPageCheckboxes();
+        updateSelectedCount();
+
+        async function fetchAllIds() {
+            const paramsObj = new URLSearchParams(window.location.search);
+            paramsObj.delete('page'); // não limitar ao page atual
+            const qs = paramsObj.toString();
+            const suffix = qs ? `?${qs}` : '';
+            const resp = await fetch(`{% url 'lancamento-ids' %}${suffix}`);
+            if (!resp.ok) {
+                throw new Error('Falha ao buscar IDs.');
+            }
+            const data = await resp.json();
+            return data.ids || [];
+        }
+
+        if (selectAllCheckbox) {
+            selectAllCheckbox.addEventListener('change', async function() {
+                if (this.checked) {
+                    try {
+                        const ids = await fetchAllIds();
+                        selectedIds = new Set(ids.map(String));
+                        persistSelection();
+                        syncPageCheckboxes();
+                        updateSelectedCount();
+                    } catch (e) {
+                        alert('Não foi possível selecionar todos. Tente novamente.');
+                        this.checked = false;
+                    }
+                } else {
+                    selectedIds.clear();
+                    persistSelection();
+                    syncPageCheckboxes();
+                    updateSelectedCount();
+                }
+            });
+        }
+
+        lancamentoCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                if (this.checked) {
+                    selectedIds.add(this.value);
+                } else {
+                    selectedIds.delete(this.value);
+                }
+                persistSelection();
+                updateSelectedCount();
+            });
+        });
+
+        if (gerarRelatorioBtn) {
+            gerarRelatorioBtn.addEventListener('click', function() {
+                if (relatorioBloqueado) {
+                    alert(bloqueioMotivo || 'Relatórios estão desabilitados até que um plano seja contratado.');
+                    return;
+                }
+
+                if (selectedIds.size === 0) {
+                    alert('Selecione pelo menos um lançamento.');
+                    return;
+                }
+
+                const ids = Array.from(selectedIds);
+
+                // Verificar se todos são da mesma empresa usando checkboxes visíveis (melhor esforço)
+                const empresas = new Set(
+                    lancamentoCheckboxes
+                        .filter(cb => ids.includes(cb.value))
+                        .map(cb => cb.dataset.empresa)
+                );
+                if (empresas.size > 1) {
+                    if (!confirm('Os lançamentos selecionados são de empresas diferentes. Deseja continuar?')) {
+                        return;
+                    }
+                }
+
+                function submeterRelatorio() {
+                    document.getElementById('inputRelatorioIds').value = ids.join(',');
+                    document.getElementById('loadingOverlayRelatorio').classList.remove('d-none');
+                    document.getElementById('formRelatorioIds').submit();
+                }
+
+                if (ids.length > 300) {
+                    document.getElementById('relatorioVolumeMensagem').textContent =
+                        `Você selecionou ${ids.length} lançamentos. Relatórios com grande volume podem levar alguns segundos para serem calculados. Deseja continuar?`;
+                    const modalVolume = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalRelatorioVolume'));
+                    document.getElementById('confirmarRelatorioVolumeBtn').onclick = function() {
+                        modalVolume.hide();
+                        submeterRelatorio();
+                    };
+                    modalVolume.show();
+                } else {
+                    submeterRelatorio();
+                }
+            });
+        }
+
+        // Exclusão em lote
+        const excluirSelecionadosBtn = document.getElementById('excluirSelecionadosBtn');
+        const modalExcluirSelecionados = document.getElementById('modalExcluirSelecionados');
+        const excluirSelecionadosCount = document.getElementById('excluirSelecionadosCount');
+        const confirmarExcluirSelecionadosBtn = document.getElementById('confirmarExcluirSelecionadosBtn');
+        const excluirSelecionadosErro = document.getElementById('excluirSelecionadosErro');
+        // Usar getOrCreateInstance evita dupla inicialização do mesmo elemento
+        const excluirModalInstance = modalExcluirSelecionados
+            ? bootstrap.Modal.getOrCreateInstance(modalExcluirSelecionados)
+            : null;
+
+        if (excluirSelecionadosBtn) {
+            excluirSelecionadosBtn.addEventListener('click', function() {
+                excluirSelecionadosCount.textContent = selectedIds.size;
+                excluirSelecionadosErro.classList.add('d-none');
+                if (excluirModalInstance) excluirModalInstance.show();
+            });
+        }
+
+        if (confirmarExcluirSelecionadosBtn) {
+            confirmarExcluirSelecionadosBtn.addEventListener('click', async function() {
+                confirmarExcluirSelecionadosBtn.disabled = true;
+                excluirSelecionadosErro.classList.add('d-none');
+                try {
+                    const ids = Array.from(selectedIds);
+                    const resp = await fetch('/lancamentos/bulk-delete/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-CSRFToken': (document.querySelector('[name=csrfmiddlewaretoken]') || {}).value || ''
+                        },
+                        body: ids.map(id => 'ids[]=' + encodeURIComponent(id)).join('&')
+                    });
+                    const data = await resp.json();
+                    if (data.success) {
+                        // Remover IDs excluídos da seleção
+                        ids.forEach(id => selectedIds.delete(id));
+                        persistSelection();
+                        if (excluirModalInstance) excluirModalInstance.hide();
+                        // Recarregar página para refletir exclusão
+                        window.location.reload();
+                    } else {
+                        excluirSelecionadosErro.textContent = (data.errors || ['Erro desconhecido']).join('\n');
+                        excluirSelecionadosErro.classList.remove('d-none');
+                    }
+                } catch (e) {
+                    excluirSelecionadosErro.textContent = 'Erro ao excluir lançamentos.';
+                    excluirSelecionadosErro.classList.remove('d-none');
+                } finally {
+                    confirmarExcluirSelecionadosBtn.disabled = false;
+                }
+            });
+        }
+    });
+
+    // Autocomplete de funcionário com cascata empresa → funcionário
+    (function () {
+        var AUTOCOMPLETE_URL = '{% url "funcionarios-autocomplete" %}';
+        var empresaEl   = document.getElementById('empresa');
+        var displayEl   = document.getElementById('funcionario_display');
+        var hiddenEl    = document.getElementById('funcionario');
+        var dropdownEl  = document.getElementById('funcionario_dropdown');
+        if (!empresaEl || !displayEl || !hiddenEl || !dropdownEl) return;
+
+        var debounceTimer = null;
+
+        function setPlaceholder() {
+            displayEl.placeholder = empresaEl.value ? 'Digite para buscar...' : 'Selecione uma empresa ou busque em todas';
+            displayEl.disabled = false;
+        }
+
+        function hideDropdown() {
+            dropdownEl.classList.add('d-none');
+            dropdownEl.innerHTML = '';
+        }
+
+        function showResults(results) {
+            dropdownEl.innerHTML = '';
+            if (!results || !results.length) {
+                var empty = document.createElement('div');
+                empty.className = 'list-group-item text-muted small py-2 px-3';
+                empty.textContent = 'Nenhum funcionário encontrado';
+                dropdownEl.appendChild(empty);
+            } else {
+                results.forEach(function (r) {
+                    var item = document.createElement('button');
+                    item.type = 'button';
+                    item.className = 'list-group-item list-group-item-action small py-2';
+                    item.textContent = r.label;
+                    item.addEventListener('mousedown', function (e) {
+                        e.preventDefault();
+                        displayEl.value = r.label;
+                        hiddenEl.value = r.id;
+                        hideDropdown();
+                    });
+                    dropdownEl.appendChild(item);
+                });
+            }
+            dropdownEl.classList.remove('d-none');
+        }
+
+        function fetchSuggestions(q) {
+            var url = AUTOCOMPLETE_URL + '?q=' + encodeURIComponent(q);
+            if (empresaEl.value) url += '&empresa_id=' + encodeURIComponent(empresaEl.value);
+            fetch(url)
+                .then(function (r) {
+                    if (!r.ok) { showResults([]); return null; }
+                    return r.json();
+                })
+                .then(function (data) { if (data !== null) showResults(data); })
+                .catch(function (err) {
+                    console.error('[Autocomplete] Erro:', err);
+                    showResults([]);
+                });
+        }
+
+        displayEl.addEventListener('input', function () {
+            var q = this.value.trim();
+            hiddenEl.value = '';
+            clearTimeout(debounceTimer);
+            if (q.length < 2) { hideDropdown(); return; }
+            debounceTimer = setTimeout(function () { fetchSuggestions(q); }, 150);
+        });
+
+        displayEl.addEventListener('blur', function () {
+            setTimeout(hideDropdown, 300);
+        });
+
+        empresaEl.addEventListener('change', function () {
+            displayEl.value = '';
+            hiddenEl.value = '';
+            hideDropdown();
+            setPlaceholder();
+        });
+
+        setPlaceholder();
+    })();
+</script>
+
+<!-- Modal de confirmação de exclusão em lote — deve ser filho direto do body (fora de qualquer overflow/transform) -->
+<div class="modal fade" id="modalExcluirSelecionados" tabindex="-1" aria-labelledby="modalExcluirSelecionadosLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header" style="background: #dc3545 !important; color: #fff !important;">
+        <h5 class="modal-title" id="modalExcluirSelecionadosLabel">
+          <i class="bi bi-trash me-2"></i>Excluir Lançamentos Selecionados
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+      <div class="modal-body">
+        <p>Tem certeza que deseja excluir <span id="excluirSelecionadosCount">0</span> lançamentos selecionados? Esta ação não pode ser desfeita.</p>
+        <div class="alert alert-warning d-none" id="excluirSelecionadosErro"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-danger" id="confirmarExcluirSelecionadosBtn">Excluir</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Form oculto para enviar IDs via POST (evita limite de URL com seleções grandes) -->
+<form id="formRelatorioIds" method="post" action="{% url 'relatorio-por-ids' %}" class="d-none">
+    {% csrf_token %}
+    <input type="hidden" name="ids" id="inputRelatorioIds">
+    <input type="hidden" name="agrupamento" value="competencia">
+</form>
+
+<!-- Loading overlay para geração de relatório -->
+<div id="loadingOverlayRelatorio" class="d-none" style="position: fixed; inset: 0; background: rgba(255,255,255,0.82); z-index: 1060; display: flex; align-items: center; justify-content: center;">
+    <div class="text-center" style="max-width: 480px;">
+        <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;" role="status">
+            <span class="visually-hidden">Carregando...</span>
+        </div>
+        <div class="fw-semibold text-dark fs-5">Gerando relatório, aguarde...</div>
+        <div class="text-muted small mt-1">Calculando valores atualizados de FGTS</div>
+        <div id="overlayAvisoLento" class="d-none mt-3 p-3 rounded" style="background: #fff3cd; border: 1px solid #ffc107;">
+            <i class="bi bi-clock-history me-1 text-warning"></i>
+            <span class="small text-dark">O volume é grande e o cálculo está demorando. O sistema vai retornar o máximo que conseguir processar dentro do tempo disponível.</span>
+        </div>
+    </div>
+</div>
+<script>
+(function() {
+    var overlay = document.getElementById('loadingOverlayRelatorio');
+    var aviso = document.getElementById('overlayAvisoLento');
+    var observer = new MutationObserver(function() {
+        if (overlay && !overlay.classList.contains('d-none')) {
+            setTimeout(function() {
+                if (aviso) aviso.classList.remove('d-none');
+            }, 20000);
+        }
+    });
+    if (overlay) observer.observe(overlay, { attributes: true, attributeFilter: ['class'] });
+})();
+</script>
+
+<!-- Modal de confirmação para seleções com alto volume -->
+<div class="modal fade" id="modalRelatorioVolume" tabindex="-1" aria-labelledby="modalRelatorioVolumeLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-warning">
+        <h5 class="modal-title" id="modalRelatorioVolumeLabel">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>Relatório com muitos lançamentos
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+      <div class="modal-body">
+        <p id="relatorioVolumeMensagem"></p>
+        <p class="text-muted small mb-0">Se o volume for muito alto, você verá uma mensagem orientando a filtrar por funcionário ou período menor.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-primary" id="confirmarRelatorioVolumeBtn">Sim, gerar relatório</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}

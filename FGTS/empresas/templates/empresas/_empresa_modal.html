@@ -1,0 +1,140 @@
+<!-- Modal de Cadastro de Empresa (Partial) -->
+<div class="modal fade" id="empresaModal" tabindex="-1" aria-labelledby="empresaModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="empresaModalLabel">
+          <i class="bi bi-building-add"></i> Cadastro de Empresa
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+      <form method="post" action="{% url 'empresa-create' %}" id="empresaForm">
+        <div class="modal-body">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="id_nome" class="form-label">Nome da Empresa *</label>
+              {{ form.nome }}
+              <small class="form-text text-muted">Usado na geracao do SEFIP.RE.</small>
+            </div>
+            <div class="col-md-3">
+              <label for="id_cnpj" class="form-label">CNPJ *</label>
+              {{ form.cnpj }}
+              <small class="form-text text-muted">Usado na geracao do SEFIP.RE.</small>
+            </div>
+            <div class="col-md-3">
+              <label for="id_codigo_folha" class="form-label">Codigo Folha</label>
+              {{ form.codigo_folha }}
+            </div>
+          </div>
+
+          <div class="row g-3 mt-2">
+            <div class="col-md-8">
+              <label for="id_endereco" class="form-label">Endereço</label>
+              {{ form.endereco }}
+              <small class="form-text text-muted">Usado na geracao do SEFIP.RE.</small>
+            </div>
+            <div class="col-md-4">
+              <label for="id_numero" class="form-label">Número</label>
+              {{ form.numero }}
+              <small class="form-text text-muted">Usado na geracao do SEFIP.RE.</small>
+            </div>
+          </div>
+
+          <div class="row g-3 mt-2">
+            <div class="col-md-4">
+              <label for="id_bairro" class="form-label">Bairro</label>
+              {{ form.bairro }}
+              <small class="form-text text-muted">Usado na geracao do SEFIP.RE.</small>
+            </div>
+            <div class="col-md-3">
+              <label for="id_cep" class="form-label">CEP</label>
+              {{ form.cep }}
+              <small class="form-text text-muted">Usado na geracao do SEFIP.RE.</small>
+            </div>
+            <div class="col-md-4">
+              <label for="id_cidade" class="form-label">Cidade</label>
+              {{ form.cidade }}
+              <small class="form-text text-muted">Usado na geracao do SEFIP.RE.</small>
+            </div>
+            <div class="col-md-1">
+              <label for="id_uf" class="form-label">UF</label>
+              {{ form.uf }}
+              <small class="form-text text-muted">SEFIP.RE.</small>
+            </div>
+          </div>
+
+          <div class="row g-3 mt-2">
+            <div class="col-md-6">
+              <label for="id_nome_contato" class="form-label">Nome do Contato</label>
+              {{ form.nome_contato }}
+            </div>
+            <div class="col-md-6">
+              <label for="id_fone_contato" class="form-label">Telefone de Contato</label>
+              {{ form.fone_contato }}
+              <small class="form-text text-muted">Usado na geracao do SEFIP.RE.</small>
+            </div>
+          </div>
+
+          <div class="row g-3 mt-2">
+            <div class="col-md-3">
+              <label for="id_cnae" class="form-label">CNAE</label>
+              {{ form.cnae }}
+              <small class="form-text text-muted">Usado na geracao do SEFIP.RE.</small>
+            </div>
+            <div class="col-md-3">
+              <label for="id_percentual_rat" class="form-label">% RAT</label>
+              {{ form.percentual_rat }}
+              <small class="form-text text-muted">Usado na geracao do SEFIP.RE.</small>
+            </div>
+            <div class="col-md-3">
+              <label for="id_optante_simples" class="form-label">Optante Simples</label>
+              {{ form.optante_simples }}
+              <small class="form-text text-muted">Usado na geracao do SEFIP.RE.</small>
+            </div>
+            <div class="col-md-3">
+              <label for="id_fpas" class="form-label">FPAS</label>
+              {{ form.fpas }}
+              <small class="form-text text-muted">Usado na geracao do SEFIP.RE.</small>
+            </div>
+          </div>
+
+          <div class="row g-3 mt-2">
+            <div class="col-md-4">
+              <label for="id_outras_entidades" class="form-label">Outras Entidades</label>
+              {{ form.outras_entidades }}
+              <small class="form-text text-muted">Usado na geracao do SEFIP.RE.</small>
+            </div>
+            <div class="col-md-8">
+              <label for="id_email" class="form-label">E-mail</label>
+              {{ form.email }}
+            </div>
+          </div>
+
+          {% if form.errors %}
+          <div class="alert alert-danger mt-3">
+            <strong>Erro!</strong> Corrija os campos destacados.
+            {{ form.errors }}
+          </div>
+          {% endif %}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <i class="bi bi-x-circle"></i> Cancelar
+          </button>
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-circle"></i> Salvar Empresa
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Auto-abrir o modal se houver erros de validação
+  {% if form.errors %}
+    var empresaModal = new bootstrap.Modal(document.getElementById('empresaModal'));
+    empresaModal.show();
+  {% endif %}
+</script>

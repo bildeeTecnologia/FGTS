@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Importar Coeficientes JAM{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Importar Coeficientes JAM</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success">Importar</button>
+        <a href="{% url 'coefjam-list' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

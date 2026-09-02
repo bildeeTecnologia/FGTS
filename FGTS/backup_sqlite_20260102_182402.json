@@ -1,0 +1,4592 @@
+[
+{
+  "model": "auth.group",
+  "pk": 1,
+  "fields": {
+    "name": "Assistente A",
+    "permissions": [
+      [
+        "add_logentry",
+        "admin",
+        "logentry"
+      ],
+      [
+        "view_logentry",
+        "admin",
+        "logentry"
+      ],
+      [
+        "view_group",
+        "auth",
+        "group"
+      ],
+      [
+        "view_billingcustomer",
+        "billing",
+        "billingcustomer"
+      ],
+      [
+        "view_pricingplan",
+        "billing",
+        "pricingplan"
+      ],
+      [
+        "view_subscription",
+        "billing",
+        "subscription"
+      ]
+    ]
+  }
+},
+{
+  "model": "billing.plan",
+  "pk": 1,
+  "fields": {
+    "plan_type": "BASIC",
+    "max_employees": 50,
+    "has_advanced_dashboard": false,
+    "has_custom_reports": false,
+    "has_pdf_export": false,
+    "has_api": false,
+    "support_level": "EMAIL",
+    "price_monthly": "99.00",
+    "price_yearly": "990.00",
+    "active": true,
+    "created_at": "2025-12-31T13:15:11.536Z",
+    "updated_at": "2025-12-31T13:15:11.536Z"
+  }
+},
+{
+  "model": "billing.plan",
+  "pk": 2,
+  "fields": {
+    "plan_type": "PROFESSIONAL",
+    "max_employees": 200,
+    "has_advanced_dashboard": true,
+    "has_custom_reports": true,
+    "has_pdf_export": true,
+    "has_api": false,
+    "support_level": "PRIORITY",
+    "price_monthly": "199.00",
+    "price_yearly": "1990.00",
+    "active": true,
+    "created_at": "2025-12-31T13:15:11.542Z",
+    "updated_at": "2025-12-31T13:15:11.542Z"
+  }
+},
+{
+  "model": "billing.plan",
+  "pk": 3,
+  "fields": {
+    "plan_type": "ENTERPRISE",
+    "max_employees": null,
+    "has_advanced_dashboard": true,
+    "has_custom_reports": true,
+    "has_pdf_export": true,
+    "has_api": true,
+    "support_level": "24_7",
+    "price_monthly": "399.00",
+    "price_yearly": "3990.00",
+    "active": true,
+    "created_at": "2025-12-31T13:15:11.546Z",
+    "updated_at": "2025-12-31T13:15:11.546Z"
+  }
+},
+{
+  "model": "billing.billingcustomer",
+  "pk": 1,
+  "fields": {
+    "empresa": 2,
+    "plan": null,
+    "active_employees": 0,
+    "email_cobranca": "contato@empresateste.com.br",
+    "asaas_customer_id": "test_customer_123",
+    "status": "trial",
+    "trial_active": true,
+    "trial_expires": "2026-01-09",
+    "trial_used": false,
+    "created_at": "2025-12-27T16:25:40.302Z",
+    "updated_at": "2026-01-02T13:49:17.382Z"
+  }
+},
+{
+  "model": "billing.billingcustomer",
+  "pk": 2,
+  "fields": {
+    "empresa": 3,
+    "plan": 1,
+    "active_employees": 0,
+    "email_cobranca": null,
+    "asaas_customer_id": null,
+    "status": "trial",
+    "trial_active": true,
+    "trial_expires": "2026-01-09",
+    "trial_used": false,
+    "created_at": "2025-12-30T14:36:09.624Z",
+    "updated_at": "2026-01-02T16:14:48.051Z"
+  }
+},
+{
+  "model": "billing.billingcustomer",
+  "pk": 3,
+  "fields": {
+    "empresa": 4,
+    "plan": null,
+    "active_employees": 0,
+    "email_cobranca": null,
+    "asaas_customer_id": null,
+    "status": "trial",
+    "trial_active": true,
+    "trial_expires": "2026-01-09",
+    "trial_used": false,
+    "created_at": "2025-12-30T14:36:09.629Z",
+    "updated_at": "2026-01-02T13:49:17.383Z"
+  }
+},
+{
+  "model": "billing.billingcustomer",
+  "pk": 4,
+  "fields": {
+    "empresa": 5,
+    "plan": 2,
+    "active_employees": 0,
+    "email_cobranca": "contato@empresademo.com.br",
+    "asaas_customer_id": "demo-customer-id",
+    "status": "trial",
+    "trial_active": true,
+    "trial_expires": "2026-01-09",
+    "trial_used": false,
+    "created_at": "2025-12-31T16:29:27.429Z",
+    "updated_at": "2026-01-02T13:49:17.384Z"
+  }
+},
+{
+  "model": "billing.pricingplan",
+  "pk": 1,
+  "fields": {
+    "name": "Plano Mensal",
+    "description": "Acesso completo ao sistema FGTS",
+    "amount": "149.90",
+    "periodicity": "MONTHLY",
+    "active": true,
+    "sort_order": 1,
+    "updated_at": "2025-12-30T13:53:19.520Z"
+  }
+},
+{
+  "model": "billing.pricingplan",
+  "pk": 2,
+  "fields": {
+    "name": "Plano Anual",
+    "description": "Sua assinatura por 6 meses",
+    "amount": "124.15",
+    "periodicity": "YEARLY",
+    "active": true,
+    "sort_order": 1,
+    "updated_at": "2025-12-30T14:37:44.577Z"
+  }
+},
+{
+  "model": "empresas.empresa",
+  "pk": 1,
+  "fields": {
+    "nome": "Like Move 360",
+    "cnpj": "29109500000148",
+    "endereco": "Rua 28 de junho",
+    "numero": "1313",
+    "bairro": "Jd. Tupinamba",
+    "cep": "87040280",
+    "cidade": "Maringá",
+    "uf": "Pr",
+    "nome_contato": "Fabio Rogerio Gutierrez",
+    "fone_contato": "44991366360",
+    "cnae": "8513900",
+    "percentual_rat": "1.00",
+    "optante_simples": 1,
+    "fpas": "574",
+    "outras_entidades": "000",
+    "email": "likemove360@gmail.com"
+  }
+},
+{
+  "model": "empresas.empresa",
+  "pk": 2,
+  "fields": {
+    "nome": "Empresa Teste LTDA",
+    "cnpj": "12.345.678/0001-90",
+    "endereco": "Rua Teste, 123",
+    "numero": "",
+    "bairro": "",
+    "cep": "01234-567",
+    "cidade": "São Paulo",
+    "uf": "SP",
+    "nome_contato": "",
+    "fone_contato": "(11) 1234-5678",
+    "cnae": "",
+    "percentual_rat": "1.00",
+    "optante_simples": 1,
+    "fpas": "",
+    "outras_entidades": "",
+    "email": "contato@empresateste.com.br"
+  }
+},
+{
+  "model": "empresas.empresa",
+  "pk": 3,
+  "fields": {
+    "nome": "Empresa A",
+    "cnpj": "11.111.111/0001-11",
+    "endereco": "",
+    "numero": "",
+    "bairro": "",
+    "cep": "",
+    "cidade": "",
+    "uf": "",
+    "nome_contato": "",
+    "fone_contato": "",
+    "cnae": "",
+    "percentual_rat": "1.00",
+    "optante_simples": 1,
+    "fpas": "",
+    "outras_entidades": "",
+    "email": ""
+  }
+},
+{
+  "model": "empresas.empresa",
+  "pk": 4,
+  "fields": {
+    "nome": "Empresa B",
+    "cnpj": "22.222.222/0001-22",
+    "endereco": "",
+    "numero": "",
+    "bairro": "",
+    "cep": "",
+    "cidade": "",
+    "uf": "",
+    "nome_contato": "",
+    "fone_contato": "",
+    "cnae": "",
+    "percentual_rat": "1.00",
+    "optante_simples": 1,
+    "fpas": "",
+    "outras_entidades": "",
+    "email": ""
+  }
+},
+{
+  "model": "empresas.empresa",
+  "pk": 5,
+  "fields": {
+    "nome": "Empresa Demo LTDA",
+    "cnpj": "12.345.678/0001-99",
+    "endereco": "Avenida Paulista",
+    "numero": "1000",
+    "bairro": "Bela Vista",
+    "cep": "01310-100",
+    "cidade": "São Paulo",
+    "uf": "SP",
+    "nome_contato": "João Silva",
+    "fone_contato": "(11) 98765-4321",
+    "cnae": "",
+    "percentual_rat": "1.00",
+    "optante_simples": 1,
+    "fpas": "",
+    "outras_entidades": "",
+    "email": "contato@empresademo.com.br"
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 1,
+  "fields": {
+    "empresa": 1,
+    "matricula": "001",
+    "nome": "Fabio Rogerio Gutierrez",
+    "pis": "12521442978",
+    "cpf": "03194889931",
+    "cbo": "21555",
+    "carteira_profissional": "0319488",
+    "serie_carteira": "9931",
+    "data_nascimento": "1980-05-08",
+    "data_admissao": "2019-08-16",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 2,
+  "fields": {
+    "empresa": 2,
+    "matricula": "F001",
+    "nome": "João da Silva",
+    "pis": "123.45678.90-1",
+    "cpf": "123.456.789-00",
+    "cbo": "",
+    "carteira_profissional": "",
+    "serie_carteira": "",
+    "data_nascimento": "1990-01-15",
+    "data_admissao": "2020-01-01",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 3,
+  "fields": {
+    "empresa": 3,
+    "matricula": "001",
+    "nome": "João da Silva",
+    "pis": "123.45678.90-1",
+    "cpf": "111.111.111-11",
+    "cbo": "",
+    "carteira_profissional": "",
+    "serie_carteira": "",
+    "data_nascimento": null,
+    "data_admissao": "2020-01-15",
+    "data_demissao": "2025-12-25",
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 4,
+  "fields": {
+    "empresa": 3,
+    "matricula": "002",
+    "nome": "Maria Santos",
+    "pis": "234.56789.01-2",
+    "cpf": "222.222.222-22",
+    "cbo": "",
+    "carteira_profissional": "",
+    "serie_carteira": "",
+    "data_nascimento": null,
+    "data_admissao": "2019-06-01",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 5,
+  "fields": {
+    "empresa": 4,
+    "matricula": "001",
+    "nome": "Carlos Oliveira",
+    "pis": "345.67890.12-3",
+    "cpf": "333.333.333-33",
+    "cbo": "",
+    "carteira_profissional": "",
+    "serie_carteira": "",
+    "data_nascimento": null,
+    "data_admissao": "2021-03-10",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 6,
+  "fields": {
+    "empresa": 5,
+    "matricula": "",
+    "nome": "Maria Silva",
+    "pis": "100000009-00",
+    "cpf": "123.456.789-00",
+    "cbo": "",
+    "carteira_profissional": "",
+    "serie_carteira": "",
+    "data_nascimento": null,
+    "data_admissao": "2022-01-15",
+    "data_demissao": "2025-12-31",
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 7,
+  "fields": {
+    "empresa": 5,
+    "matricula": "",
+    "nome": "Carlos Santos",
+    "pis": "100000000-11",
+    "cpf": "234.567.890-11",
+    "cbo": "",
+    "carteira_profissional": "",
+    "serie_carteira": "",
+    "data_nascimento": null,
+    "data_admissao": "2022-01-15",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 8,
+  "fields": {
+    "empresa": 5,
+    "matricula": "",
+    "nome": "Ana Oliveira",
+    "pis": "100000001-22",
+    "cpf": "345.678.901-22",
+    "cbo": "",
+    "carteira_profissional": "",
+    "serie_carteira": "",
+    "data_nascimento": null,
+    "data_admissao": "2022-01-15",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 9,
+  "fields": {
+    "empresa": 5,
+    "matricula": "",
+    "nome": "Pedro Costa",
+    "pis": "100000002-33",
+    "cpf": "456.789.012-33",
+    "cbo": "",
+    "carteira_profissional": "",
+    "serie_carteira": "",
+    "data_nascimento": null,
+    "data_admissao": "2022-01-15",
+    "data_demissao": "2025-12-25",
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 10,
+  "fields": {
+    "empresa": 5,
+    "matricula": "",
+    "nome": "Fernanda Lima",
+    "pis": "100000003-44",
+    "cpf": "567.890.123-44",
+    "cbo": "",
+    "carteira_profissional": "",
+    "serie_carteira": "",
+    "data_nascimento": null,
+    "data_admissao": "2022-02-15",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 11,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP001",
+    "nome": "João da Silva",
+    "pis": "120.123.456-70",
+    "cpf": "123.456.789-00",
+    "cbo": "2110",
+    "carteira_profissional": "AB123456",
+    "serie_carteira": "12",
+    "data_nascimento": "1990-05-10",
+    "data_admissao": "2023-01-15",
+    "data_demissao": null,
+    "observacao": "Informações adicionais"
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 12,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP001",
+    "nome": "Ana Pereira Souza",
+    "pis": "120.111.111-01",
+    "cpf": "123.456.111-01",
+    "cbo": "2110",
+    "carteira_profissional": "AB123451",
+    "serie_carteira": "12",
+    "data_nascimento": "1988-07-15",
+    "data_admissao": "2022-03-10",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 13,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP002",
+    "nome": "Carlos Mendes Oliveira",
+    "pis": "120.111.111-02",
+    "cpf": "123.456.111-02",
+    "cbo": "2525",
+    "carteira_profissional": "AB123452",
+    "serie_carteira": "14",
+    "data_nascimento": "1992-02-20",
+    "data_admissao": "2021-11-05",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 14,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP003",
+    "nome": "Mariana Costa Ribeiro",
+    "pis": "120.111.111-03",
+    "cpf": "123.456.111-03",
+    "cbo": "4110",
+    "carteira_profissional": "AB123453",
+    "serie_carteira": "15",
+    "data_nascimento": "1995-09-10",
+    "data_admissao": "2020-01-22",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 15,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP004",
+    "nome": "João Batista Fernandes",
+    "pis": "120.111.111-04",
+    "cpf": "123.456.111-04",
+    "cbo": "3175",
+    "carteira_profissional": "AB123454",
+    "serie_carteira": "10",
+    "data_nascimento": "1987-12-01",
+    "data_admissao": "2019-06-18",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 16,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP005",
+    "nome": "Lucas Andrade Martins",
+    "pis": "120.111.111-05",
+    "cpf": "123.456.111-05",
+    "cbo": "2140",
+    "carteira_profissional": "AB123455",
+    "serie_carteira": "18",
+    "data_nascimento": "1998-03-25",
+    "data_admissao": "2023-02-01",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 17,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP006",
+    "nome": "Paula Nunes Albuquerque",
+    "pis": "120.111.111-06",
+    "cpf": "123.456.111-06",
+    "cbo": "4221",
+    "carteira_profissional": "AB123456",
+    "serie_carteira": "20",
+    "data_nascimento": "1991-10-09",
+    "data_admissao": "2022-07-12",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 18,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP007",
+    "nome": "Bruno Moreira Lopes",
+    "pis": "120.111.111-07",
+    "cpf": "123.456.111-07",
+    "cbo": "7155",
+    "carteira_profissional": "AB123457",
+    "serie_carteira": "05",
+    "data_nascimento": "1989-11-03",
+    "data_admissao": "2021-04-30",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 19,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP008",
+    "nome": "Fernanda Dias Rodrigues",
+    "pis": "120.111.111-08",
+    "cpf": "123.456.111-08",
+    "cbo": "1425",
+    "carteira_profissional": "AB123458",
+    "serie_carteira": "06",
+    "data_nascimento": "1985-05-22",
+    "data_admissao": "2018-09-17",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 20,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP009",
+    "nome": "Rafael Gomes Barros",
+    "pis": "120.111.111-09",
+    "cpf": "123.456.111-09",
+    "cbo": "2122",
+    "carteira_profissional": "AB123459",
+    "serie_carteira": "19",
+    "data_nascimento": "1993-06-11",
+    "data_admissao": "2020-12-03",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 21,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP010",
+    "nome": "Camila Teixeira Prado",
+    "pis": "120.111.111-10",
+    "cpf": "123.456.111-10",
+    "cbo": "2515",
+    "carteira_profissional": "AB123460",
+    "serie_carteira": "07",
+    "data_nascimento": "1999-01-28",
+    "data_admissao": "2023-05-25",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 22,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP011",
+    "nome": "Diego Carvalho Tavares",
+    "pis": "120.111.111-11",
+    "cpf": "123.456.111-11",
+    "cbo": "4115",
+    "carteira_profissional": "AB123461",
+    "serie_carteira": "16",
+    "data_nascimento": "1994-04-17",
+    "data_admissao": "2022-08-14",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 23,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP012",
+    "nome": "Tatiane Lopes Guimarães",
+    "pis": "120.111.111-12",
+    "cpf": "123.456.111-12",
+    "cbo": "5172",
+    "carteira_profissional": "AB123462",
+    "serie_carteira": "22",
+    "data_nascimento": "1990-08-30",
+    "data_admissao": "2021-10-09",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 24,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP013",
+    "nome": "Guilherme Pinto Araújo",
+    "pis": "120.111.111-13",
+    "cpf": "123.456.111-13",
+    "cbo": "7150",
+    "carteira_profissional": "AB123463",
+    "serie_carteira": "08",
+    "data_nascimento": "1986-06-06",
+    "data_admissao": "2020-03-19",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 25,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP014",
+    "nome": "Daniela Freitas Moura",
+    "pis": "120.111.111-14",
+    "cpf": "123.456.111-14",
+    "cbo": "2523",
+    "carteira_profissional": "AB123464",
+    "serie_carteira": "09",
+    "data_nascimento": "1984-03-14",
+    "data_admissao": "2019-11-27",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 26,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP015",
+    "nome": "Pedro Henrique Sales",
+    "pis": "120.111.111-15",
+    "cpf": "123.456.111-15",
+    "cbo": "2142",
+    "carteira_profissional": "AB123465",
+    "serie_carteira": "11",
+    "data_nascimento": "1997-02-05",
+    "data_admissao": "2023-01-04",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 27,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP016",
+    "nome": "Aline Rocha Campos",
+    "pis": "120.111.111-16",
+    "cpf": "123.456.111-16",
+    "cbo": "4111",
+    "carteira_profissional": "AB123466",
+    "serie_carteira": "13",
+    "data_nascimento": "1991-09-01",
+    "data_admissao": "2022-06-21",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 28,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP017",
+    "nome": "Rodrigo Lima Vasconcelos",
+    "pis": "120.111.111-17",
+    "cpf": "123.456.111-17",
+    "cbo": "1423",
+    "carteira_profissional": "AB123467",
+    "serie_carteira": "21",
+    "data_nascimento": "1989-10-29",
+    "data_admissao": "2021-02-10",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 29,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP018",
+    "nome": "Beatriz Souza Martins",
+    "pis": "120.111.111-18",
+    "cpf": "123.456.111-18",
+    "cbo": "5173",
+    "carteira_profissional": "AB123468",
+    "serie_carteira": "02",
+    "data_nascimento": "1996-12-12",
+    "data_admissao": "2020-09-07",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 30,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP019",
+    "nome": "Marcelo Torres Figueiredo",
+    "pis": "120.111.111-19",
+    "cpf": "123.456.111-19",
+    "cbo": "3171",
+    "carteira_profissional": "AB123469",
+    "serie_carteira": "04",
+    "data_nascimento": "1983-01-09",
+    "data_admissao": "2019-05-02",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 31,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP020",
+    "nome": "Larissa Alves Coutinho",
+    "pis": "120.111.111-20",
+    "cpf": "123.456.111-20",
+    "cbo": "2521",
+    "carteira_profissional": "AB123470",
+    "serie_carteira": "03",
+    "data_nascimento": "1998-07-03",
+    "data_admissao": "2023-04-18",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 32,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP001",
+    "nome": "João da Silva",
+    "pis": "120.123.456-70",
+    "cpf": "123.456.789-00",
+    "cbo": "2110",
+    "carteira_profissional": "AB123456",
+    "serie_carteira": "12",
+    "data_nascimento": "1990-05-10",
+    "data_admissao": "2023-01-15",
+    "data_demissao": null,
+    "observacao": "Informações adicionais"
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 33,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP001",
+    "nome": "Ana Pereira Souza",
+    "pis": "120.111.111-01",
+    "cpf": "123.456.111-01",
+    "cbo": "2110",
+    "carteira_profissional": "AB123451",
+    "serie_carteira": "12",
+    "data_nascimento": "1988-07-15",
+    "data_admissao": "2022-03-10",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 34,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP002",
+    "nome": "Carlos Mendes Oliveira",
+    "pis": "120.111.111-02",
+    "cpf": "123.456.111-02",
+    "cbo": "2525",
+    "carteira_profissional": "AB123452",
+    "serie_carteira": "14",
+    "data_nascimento": "1992-02-20",
+    "data_admissao": "2021-11-05",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 35,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP003",
+    "nome": "Mariana Costa Ribeiro",
+    "pis": "120.111.111-03",
+    "cpf": "123.456.111-03",
+    "cbo": "4110",
+    "carteira_profissional": "AB123453",
+    "serie_carteira": "15",
+    "data_nascimento": "1995-09-10",
+    "data_admissao": "2020-01-22",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 36,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP004",
+    "nome": "João Batista Fernandes",
+    "pis": "120.111.111-04",
+    "cpf": "123.456.111-04",
+    "cbo": "3175",
+    "carteira_profissional": "AB123454",
+    "serie_carteira": "10",
+    "data_nascimento": "1987-12-01",
+    "data_admissao": "2019-06-18",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 37,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP005",
+    "nome": "Lucas Andrade Martins",
+    "pis": "120.111.111-05",
+    "cpf": "123.456.111-05",
+    "cbo": "2140",
+    "carteira_profissional": "AB123455",
+    "serie_carteira": "18",
+    "data_nascimento": "1998-03-25",
+    "data_admissao": "2023-02-01",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 38,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP006",
+    "nome": "Paula Nunes Albuquerque",
+    "pis": "120.111.111-06",
+    "cpf": "123.456.111-06",
+    "cbo": "4221",
+    "carteira_profissional": "AB123456",
+    "serie_carteira": "20",
+    "data_nascimento": "1991-10-09",
+    "data_admissao": "2022-07-12",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 39,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP007",
+    "nome": "Bruno Moreira Lopes",
+    "pis": "120.111.111-07",
+    "cpf": "123.456.111-07",
+    "cbo": "7155",
+    "carteira_profissional": "AB123457",
+    "serie_carteira": "05",
+    "data_nascimento": "1989-11-03",
+    "data_admissao": "2021-04-30",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 40,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP008",
+    "nome": "Fernanda Dias Rodrigues",
+    "pis": "120.111.111-08",
+    "cpf": "123.456.111-08",
+    "cbo": "1425",
+    "carteira_profissional": "AB123458",
+    "serie_carteira": "06",
+    "data_nascimento": "1985-05-22",
+    "data_admissao": "2018-09-17",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 41,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP009",
+    "nome": "Rafael Gomes Barros",
+    "pis": "120.111.111-09",
+    "cpf": "123.456.111-09",
+    "cbo": "2122",
+    "carteira_profissional": "AB123459",
+    "serie_carteira": "19",
+    "data_nascimento": "1993-06-11",
+    "data_admissao": "2020-12-03",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 42,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP010",
+    "nome": "Camila Teixeira Prado",
+    "pis": "120.111.111-10",
+    "cpf": "123.456.111-10",
+    "cbo": "2515",
+    "carteira_profissional": "AB123460",
+    "serie_carteira": "07",
+    "data_nascimento": "1999-01-28",
+    "data_admissao": "2023-05-25",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 43,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP011",
+    "nome": "Diego Carvalho Tavares",
+    "pis": "120.111.111-11",
+    "cpf": "123.456.111-11",
+    "cbo": "4115",
+    "carteira_profissional": "AB123461",
+    "serie_carteira": "16",
+    "data_nascimento": "1994-04-17",
+    "data_admissao": "2022-08-14",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 44,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP012",
+    "nome": "Tatiane Lopes Guimarães",
+    "pis": "120.111.111-12",
+    "cpf": "123.456.111-12",
+    "cbo": "5172",
+    "carteira_profissional": "AB123462",
+    "serie_carteira": "22",
+    "data_nascimento": "1990-08-30",
+    "data_admissao": "2021-10-09",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 45,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP013",
+    "nome": "Guilherme Pinto Araújo",
+    "pis": "120.111.111-13",
+    "cpf": "123.456.111-13",
+    "cbo": "7150",
+    "carteira_profissional": "AB123463",
+    "serie_carteira": "08",
+    "data_nascimento": "1986-06-06",
+    "data_admissao": "2020-03-19",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 46,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP014",
+    "nome": "Daniela Freitas Moura",
+    "pis": "120.111.111-14",
+    "cpf": "123.456.111-14",
+    "cbo": "2523",
+    "carteira_profissional": "AB123464",
+    "serie_carteira": "09",
+    "data_nascimento": "1984-03-14",
+    "data_admissao": "2019-11-27",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 47,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP015",
+    "nome": "Pedro Henrique Sales",
+    "pis": "120.111.111-15",
+    "cpf": "123.456.111-15",
+    "cbo": "2142",
+    "carteira_profissional": "AB123465",
+    "serie_carteira": "11",
+    "data_nascimento": "1997-02-05",
+    "data_admissao": "2023-01-04",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 48,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP016",
+    "nome": "Aline Rocha Campos",
+    "pis": "120.111.111-16",
+    "cpf": "123.456.111-16",
+    "cbo": "4111",
+    "carteira_profissional": "AB123466",
+    "serie_carteira": "13",
+    "data_nascimento": "1991-09-01",
+    "data_admissao": "2022-06-21",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 49,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP017",
+    "nome": "Rodrigo Lima Vasconcelos",
+    "pis": "120.111.111-17",
+    "cpf": "123.456.111-17",
+    "cbo": "1423",
+    "carteira_profissional": "AB123467",
+    "serie_carteira": "21",
+    "data_nascimento": "1989-10-29",
+    "data_admissao": "2021-02-10",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 50,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP018",
+    "nome": "Beatriz Souza Martins",
+    "pis": "120.111.111-18",
+    "cpf": "123.456.111-18",
+    "cbo": "5173",
+    "carteira_profissional": "AB123468",
+    "serie_carteira": "02",
+    "data_nascimento": "1996-12-12",
+    "data_admissao": "2020-09-07",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 51,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP019",
+    "nome": "Marcelo Torres Figueiredo",
+    "pis": "120.111.111-19",
+    "cpf": "123.456.111-19",
+    "cbo": "3171",
+    "carteira_profissional": "AB123469",
+    "serie_carteira": "04",
+    "data_nascimento": "1983-01-09",
+    "data_admissao": "2019-05-02",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 52,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP020",
+    "nome": "Larissa Alves Coutinho",
+    "pis": "120.111.111-20",
+    "cpf": "123.456.111-20",
+    "cbo": "2521",
+    "carteira_profissional": "AB123470",
+    "serie_carteira": "03",
+    "data_nascimento": "1998-07-03",
+    "data_admissao": "2023-04-18",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 53,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP001",
+    "nome": "João da Silva",
+    "pis": "120.123.456-70",
+    "cpf": "123.456.789-00",
+    "cbo": "2110",
+    "carteira_profissional": "AB123456",
+    "serie_carteira": "12",
+    "data_nascimento": "1990-05-10",
+    "data_admissao": "2023-01-15",
+    "data_demissao": null,
+    "observacao": "Informações adicionais"
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 54,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP001",
+    "nome": "Ana Pereira Souza",
+    "pis": "120.111.111-01",
+    "cpf": "123.456.111-01",
+    "cbo": "2110",
+    "carteira_profissional": "AB123451",
+    "serie_carteira": "12",
+    "data_nascimento": "1988-07-15",
+    "data_admissao": "2022-03-10",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 55,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP002",
+    "nome": "Carlos Mendes Oliveira",
+    "pis": "120.111.111-02",
+    "cpf": "123.456.111-02",
+    "cbo": "2525",
+    "carteira_profissional": "AB123452",
+    "serie_carteira": "14",
+    "data_nascimento": "1992-02-20",
+    "data_admissao": "2021-11-05",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 56,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP003",
+    "nome": "Mariana Costa Ribeiro",
+    "pis": "120.111.111-03",
+    "cpf": "123.456.111-03",
+    "cbo": "4110",
+    "carteira_profissional": "AB123453",
+    "serie_carteira": "15",
+    "data_nascimento": "1995-09-10",
+    "data_admissao": "2020-01-22",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 57,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP004",
+    "nome": "João Batista Fernandes",
+    "pis": "120.111.111-04",
+    "cpf": "123.456.111-04",
+    "cbo": "3175",
+    "carteira_profissional": "AB123454",
+    "serie_carteira": "10",
+    "data_nascimento": "1987-12-01",
+    "data_admissao": "2019-06-18",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 58,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP005",
+    "nome": "Lucas Andrade Martins",
+    "pis": "120.111.111-05",
+    "cpf": "123.456.111-05",
+    "cbo": "2140",
+    "carteira_profissional": "AB123455",
+    "serie_carteira": "18",
+    "data_nascimento": "1998-03-25",
+    "data_admissao": "2023-02-01",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 59,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP006",
+    "nome": "Paula Nunes Albuquerque",
+    "pis": "120.111.111-06",
+    "cpf": "123.456.111-06",
+    "cbo": "4221",
+    "carteira_profissional": "AB123456",
+    "serie_carteira": "20",
+    "data_nascimento": "1991-10-09",
+    "data_admissao": "2022-07-12",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 60,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP007",
+    "nome": "Bruno Moreira Lopes",
+    "pis": "120.111.111-07",
+    "cpf": "123.456.111-07",
+    "cbo": "7155",
+    "carteira_profissional": "AB123457",
+    "serie_carteira": "05",
+    "data_nascimento": "1989-11-03",
+    "data_admissao": "2021-04-30",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 61,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP008",
+    "nome": "Fernanda Dias Rodrigues",
+    "pis": "120.111.111-08",
+    "cpf": "123.456.111-08",
+    "cbo": "1425",
+    "carteira_profissional": "AB123458",
+    "serie_carteira": "06",
+    "data_nascimento": "1985-05-22",
+    "data_admissao": "2018-09-17",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 62,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP009",
+    "nome": "Rafael Gomes Barros",
+    "pis": "120.111.111-09",
+    "cpf": "123.456.111-09",
+    "cbo": "2122",
+    "carteira_profissional": "AB123459",
+    "serie_carteira": "19",
+    "data_nascimento": "1993-06-11",
+    "data_admissao": "2020-12-03",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 63,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP010",
+    "nome": "Camila Teixeira Prado",
+    "pis": "120.111.111-10",
+    "cpf": "123.456.111-10",
+    "cbo": "2515",
+    "carteira_profissional": "AB123460",
+    "serie_carteira": "07",
+    "data_nascimento": "1999-01-28",
+    "data_admissao": "2023-05-25",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 64,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP011",
+    "nome": "Diego Carvalho Tavares",
+    "pis": "120.111.111-11",
+    "cpf": "123.456.111-11",
+    "cbo": "4115",
+    "carteira_profissional": "AB123461",
+    "serie_carteira": "16",
+    "data_nascimento": "1994-04-17",
+    "data_admissao": "2022-08-14",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 65,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP012",
+    "nome": "Tatiane Lopes Guimarães",
+    "pis": "120.111.111-12",
+    "cpf": "123.456.111-12",
+    "cbo": "5172",
+    "carteira_profissional": "AB123462",
+    "serie_carteira": "22",
+    "data_nascimento": "1990-08-30",
+    "data_admissao": "2021-10-09",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 66,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP013",
+    "nome": "Guilherme Pinto Araújo",
+    "pis": "120.111.111-13",
+    "cpf": "123.456.111-13",
+    "cbo": "7150",
+    "carteira_profissional": "AB123463",
+    "serie_carteira": "08",
+    "data_nascimento": "1986-06-06",
+    "data_admissao": "2020-03-19",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 67,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP014",
+    "nome": "Daniela Freitas Moura",
+    "pis": "120.111.111-14",
+    "cpf": "123.456.111-14",
+    "cbo": "2523",
+    "carteira_profissional": "AB123464",
+    "serie_carteira": "09",
+    "data_nascimento": "1984-03-14",
+    "data_admissao": "2019-11-27",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 68,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP015",
+    "nome": "Pedro Henrique Sales",
+    "pis": "120.111.111-15",
+    "cpf": "123.456.111-15",
+    "cbo": "2142",
+    "carteira_profissional": "AB123465",
+    "serie_carteira": "11",
+    "data_nascimento": "1997-02-05",
+    "data_admissao": "2023-01-04",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 69,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP016",
+    "nome": "Aline Rocha Campos",
+    "pis": "120.111.111-16",
+    "cpf": "123.456.111-16",
+    "cbo": "4111",
+    "carteira_profissional": "AB123466",
+    "serie_carteira": "13",
+    "data_nascimento": "1991-09-01",
+    "data_admissao": "2022-06-21",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 70,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP017",
+    "nome": "Rodrigo Lima Vasconcelos",
+    "pis": "120.111.111-17",
+    "cpf": "123.456.111-17",
+    "cbo": "1423",
+    "carteira_profissional": "AB123467",
+    "serie_carteira": "21",
+    "data_nascimento": "1989-10-29",
+    "data_admissao": "2021-02-10",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 71,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP018",
+    "nome": "Beatriz Souza Martins",
+    "pis": "120.111.111-18",
+    "cpf": "123.456.111-18",
+    "cbo": "5173",
+    "carteira_profissional": "AB123468",
+    "serie_carteira": "02",
+    "data_nascimento": "1996-12-12",
+    "data_admissao": "2020-09-07",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 72,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP019",
+    "nome": "Marcelo Torres Figueiredo",
+    "pis": "120.111.111-19",
+    "cpf": "123.456.111-19",
+    "cbo": "3171",
+    "carteira_profissional": "AB123469",
+    "serie_carteira": "04",
+    "data_nascimento": "1983-01-09",
+    "data_admissao": "2019-05-02",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 73,
+  "fields": {
+    "empresa": 1,
+    "matricula": "EMP020",
+    "nome": "Larissa Alves Coutinho",
+    "pis": "120.111.111-20",
+    "cpf": "123.456.111-20",
+    "cbo": "2521",
+    "carteira_profissional": "AB123470",
+    "serie_carteira": "03",
+    "data_nascimento": "1998-07-03",
+    "data_admissao": "2023-04-18",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 74,
+  "fields": {
+    "empresa": 5,
+    "matricula": "EMP001",
+    "nome": "João da Silva",
+    "pis": "120.123.456-70",
+    "cpf": "123.456.789-00",
+    "cbo": "2110",
+    "carteira_profissional": "AB123456",
+    "serie_carteira": "12",
+    "data_nascimento": "1990-05-10",
+    "data_admissao": "2023-01-15",
+    "data_demissao": "2025-12-26",
+    "observacao": "Informações adicionais"
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 75,
+  "fields": {
+    "empresa": 5,
+    "matricula": "EMP001",
+    "nome": "Ana Pereira Souza",
+    "pis": "120.111.111-01",
+    "cpf": "123.456.111-01",
+    "cbo": "2110",
+    "carteira_profissional": "AB123451",
+    "serie_carteira": "12",
+    "data_nascimento": "1988-07-15",
+    "data_admissao": "2022-03-10",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 76,
+  "fields": {
+    "empresa": 5,
+    "matricula": "EMP002",
+    "nome": "Carlos Mendes Oliveira",
+    "pis": "120.111.111-02",
+    "cpf": "123.456.111-02",
+    "cbo": "2525",
+    "carteira_profissional": "AB123452",
+    "serie_carteira": "14",
+    "data_nascimento": "1992-02-20",
+    "data_admissao": "2021-11-05",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 77,
+  "fields": {
+    "empresa": 5,
+    "matricula": "EMP003",
+    "nome": "Mariana Costa Ribeiro",
+    "pis": "120.111.111-03",
+    "cpf": "123.456.111-03",
+    "cbo": "4110",
+    "carteira_profissional": "AB123453",
+    "serie_carteira": "15",
+    "data_nascimento": "1995-09-10",
+    "data_admissao": "2020-01-22",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 78,
+  "fields": {
+    "empresa": 5,
+    "matricula": "EMP004",
+    "nome": "João Batista Fernandes",
+    "pis": "120.111.111-04",
+    "cpf": "123.456.111-04",
+    "cbo": "3175",
+    "carteira_profissional": "AB123454",
+    "serie_carteira": "10",
+    "data_nascimento": "1987-12-01",
+    "data_admissao": "2019-06-18",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 79,
+  "fields": {
+    "empresa": 5,
+    "matricula": "EMP005",
+    "nome": "Lucas Andrade Martins",
+    "pis": "120.111.111-05",
+    "cpf": "123.456.111-05",
+    "cbo": "2140",
+    "carteira_profissional": "AB123455",
+    "serie_carteira": "18",
+    "data_nascimento": "1998-03-25",
+    "data_admissao": "2023-02-01",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 80,
+  "fields": {
+    "empresa": 5,
+    "matricula": "EMP006",
+    "nome": "Paula Nunes Albuquerque",
+    "pis": "120.111.111-06",
+    "cpf": "123.456.111-06",
+    "cbo": "4221",
+    "carteira_profissional": "AB123456",
+    "serie_carteira": "20",
+    "data_nascimento": "1991-10-09",
+    "data_admissao": "2022-07-12",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 81,
+  "fields": {
+    "empresa": 5,
+    "matricula": "EMP007",
+    "nome": "Bruno Moreira Lopes",
+    "pis": "120.111.111-07",
+    "cpf": "123.456.111-07",
+    "cbo": "7155",
+    "carteira_profissional": "AB123457",
+    "serie_carteira": "05",
+    "data_nascimento": "1989-11-03",
+    "data_admissao": "2021-04-30",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 82,
+  "fields": {
+    "empresa": 5,
+    "matricula": "EMP008",
+    "nome": "Fernanda Dias Rodrigues",
+    "pis": "120.111.111-08",
+    "cpf": "123.456.111-08",
+    "cbo": "1425",
+    "carteira_profissional": "AB123458",
+    "serie_carteira": "06",
+    "data_nascimento": "1985-05-22",
+    "data_admissao": "2018-09-17",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 83,
+  "fields": {
+    "empresa": 5,
+    "matricula": "EMP009",
+    "nome": "Rafael Gomes Barros",
+    "pis": "120.111.111-09",
+    "cpf": "123.456.111-09",
+    "cbo": "2122",
+    "carteira_profissional": "AB123459",
+    "serie_carteira": "19",
+    "data_nascimento": "1993-06-11",
+    "data_admissao": "2020-12-03",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 84,
+  "fields": {
+    "empresa": 5,
+    "matricula": "EMP010",
+    "nome": "Camila Teixeira Prado",
+    "pis": "120.111.111-10",
+    "cpf": "123.456.111-10",
+    "cbo": "2515",
+    "carteira_profissional": "AB123460",
+    "serie_carteira": "07",
+    "data_nascimento": "1999-01-28",
+    "data_admissao": "2023-05-25",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 85,
+  "fields": {
+    "empresa": 5,
+    "matricula": "EMP011",
+    "nome": "Diego Carvalho Tavares",
+    "pis": "120.111.111-11",
+    "cpf": "123.456.111-11",
+    "cbo": "4115",
+    "carteira_profissional": "AB123461",
+    "serie_carteira": "16",
+    "data_nascimento": "1994-04-17",
+    "data_admissao": "2022-08-14",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 86,
+  "fields": {
+    "empresa": 5,
+    "matricula": "EMP012",
+    "nome": "Tatiane Lopes Guimarães",
+    "pis": "120.111.111-12",
+    "cpf": "123.456.111-12",
+    "cbo": "5172",
+    "carteira_profissional": "AB123462",
+    "serie_carteira": "22",
+    "data_nascimento": "1990-08-30",
+    "data_admissao": "2021-10-09",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 87,
+  "fields": {
+    "empresa": 5,
+    "matricula": "EMP013",
+    "nome": "Guilherme Pinto Araújo",
+    "pis": "120.111.111-13",
+    "cpf": "123.456.111-13",
+    "cbo": "7150",
+    "carteira_profissional": "AB123463",
+    "serie_carteira": "08",
+    "data_nascimento": "1986-06-06",
+    "data_admissao": "2020-03-19",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 88,
+  "fields": {
+    "empresa": 5,
+    "matricula": "EMP014",
+    "nome": "Daniela Freitas Moura",
+    "pis": "120.111.111-14",
+    "cpf": "123.456.111-14",
+    "cbo": "2523",
+    "carteira_profissional": "AB123464",
+    "serie_carteira": "09",
+    "data_nascimento": "1984-03-14",
+    "data_admissao": "2019-11-27",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 89,
+  "fields": {
+    "empresa": 5,
+    "matricula": "EMP015",
+    "nome": "Pedro Henrique Sales",
+    "pis": "120.111.111-15",
+    "cpf": "123.456.111-15",
+    "cbo": "2142",
+    "carteira_profissional": "AB123465",
+    "serie_carteira": "11",
+    "data_nascimento": "1997-02-05",
+    "data_admissao": "2023-01-04",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 90,
+  "fields": {
+    "empresa": 5,
+    "matricula": "EMP016",
+    "nome": "Aline Rocha Campos",
+    "pis": "120.111.111-16",
+    "cpf": "123.456.111-16",
+    "cbo": "4111",
+    "carteira_profissional": "AB123466",
+    "serie_carteira": "13",
+    "data_nascimento": "1991-09-01",
+    "data_admissao": "2022-06-21",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 91,
+  "fields": {
+    "empresa": 5,
+    "matricula": "EMP017",
+    "nome": "Rodrigo Lima Vasconcelos",
+    "pis": "120.111.111-17",
+    "cpf": "123.456.111-17",
+    "cbo": "1423",
+    "carteira_profissional": "AB123467",
+    "serie_carteira": "21",
+    "data_nascimento": "1989-10-29",
+    "data_admissao": "2021-02-10",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 92,
+  "fields": {
+    "empresa": 5,
+    "matricula": "EMP018",
+    "nome": "Beatriz Souza Martins",
+    "pis": "120.111.111-18",
+    "cpf": "123.456.111-18",
+    "cbo": "5173",
+    "carteira_profissional": "AB123468",
+    "serie_carteira": "02",
+    "data_nascimento": "1996-12-12",
+    "data_admissao": "2020-09-07",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 93,
+  "fields": {
+    "empresa": 5,
+    "matricula": "EMP019",
+    "nome": "Marcelo Torres Figueiredo",
+    "pis": "120.111.111-19",
+    "cpf": "123.456.111-19",
+    "cbo": "3171",
+    "carteira_profissional": "AB123469",
+    "serie_carteira": "04",
+    "data_nascimento": "1983-01-09",
+    "data_admissao": "2019-05-02",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 94,
+  "fields": {
+    "empresa": 5,
+    "matricula": "EMP020",
+    "nome": "Larissa Alves Coutinho",
+    "pis": "120.111.111-20",
+    "cpf": "123.456.111-20",
+    "cbo": "2521",
+    "carteira_profissional": "AB123470",
+    "serie_carteira": "03",
+    "data_nascimento": "1998-07-03",
+    "data_admissao": "2023-04-18",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 96,
+  "fields": {
+    "empresa": 3,
+    "matricula": "EMP001",
+    "nome": "Ana Pereira Souza",
+    "pis": "120.111.111-01",
+    "cpf": "123.456.111-01",
+    "cbo": "2110",
+    "carteira_profissional": "AB123451",
+    "serie_carteira": "12",
+    "data_nascimento": "1988-07-15",
+    "data_admissao": "2022-03-10",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 97,
+  "fields": {
+    "empresa": 3,
+    "matricula": "EMP002",
+    "nome": "Carlos Mendes Oliveira",
+    "pis": "120.111.111-02",
+    "cpf": "123.456.111-02",
+    "cbo": "2525",
+    "carteira_profissional": "AB123452",
+    "serie_carteira": "14",
+    "data_nascimento": "1992-02-20",
+    "data_admissao": "2021-11-05",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 98,
+  "fields": {
+    "empresa": 3,
+    "matricula": "EMP003",
+    "nome": "Mariana Costa Ribeiro",
+    "pis": "120.111.111-03",
+    "cpf": "123.456.111-03",
+    "cbo": "4110",
+    "carteira_profissional": "AB123453",
+    "serie_carteira": "15",
+    "data_nascimento": "1995-09-10",
+    "data_admissao": "2020-01-22",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 99,
+  "fields": {
+    "empresa": 3,
+    "matricula": "EMP004",
+    "nome": "João Batista Fernandes",
+    "pis": "120.111.111-04",
+    "cpf": "123.456.111-04",
+    "cbo": "3175",
+    "carteira_profissional": "AB123454",
+    "serie_carteira": "10",
+    "data_nascimento": "1987-12-01",
+    "data_admissao": "2019-06-18",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 100,
+  "fields": {
+    "empresa": 3,
+    "matricula": "EMP005",
+    "nome": "Lucas Andrade Martins",
+    "pis": "120.111.111-05",
+    "cpf": "123.456.111-05",
+    "cbo": "2140",
+    "carteira_profissional": "AB123455",
+    "serie_carteira": "18",
+    "data_nascimento": "1998-03-25",
+    "data_admissao": "2023-02-01",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 101,
+  "fields": {
+    "empresa": 3,
+    "matricula": "EMP006",
+    "nome": "Paula Nunes Albuquerque",
+    "pis": "120.111.111-06",
+    "cpf": "123.456.111-06",
+    "cbo": "4221",
+    "carteira_profissional": "AB123456",
+    "serie_carteira": "20",
+    "data_nascimento": "1991-10-09",
+    "data_admissao": "2022-07-12",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 102,
+  "fields": {
+    "empresa": 3,
+    "matricula": "EMP007",
+    "nome": "Bruno Moreira Lopes",
+    "pis": "120.111.111-07",
+    "cpf": "123.456.111-07",
+    "cbo": "7155",
+    "carteira_profissional": "AB123457",
+    "serie_carteira": "05",
+    "data_nascimento": "1989-11-03",
+    "data_admissao": "2021-04-30",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 103,
+  "fields": {
+    "empresa": 3,
+    "matricula": "EMP008",
+    "nome": "Fernanda Dias Rodrigues",
+    "pis": "120.111.111-08",
+    "cpf": "123.456.111-08",
+    "cbo": "1425",
+    "carteira_profissional": "AB123458",
+    "serie_carteira": "06",
+    "data_nascimento": "1985-05-22",
+    "data_admissao": "2018-09-17",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 104,
+  "fields": {
+    "empresa": 3,
+    "matricula": "EMP009",
+    "nome": "Rafael Gomes Barros",
+    "pis": "120.111.111-09",
+    "cpf": "123.456.111-09",
+    "cbo": "2122",
+    "carteira_profissional": "AB123459",
+    "serie_carteira": "19",
+    "data_nascimento": "1993-06-11",
+    "data_admissao": "2020-12-03",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 105,
+  "fields": {
+    "empresa": 3,
+    "matricula": "EMP010",
+    "nome": "Camila Teixeira Prado",
+    "pis": "120.111.111-10",
+    "cpf": "123.456.111-10",
+    "cbo": "2515",
+    "carteira_profissional": "AB123460",
+    "serie_carteira": "07",
+    "data_nascimento": "1999-01-28",
+    "data_admissao": "2023-05-25",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 106,
+  "fields": {
+    "empresa": 3,
+    "matricula": "EMP011",
+    "nome": "Diego Carvalho Tavares",
+    "pis": "120.111.111-11",
+    "cpf": "123.456.111-11",
+    "cbo": "4115",
+    "carteira_profissional": "AB123461",
+    "serie_carteira": "16",
+    "data_nascimento": "1994-04-17",
+    "data_admissao": "2022-08-14",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 107,
+  "fields": {
+    "empresa": 3,
+    "matricula": "EMP012",
+    "nome": "Tatiane Lopes Guimarães",
+    "pis": "120.111.111-12",
+    "cpf": "123.456.111-12",
+    "cbo": "5172",
+    "carteira_profissional": "AB123462",
+    "serie_carteira": "22",
+    "data_nascimento": "1990-08-30",
+    "data_admissao": "2021-10-09",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 108,
+  "fields": {
+    "empresa": 3,
+    "matricula": "EMP013",
+    "nome": "Guilherme Pinto Araújo",
+    "pis": "120.111.111-13",
+    "cpf": "123.456.111-13",
+    "cbo": "7150",
+    "carteira_profissional": "AB123463",
+    "serie_carteira": "08",
+    "data_nascimento": "1986-06-06",
+    "data_admissao": "2020-03-19",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 109,
+  "fields": {
+    "empresa": 3,
+    "matricula": "EMP014",
+    "nome": "Daniela Freitas Moura",
+    "pis": "120.111.111-14",
+    "cpf": "123.456.111-14",
+    "cbo": "2523",
+    "carteira_profissional": "AB123464",
+    "serie_carteira": "09",
+    "data_nascimento": "1984-03-14",
+    "data_admissao": "2019-11-27",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 110,
+  "fields": {
+    "empresa": 3,
+    "matricula": "EMP015",
+    "nome": "Pedro Henrique Sales",
+    "pis": "120.111.111-15",
+    "cpf": "123.456.111-15",
+    "cbo": "2142",
+    "carteira_profissional": "AB123465",
+    "serie_carteira": "11",
+    "data_nascimento": "1997-02-05",
+    "data_admissao": "2023-01-04",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 111,
+  "fields": {
+    "empresa": 3,
+    "matricula": "EMP016",
+    "nome": "Aline Rocha Campos",
+    "pis": "120.111.111-16",
+    "cpf": "123.456.111-16",
+    "cbo": "4111",
+    "carteira_profissional": "AB123466",
+    "serie_carteira": "13",
+    "data_nascimento": "1991-09-01",
+    "data_admissao": "2022-06-21",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 112,
+  "fields": {
+    "empresa": 3,
+    "matricula": "EMP017",
+    "nome": "Rodrigo Lima Vasconcelos",
+    "pis": "120.111.111-17",
+    "cpf": "123.456.111-17",
+    "cbo": "1423",
+    "carteira_profissional": "AB123467",
+    "serie_carteira": "21",
+    "data_nascimento": "1989-10-29",
+    "data_admissao": "2021-02-10",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 113,
+  "fields": {
+    "empresa": 3,
+    "matricula": "EMP018",
+    "nome": "Beatriz Souza Martins",
+    "pis": "120.111.111-18",
+    "cpf": "123.456.111-18",
+    "cbo": "5173",
+    "carteira_profissional": "AB123468",
+    "serie_carteira": "02",
+    "data_nascimento": "1996-12-12",
+    "data_admissao": "2020-09-07",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 114,
+  "fields": {
+    "empresa": 3,
+    "matricula": "EMP019",
+    "nome": "Marcelo Torres Figueiredo",
+    "pis": "120.111.111-19",
+    "cpf": "123.456.111-19",
+    "cbo": "3171",
+    "carteira_profissional": "AB123469",
+    "serie_carteira": "04",
+    "data_nascimento": "1983-01-09",
+    "data_admissao": "2019-05-02",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "funcionarios.funcionario",
+  "pk": 115,
+  "fields": {
+    "empresa": 3,
+    "matricula": "EMP020",
+    "nome": "Larissa Alves Coutinho",
+    "pis": "120.111.111-20",
+    "cpf": "123.456.111-20",
+    "cbo": "2521",
+    "carteira_profissional": "AB123470",
+    "serie_carteira": "03",
+    "data_nascimento": "1998-07-03",
+    "data_admissao": "2023-04-18",
+    "data_demissao": null,
+    "observacao": ""
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 1,
+  "fields": {
+    "empresa": 2,
+    "funcionario": 2,
+    "competencia": "01/2024",
+    "base_fgts": "3500.00",
+    "valor_fgts": "280.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T03:55:45.609Z",
+    "atualizado_em": "2025-12-31T03:55:45.599Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 2,
+  "fields": {
+    "empresa": 2,
+    "funcionario": 2,
+    "competencia": "02/2024",
+    "base_fgts": "3500.00",
+    "valor_fgts": "280.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T03:55:45.609Z",
+    "atualizado_em": "2025-12-31T03:55:45.599Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 3,
+  "fields": {
+    "empresa": 2,
+    "funcionario": 2,
+    "competencia": "03/2024",
+    "base_fgts": "3500.00",
+    "valor_fgts": "280.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T03:55:45.609Z",
+    "atualizado_em": "2025-12-31T03:55:45.599Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 4,
+  "fields": {
+    "empresa": 2,
+    "funcionario": 2,
+    "competencia": "04/2024",
+    "base_fgts": "3500.00",
+    "valor_fgts": "280.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T03:55:45.609Z",
+    "atualizado_em": "2025-12-31T03:55:45.599Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 5,
+  "fields": {
+    "empresa": 2,
+    "funcionario": 2,
+    "competencia": "05/2024",
+    "base_fgts": "3500.00",
+    "valor_fgts": "280.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T03:55:45.609Z",
+    "atualizado_em": "2025-12-31T03:55:45.599Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 6,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 3,
+    "competencia": "01/2023",
+    "base_fgts": "1200.00",
+    "valor_fgts": "96.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T03:55:45.609Z",
+    "atualizado_em": "2025-12-31T03:55:45.599Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 7,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 3,
+    "competencia": "02/2023",
+    "base_fgts": "1200.00",
+    "valor_fgts": "96.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T03:55:45.609Z",
+    "atualizado_em": "2025-12-31T03:55:45.599Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 8,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 3,
+    "competencia": "03/2023",
+    "base_fgts": "1200.00",
+    "valor_fgts": "96.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T03:55:45.609Z",
+    "atualizado_em": "2025-12-31T03:55:45.599Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 9,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 3,
+    "competencia": "04/2023",
+    "base_fgts": "1350.00",
+    "valor_fgts": "108.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T03:55:45.609Z",
+    "atualizado_em": "2025-12-31T03:55:45.599Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 10,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 3,
+    "competencia": "05/2023",
+    "base_fgts": "1350.00",
+    "valor_fgts": "108.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T03:55:45.609Z",
+    "atualizado_em": "2025-12-31T03:55:45.599Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 11,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 4,
+    "competencia": "01/2023",
+    "base_fgts": "2500.00",
+    "valor_fgts": "200.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T03:55:45.609Z",
+    "atualizado_em": "2025-12-31T03:55:45.599Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 12,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 4,
+    "competencia": "02/2023",
+    "base_fgts": "2500.00",
+    "valor_fgts": "200.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T03:55:45.609Z",
+    "atualizado_em": "2025-12-31T03:55:45.599Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 13,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 4,
+    "competencia": "03/2023",
+    "base_fgts": "2500.00",
+    "valor_fgts": "200.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T03:55:45.609Z",
+    "atualizado_em": "2025-12-31T03:55:45.599Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 14,
+  "fields": {
+    "empresa": 4,
+    "funcionario": 5,
+    "competencia": "03/2024",
+    "base_fgts": "1800.00",
+    "valor_fgts": "144.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T03:55:45.609Z",
+    "atualizado_em": "2025-12-31T03:55:45.599Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 15,
+  "fields": {
+    "empresa": 4,
+    "funcionario": 5,
+    "competencia": "04/2024",
+    "base_fgts": "1800.00",
+    "valor_fgts": "144.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T03:55:45.609Z",
+    "atualizado_em": "2025-12-31T03:55:45.599Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 16,
+  "fields": {
+    "empresa": 4,
+    "funcionario": 5,
+    "competencia": "05/2024",
+    "base_fgts": "1800.00",
+    "valor_fgts": "144.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T03:55:45.609Z",
+    "atualizado_em": "2025-12-31T03:55:45.599Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 17,
+  "fields": {
+    "empresa": 4,
+    "funcionario": 5,
+    "competencia": "06/2024",
+    "base_fgts": "1800.00",
+    "valor_fgts": "144.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T12:17:06.668Z",
+    "atualizado_em": "2025-12-31T12:17:06.668Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 18,
+  "fields": {
+    "empresa": 4,
+    "funcionario": 5,
+    "competencia": "07/2024",
+    "base_fgts": "1800.00",
+    "valor_fgts": "144.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T12:17:06.673Z",
+    "atualizado_em": "2025-12-31T12:17:06.673Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 19,
+  "fields": {
+    "empresa": 4,
+    "funcionario": 5,
+    "competencia": "08/2024",
+    "base_fgts": "1800.00",
+    "valor_fgts": "144.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T12:17:06.677Z",
+    "atualizado_em": "2025-12-31T12:17:06.677Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 20,
+  "fields": {
+    "empresa": 4,
+    "funcionario": 5,
+    "competencia": "09/2024",
+    "base_fgts": "1800.00",
+    "valor_fgts": "144.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T12:17:06.682Z",
+    "atualizado_em": "2025-12-31T12:17:06.682Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 21,
+  "fields": {
+    "empresa": 4,
+    "funcionario": 5,
+    "competencia": "10/2024",
+    "base_fgts": "1800.00",
+    "valor_fgts": "144.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T12:17:06.685Z",
+    "atualizado_em": "2025-12-31T12:17:06.685Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 22,
+  "fields": {
+    "empresa": 4,
+    "funcionario": 5,
+    "competencia": "11/2024",
+    "base_fgts": "1800.00",
+    "valor_fgts": "144.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T12:17:06.689Z",
+    "atualizado_em": "2025-12-31T12:17:06.689Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 23,
+  "fields": {
+    "empresa": 4,
+    "funcionario": 5,
+    "competencia": "12/2024",
+    "base_fgts": "1800.00",
+    "valor_fgts": "144.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T12:17:06.693Z",
+    "atualizado_em": "2025-12-31T12:17:06.693Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 24,
+  "fields": {
+    "empresa": 4,
+    "funcionario": 5,
+    "competencia": "01/2025",
+    "base_fgts": "1800.00",
+    "valor_fgts": "144.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T12:17:06.698Z",
+    "atualizado_em": "2025-12-31T12:17:06.698Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 25,
+  "fields": {
+    "empresa": 4,
+    "funcionario": 5,
+    "competencia": "02/2025",
+    "base_fgts": "1800.00",
+    "valor_fgts": "144.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T12:17:06.702Z",
+    "atualizado_em": "2025-12-31T12:17:06.702Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 26,
+  "fields": {
+    "empresa": 4,
+    "funcionario": 5,
+    "competencia": "03/2025",
+    "base_fgts": "1800.00",
+    "valor_fgts": "144.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T12:17:06.707Z",
+    "atualizado_em": "2025-12-31T12:17:06.707Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 27,
+  "fields": {
+    "empresa": 4,
+    "funcionario": 5,
+    "competencia": "04/2025",
+    "base_fgts": "1800.00",
+    "valor_fgts": "144.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T12:17:06.712Z",
+    "atualizado_em": "2025-12-31T12:17:06.712Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 28,
+  "fields": {
+    "empresa": 4,
+    "funcionario": 5,
+    "competencia": "05/2025",
+    "base_fgts": "1800.00",
+    "valor_fgts": "144.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T12:17:06.716Z",
+    "atualizado_em": "2025-12-31T12:17:06.716Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 29,
+  "fields": {
+    "empresa": 4,
+    "funcionario": 5,
+    "competencia": "06/2025",
+    "base_fgts": "1800.00",
+    "valor_fgts": "144.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T12:17:06.720Z",
+    "atualizado_em": "2025-12-31T12:17:06.720Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 30,
+  "fields": {
+    "empresa": 4,
+    "funcionario": 5,
+    "competencia": "07/2025",
+    "base_fgts": "1800.00",
+    "valor_fgts": "144.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T12:17:06.723Z",
+    "atualizado_em": "2025-12-31T12:17:06.723Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 31,
+  "fields": {
+    "empresa": 4,
+    "funcionario": 5,
+    "competencia": "08/2025",
+    "base_fgts": "1800.00",
+    "valor_fgts": "144.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T12:17:06.728Z",
+    "atualizado_em": "2025-12-31T12:17:06.728Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 32,
+  "fields": {
+    "empresa": 4,
+    "funcionario": 5,
+    "competencia": "09/2025",
+    "base_fgts": "1800.00",
+    "valor_fgts": "144.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T12:17:06.733Z",
+    "atualizado_em": "2025-12-31T12:17:06.733Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 33,
+  "fields": {
+    "empresa": 4,
+    "funcionario": 5,
+    "competencia": "10/2025",
+    "base_fgts": "1800.00",
+    "valor_fgts": "144.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T12:17:06.736Z",
+    "atualizado_em": "2025-12-31T12:17:06.736Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 34,
+  "fields": {
+    "empresa": 4,
+    "funcionario": 5,
+    "competencia": "11/2025",
+    "base_fgts": "1800.00",
+    "valor_fgts": "144.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T12:17:06.740Z",
+    "atualizado_em": "2025-12-31T12:17:06.740Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 35,
+  "fields": {
+    "empresa": 4,
+    "funcionario": 5,
+    "competencia": "12/2025",
+    "base_fgts": "1800.00",
+    "valor_fgts": "144.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T12:17:06.744Z",
+    "atualizado_em": "2025-12-31T12:17:06.745Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 51,
+  "fields": {
+    "empresa": 5,
+    "funcionario": 6,
+    "competencia": "12/2025",
+    "base_fgts": "3853.00",
+    "valor_fgts": "308.24",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T16:41:33.963Z",
+    "atualizado_em": "2025-12-31T16:41:33.963Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 52,
+  "fields": {
+    "empresa": 5,
+    "funcionario": 7,
+    "competencia": "12/2025",
+    "base_fgts": "3099.00",
+    "valor_fgts": "247.92",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T16:41:33.970Z",
+    "atualizado_em": "2025-12-31T16:41:33.970Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 53,
+  "fields": {
+    "empresa": 5,
+    "funcionario": 8,
+    "competencia": "12/2025",
+    "base_fgts": "4674.00",
+    "valor_fgts": "373.92",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T16:41:33.975Z",
+    "atualizado_em": "2025-12-31T16:41:33.975Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 54,
+  "fields": {
+    "empresa": 5,
+    "funcionario": 9,
+    "competencia": "12/2025",
+    "base_fgts": "2500.00",
+    "valor_fgts": "200.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T16:41:33.981Z",
+    "atualizado_em": "2025-12-31T16:41:33.981Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 55,
+  "fields": {
+    "empresa": 5,
+    "funcionario": 10,
+    "competencia": "12/2025",
+    "base_fgts": "3200.00",
+    "valor_fgts": "256.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T16:41:33.986Z",
+    "atualizado_em": "2025-12-31T16:41:33.986Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 56,
+  "fields": {
+    "empresa": 5,
+    "funcionario": 6,
+    "competencia": "11/2025",
+    "base_fgts": "3853.00",
+    "valor_fgts": "308.24",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T16:41:33.996Z",
+    "atualizado_em": "2025-12-31T16:41:33.996Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 57,
+  "fields": {
+    "empresa": 5,
+    "funcionario": 7,
+    "competencia": "11/2025",
+    "base_fgts": "3099.00",
+    "valor_fgts": "247.92",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T16:41:34.001Z",
+    "atualizado_em": "2025-12-31T16:41:34.001Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 58,
+  "fields": {
+    "empresa": 5,
+    "funcionario": 8,
+    "competencia": "11/2025",
+    "base_fgts": "4674.00",
+    "valor_fgts": "373.92",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T16:41:34.006Z",
+    "atualizado_em": "2025-12-31T16:41:34.006Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 59,
+  "fields": {
+    "empresa": 5,
+    "funcionario": 9,
+    "competencia": "11/2025",
+    "base_fgts": "2500.00",
+    "valor_fgts": "200.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T16:41:34.013Z",
+    "atualizado_em": "2025-12-31T16:41:34.013Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 60,
+  "fields": {
+    "empresa": 5,
+    "funcionario": 10,
+    "competencia": "11/2025",
+    "base_fgts": "3200.00",
+    "valor_fgts": "256.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T16:41:34.018Z",
+    "atualizado_em": "2025-12-31T16:41:34.018Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 61,
+  "fields": {
+    "empresa": 5,
+    "funcionario": 6,
+    "competencia": "10/2025",
+    "base_fgts": "3853.00",
+    "valor_fgts": "308.24",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T16:41:34.023Z",
+    "atualizado_em": "2025-12-31T16:41:34.023Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 62,
+  "fields": {
+    "empresa": 5,
+    "funcionario": 7,
+    "competencia": "10/2025",
+    "base_fgts": "3099.00",
+    "valor_fgts": "247.92",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T16:41:34.028Z",
+    "atualizado_em": "2025-12-31T16:41:34.028Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 63,
+  "fields": {
+    "empresa": 5,
+    "funcionario": 8,
+    "competencia": "10/2025",
+    "base_fgts": "4674.00",
+    "valor_fgts": "373.92",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T16:41:34.033Z",
+    "atualizado_em": "2025-12-31T16:41:34.033Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 64,
+  "fields": {
+    "empresa": 5,
+    "funcionario": 9,
+    "competencia": "10/2025",
+    "base_fgts": "2500.00",
+    "valor_fgts": "200.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T16:41:34.037Z",
+    "atualizado_em": "2025-12-31T16:41:34.037Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 65,
+  "fields": {
+    "empresa": 5,
+    "funcionario": 10,
+    "competencia": "10/2025",
+    "base_fgts": "3200.00",
+    "valor_fgts": "256.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T16:41:34.044Z",
+    "atualizado_em": "2025-12-31T16:41:34.044Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 66,
+  "fields": {
+    "empresa": 5,
+    "funcionario": 6,
+    "competencia": "09/2025",
+    "base_fgts": "3853.00",
+    "valor_fgts": "308.24",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T16:41:34.050Z",
+    "atualizado_em": "2025-12-31T16:41:34.050Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 67,
+  "fields": {
+    "empresa": 5,
+    "funcionario": 7,
+    "competencia": "09/2025",
+    "base_fgts": "3099.00",
+    "valor_fgts": "247.92",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T16:41:34.054Z",
+    "atualizado_em": "2025-12-31T16:41:34.054Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 68,
+  "fields": {
+    "empresa": 5,
+    "funcionario": 8,
+    "competencia": "09/2025",
+    "base_fgts": "4674.00",
+    "valor_fgts": "373.92",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T16:41:34.059Z",
+    "atualizado_em": "2025-12-31T16:41:34.059Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 69,
+  "fields": {
+    "empresa": 5,
+    "funcionario": 9,
+    "competencia": "09/2025",
+    "base_fgts": "2500.00",
+    "valor_fgts": "200.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T16:41:34.064Z",
+    "atualizado_em": "2025-12-31T16:41:34.064Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 70,
+  "fields": {
+    "empresa": 5,
+    "funcionario": 10,
+    "competencia": "09/2025",
+    "base_fgts": "3200.00",
+    "valor_fgts": "256.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T16:41:34.069Z",
+    "atualizado_em": "2025-12-31T16:41:34.069Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 71,
+  "fields": {
+    "empresa": 5,
+    "funcionario": 6,
+    "competencia": "08/2025",
+    "base_fgts": "3853.00",
+    "valor_fgts": "308.24",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T16:41:34.074Z",
+    "atualizado_em": "2025-12-31T16:41:34.074Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 72,
+  "fields": {
+    "empresa": 5,
+    "funcionario": 7,
+    "competencia": "08/2025",
+    "base_fgts": "3099.00",
+    "valor_fgts": "247.92",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T16:41:34.079Z",
+    "atualizado_em": "2025-12-31T16:41:34.079Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 73,
+  "fields": {
+    "empresa": 5,
+    "funcionario": 8,
+    "competencia": "08/2025",
+    "base_fgts": "4674.00",
+    "valor_fgts": "373.92",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T16:41:34.085Z",
+    "atualizado_em": "2025-12-31T16:41:34.085Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 74,
+  "fields": {
+    "empresa": 5,
+    "funcionario": 9,
+    "competencia": "08/2025",
+    "base_fgts": "2500.00",
+    "valor_fgts": "200.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T16:41:34.090Z",
+    "atualizado_em": "2025-12-31T16:41:34.090Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 75,
+  "fields": {
+    "empresa": 5,
+    "funcionario": 10,
+    "competencia": "08/2025",
+    "base_fgts": "3200.00",
+    "valor_fgts": "256.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2025-12-31T16:41:34.095Z",
+    "atualizado_em": "2025-12-31T16:41:34.095Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 76,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 4,
+    "competencia": "04/2023",
+    "base_fgts": "2500.00",
+    "valor_fgts": "200.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2026-01-02T16:22:45.800Z",
+    "atualizado_em": "2026-01-02T16:22:45.800Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 77,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 4,
+    "competencia": "05/2023",
+    "base_fgts": "2500.00",
+    "valor_fgts": "200.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2026-01-02T16:22:45.810Z",
+    "atualizado_em": "2026-01-02T16:22:45.810Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 78,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 4,
+    "competencia": "06/2023",
+    "base_fgts": "2500.00",
+    "valor_fgts": "200.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2026-01-02T16:22:45.817Z",
+    "atualizado_em": "2026-01-02T16:22:45.817Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 79,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 4,
+    "competencia": "07/2023",
+    "base_fgts": "2500.00",
+    "valor_fgts": "200.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2026-01-02T16:22:45.824Z",
+    "atualizado_em": "2026-01-02T16:22:45.824Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 80,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 4,
+    "competencia": "08/2023",
+    "base_fgts": "2500.00",
+    "valor_fgts": "200.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2026-01-02T16:22:45.832Z",
+    "atualizado_em": "2026-01-02T16:22:45.832Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 81,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 4,
+    "competencia": "09/2023",
+    "base_fgts": "2500.00",
+    "valor_fgts": "200.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2026-01-02T16:22:45.839Z",
+    "atualizado_em": "2026-01-02T16:22:45.839Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 82,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 4,
+    "competencia": "10/2023",
+    "base_fgts": "2500.00",
+    "valor_fgts": "200.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2026-01-02T16:22:45.847Z",
+    "atualizado_em": "2026-01-02T16:22:45.847Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 83,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 4,
+    "competencia": "11/2023",
+    "base_fgts": "2500.00",
+    "valor_fgts": "200.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2026-01-02T16:22:45.854Z",
+    "atualizado_em": "2026-01-02T16:22:45.854Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 84,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 4,
+    "competencia": "12/2023",
+    "base_fgts": "2500.00",
+    "valor_fgts": "200.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2026-01-02T16:22:45.862Z",
+    "atualizado_em": "2026-01-02T16:22:45.862Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 85,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 4,
+    "competencia": "01/2024",
+    "base_fgts": "2500.00",
+    "valor_fgts": "200.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2026-01-02T16:22:45.869Z",
+    "atualizado_em": "2026-01-02T16:22:45.869Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 86,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 4,
+    "competencia": "02/2024",
+    "base_fgts": "2500.00",
+    "valor_fgts": "200.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2026-01-02T16:22:45.877Z",
+    "atualizado_em": "2026-01-02T16:22:45.877Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 87,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 4,
+    "competencia": "03/2024",
+    "base_fgts": "2500.00",
+    "valor_fgts": "200.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2026-01-02T16:22:45.885Z",
+    "atualizado_em": "2026-01-02T16:22:45.885Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 88,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 4,
+    "competencia": "04/2024",
+    "base_fgts": "2500.00",
+    "valor_fgts": "200.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2026-01-02T16:22:45.893Z",
+    "atualizado_em": "2026-01-02T16:22:45.893Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 89,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 4,
+    "competencia": "05/2024",
+    "base_fgts": "2500.00",
+    "valor_fgts": "200.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2026-01-02T16:22:45.901Z",
+    "atualizado_em": "2026-01-02T16:22:45.901Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 90,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 4,
+    "competencia": "06/2024",
+    "base_fgts": "2500.00",
+    "valor_fgts": "200.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2026-01-02T16:22:45.908Z",
+    "atualizado_em": "2026-01-02T16:22:45.908Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 91,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 4,
+    "competencia": "07/2024",
+    "base_fgts": "2500.00",
+    "valor_fgts": "200.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2026-01-02T16:22:45.916Z",
+    "atualizado_em": "2026-01-02T16:22:45.916Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 92,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 4,
+    "competencia": "08/2024",
+    "base_fgts": "2500.00",
+    "valor_fgts": "200.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2026-01-02T16:22:45.924Z",
+    "atualizado_em": "2026-01-02T16:22:45.924Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 93,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 4,
+    "competencia": "09/2024",
+    "base_fgts": "3000.00",
+    "valor_fgts": "200.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2026-01-02T16:22:45.931Z",
+    "atualizado_em": "2026-01-02T16:23:45.240Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 94,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 4,
+    "competencia": "10/2024",
+    "base_fgts": "3000.00",
+    "valor_fgts": "240.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2026-01-02T16:22:45.939Z",
+    "atualizado_em": "2026-01-02T16:22:45.939Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 95,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 4,
+    "competencia": "11/2024",
+    "base_fgts": "3000.00",
+    "valor_fgts": "240.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2026-01-02T16:22:45.947Z",
+    "atualizado_em": "2026-01-02T16:22:45.947Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 96,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 4,
+    "competencia": "12/2024",
+    "base_fgts": "3000.00",
+    "valor_fgts": "240.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2026-01-02T16:22:45.954Z",
+    "atualizado_em": "2026-01-02T16:22:45.954Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 97,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 4,
+    "competencia": "01/2025",
+    "base_fgts": "3000.00",
+    "valor_fgts": "240.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2026-01-02T16:22:45.963Z",
+    "atualizado_em": "2026-01-02T16:22:45.963Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 98,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 4,
+    "competencia": "02/2025",
+    "base_fgts": "3000.00",
+    "valor_fgts": "240.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2026-01-02T16:22:45.972Z",
+    "atualizado_em": "2026-01-02T16:22:45.972Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 99,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 4,
+    "competencia": "03/2025",
+    "base_fgts": "3000.00",
+    "valor_fgts": "240.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2026-01-02T16:22:45.982Z",
+    "atualizado_em": "2026-01-02T16:22:45.982Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 100,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 4,
+    "competencia": "04/2025",
+    "base_fgts": "3000.00",
+    "valor_fgts": "240.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2026-01-02T16:22:45.991Z",
+    "atualizado_em": "2026-01-02T16:22:45.991Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 101,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 4,
+    "competencia": "05/2025",
+    "base_fgts": "3000.00",
+    "valor_fgts": "240.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2026-01-02T16:22:46.000Z",
+    "atualizado_em": "2026-01-02T16:22:46.000Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 102,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 4,
+    "competencia": "06/2025",
+    "base_fgts": "3000.00",
+    "valor_fgts": "240.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2026-01-02T16:22:46.009Z",
+    "atualizado_em": "2026-01-02T16:22:46.009Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 103,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 4,
+    "competencia": "07/2025",
+    "base_fgts": "3000.00",
+    "valor_fgts": "240.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2026-01-02T16:22:46.016Z",
+    "atualizado_em": "2026-01-02T16:22:46.016Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 104,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 4,
+    "competencia": "08/2025",
+    "base_fgts": "3000.00",
+    "valor_fgts": "240.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2026-01-02T16:22:46.024Z",
+    "atualizado_em": "2026-01-02T16:22:46.024Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 105,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 4,
+    "competencia": "09/2025",
+    "base_fgts": "3000.00",
+    "valor_fgts": "240.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2026-01-02T16:22:46.033Z",
+    "atualizado_em": "2026-01-02T16:22:46.033Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 106,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 4,
+    "competencia": "10/2025",
+    "base_fgts": "3000.00",
+    "valor_fgts": "240.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2026-01-02T16:22:46.041Z",
+    "atualizado_em": "2026-01-02T16:22:46.041Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 107,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 4,
+    "competencia": "11/2025",
+    "base_fgts": "3000.00",
+    "valor_fgts": "240.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2026-01-02T16:22:46.049Z",
+    "atualizado_em": "2026-01-02T16:22:46.049Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 108,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 4,
+    "competencia": "12/2025",
+    "base_fgts": "3000.00",
+    "valor_fgts": "240.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2026-01-02T16:22:46.058Z",
+    "atualizado_em": "2026-01-02T16:22:46.058Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 109,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 4,
+    "competencia": "01/2026",
+    "base_fgts": "3000.00",
+    "valor_fgts": "240.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2026-01-02T16:22:46.066Z",
+    "atualizado_em": "2026-01-02T16:22:46.066Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 110,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 111,
+    "competencia": "01/2025",
+    "base_fgts": "2500.00",
+    "valor_fgts": "200.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2026-01-02T19:27:58.602Z",
+    "atualizado_em": "2026-01-02T19:27:58.612Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 111,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 111,
+    "competencia": "02/2025",
+    "base_fgts": "2500.00",
+    "valor_fgts": "200.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2026-01-02T19:28:23.882Z",
+    "atualizado_em": "2026-01-02T19:28:23.882Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 112,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 111,
+    "competencia": "03/2025",
+    "base_fgts": "2500.00",
+    "valor_fgts": "200.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2026-01-02T19:28:23.894Z",
+    "atualizado_em": "2026-01-02T19:28:23.894Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 113,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 111,
+    "competencia": "04/2025",
+    "base_fgts": "2500.00",
+    "valor_fgts": "200.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2026-01-02T19:28:23.910Z",
+    "atualizado_em": "2026-01-02T19:28:23.910Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 114,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 111,
+    "competencia": "05/2025",
+    "base_fgts": "2500.00",
+    "valor_fgts": "200.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2026-01-02T19:28:23.917Z",
+    "atualizado_em": "2026-01-02T19:28:23.917Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 115,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 111,
+    "competencia": "06/2025",
+    "base_fgts": "2500.00",
+    "valor_fgts": "200.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2026-01-02T19:28:23.951Z",
+    "atualizado_em": "2026-01-02T19:28:23.951Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 116,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 111,
+    "competencia": "07/2025",
+    "base_fgts": "2500.00",
+    "valor_fgts": "200.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2026-01-02T19:28:23.961Z",
+    "atualizado_em": "2026-01-02T19:28:23.961Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 117,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 111,
+    "competencia": "08/2025",
+    "base_fgts": "2500.00",
+    "valor_fgts": "200.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2026-01-02T19:28:23.969Z",
+    "atualizado_em": "2026-01-02T19:28:23.969Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 118,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 111,
+    "competencia": "09/2025",
+    "base_fgts": "2500.00",
+    "valor_fgts": "200.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2026-01-02T19:28:23.982Z",
+    "atualizado_em": "2026-01-02T19:28:23.982Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 119,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 111,
+    "competencia": "10/2025",
+    "base_fgts": "2500.00",
+    "valor_fgts": "200.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2026-01-02T19:28:23.999Z",
+    "atualizado_em": "2026-01-02T19:28:23.999Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 120,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 111,
+    "competencia": "11/2025",
+    "base_fgts": "2500.00",
+    "valor_fgts": "200.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2026-01-02T19:28:24.006Z",
+    "atualizado_em": "2026-01-02T19:28:24.006Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 121,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 111,
+    "competencia": "12/2025",
+    "base_fgts": "2500.00",
+    "valor_fgts": "200.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2026-01-02T19:28:24.016Z",
+    "atualizado_em": "2026-01-02T19:28:24.016Z"
+  }
+},
+{
+  "model": "lancamentos.lancamento",
+  "pk": 122,
+  "fields": {
+    "empresa": 3,
+    "funcionario": 111,
+    "competencia": "01/2026",
+    "base_fgts": "2500.00",
+    "valor_fgts": "200.00",
+    "pago": false,
+    "data_pagto": null,
+    "valor_pago": null,
+    "pago_em": null,
+    "criado_em": "2026-01-02T19:28:24.026Z",
+    "atualizado_em": "2026-01-02T19:28:24.026Z"
+  }
+},
+{
+  "model": "usuarios.usuario",
+  "pk": 1,
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$ApaMpHUL6C9en4KyWP6MtA$ZQ2D3B8th+n6C33HfvSkxlmitU1oBbFkSTidd6D8DZ4=",
+    "last_login": "2025-12-31T15:12:47.670Z",
+    "is_superuser": true,
+    "username": "admin",
+    "first_name": "",
+    "last_name": "",
+    "email": "admin@example.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-12-27T15:19:30.484Z",
+    "manutencao": false,
+    "empresa": 1,
+    "is_multi_empresa": true,
+    "groups": [],
+    "user_permissions": [],
+    "empresas_permitidas": [
+      1,
+      2,
+      3,
+      4
+    ]
+  }
+},
+{
+  "model": "usuarios.usuario",
+  "pk": 2,
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$0y6XpXRMN23crGBiuTHbZF$u6wgE08lXOn/FGrH9kv7JOz6o4tJ62E08LR5neYxLBA=",
+    "last_login": "2026-01-02T14:53:54.418Z",
+    "is_superuser": false,
+    "username": "user_a",
+    "first_name": "",
+    "last_name": "",
+    "email": "user_a@test.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-12-30T14:36:09.633Z",
+    "manutencao": false,
+    "empresa": 3,
+    "is_multi_empresa": false,
+    "groups": [],
+    "user_permissions": [],
+    "empresas_permitidas": []
+  }
+},
+{
+  "model": "usuarios.usuario",
+  "pk": 3,
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$NQRv1fX7n4UsubOdNOrYrI$rNulvChuSIlKRRQyOcKXudA30q3mTwrVgBCCCJsYwgs=",
+    "last_login": "2025-12-31T11:17:24.655Z",
+    "is_superuser": false,
+    "username": "gestor_multi",
+    "first_name": "",
+    "last_name": "",
+    "email": "gestor@test.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-12-30T14:36:10.578Z",
+    "manutencao": false,
+    "empresa": 3,
+    "is_multi_empresa": true,
+    "groups": [],
+    "user_permissions": [],
+    "empresas_permitidas": [
+      3,
+      4
+    ]
+  }
+},
+{
+  "model": "usuarios.usuario",
+  "pk": 4,
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$lm96c3Tx8sFWKCq90DGy3i$B+6y99WRp3gSWc2ZrzPMV8CoPtXzx+yU9mqoeGYV+Gs=",
+    "last_login": "2025-12-31T16:06:03.037Z",
+    "is_superuser": false,
+    "username": "LM360",
+    "first_name": "Like",
+    "last_name": "360",
+    "email": "likemove360@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-12-31T16:06:01.112Z",
+    "manutencao": false,
+    "empresa": null,
+    "is_multi_empresa": false,
+    "groups": [],
+    "user_permissions": [],
+    "empresas_permitidas": []
+  }
+},
+{
+  "model": "usuarios.usuario",
+  "pk": 5,
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$EUwz3KmtqMEJVGUNEGEbYT$kWyuR3jUFYh6fx3kTiVzrnkaia2KgAGdaeymulZ2m/A=",
+    "last_login": "2025-12-31T16:07:53.630Z",
+    "is_superuser": false,
+    "username": "Like",
+    "first_name": "Like",
+    "last_name": "360",
+    "email": "likemove360@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-12-31T16:07:51.759Z",
+    "manutencao": false,
+    "empresa": null,
+    "is_multi_empresa": false,
+    "groups": [],
+    "user_permissions": [],
+    "empresas_permitidas": []
+  }
+},
+{
+  "model": "usuarios.usuario",
+  "pk": 6,
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$KxqznaoQTEs6jVDpbUtQUs$UbytLbQQG2tGym/qbpCp/WOoPQLu9f0ZK+ZLmNhCwVU=",
+    "last_login": "2026-01-02T12:51:54.236Z",
+    "is_superuser": false,
+    "username": "demo",
+    "first_name": "Cliente",
+    "last_name": "Demo",
+    "email": "demo@fgtsweb.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-12-31T16:29:15.073Z",
+    "manutencao": false,
+    "empresa": 5,
+    "is_multi_empresa": false,
+    "groups": [],
+    "user_permissions": [],
+    "empresas_permitidas": []
+  }
+},
+{
+  "model": "usuarios.usuario",
+  "pk": 7,
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$JcrYuLtHtmpq0bmzgxir4Z$qybtLlXmCj0IEi+YxBH20ahxWiFIrNIOT0XIuiTM9Ko=",
+    "last_login": "2026-01-02T14:52:50.288Z",
+    "is_superuser": false,
+    "username": "iandora",
+    "first_name": "Cris",
+    "last_name": "Sá",
+    "email": "iandorasa@outlook.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-01-02T14:45:27.075Z",
+    "manutencao": false,
+    "empresa": null,
+    "is_multi_empresa": false,
+    "groups": [],
+    "user_permissions": [],
+    "empresas_permitidas": []
+  }
+},
+{
+  "model": "indices.indice",
+  "pk": 1,
+  "fields": {
+    "competencia": "01/2023",
+    "data_indice": "2023-01-01",
+    "valor": "1.08500000"
+  }
+},
+{
+  "model": "indices.indice",
+  "pk": 2,
+  "fields": {
+    "competencia": "02/2023",
+    "data_indice": "2023-02-01",
+    "valor": "1.08200000"
+  }
+},
+{
+  "model": "indices.indice",
+  "pk": 3,
+  "fields": {
+    "competencia": "03/2023",
+    "data_indice": "2023-03-01",
+    "valor": "1.07900000"
+  }
+},
+{
+  "model": "indices.indice",
+  "pk": 4,
+  "fields": {
+    "competencia": "04/2023",
+    "data_indice": "2023-04-01",
+    "valor": "1.07600000"
+  }
+},
+{
+  "model": "indices.indice",
+  "pk": 5,
+  "fields": {
+    "competencia": "05/2023",
+    "data_indice": "2023-05-01",
+    "valor": "1.07300000"
+  }
+},
+{
+  "model": "indices.indice",
+  "pk": 6,
+  "fields": {
+    "competencia": "06/2023",
+    "data_indice": "2023-06-01",
+    "valor": "1.07000000"
+  }
+},
+{
+  "model": "indices.indice",
+  "pk": 7,
+  "fields": {
+    "competencia": "07/2023",
+    "data_indice": "2023-07-01",
+    "valor": "1.06700000"
+  }
+},
+{
+  "model": "indices.indice",
+  "pk": 8,
+  "fields": {
+    "competencia": "08/2023",
+    "data_indice": "2023-08-01",
+    "valor": "1.06400000"
+  }
+},
+{
+  "model": "indices.indice",
+  "pk": 9,
+  "fields": {
+    "competencia": "09/2023",
+    "data_indice": "2023-09-01",
+    "valor": "1.06100000"
+  }
+},
+{
+  "model": "indices.indice",
+  "pk": 10,
+  "fields": {
+    "competencia": "10/2023",
+    "data_indice": "2023-10-01",
+    "valor": "1.05800000"
+  }
+},
+{
+  "model": "indices.indice",
+  "pk": 11,
+  "fields": {
+    "competencia": "11/2023",
+    "data_indice": "2023-11-01",
+    "valor": "1.05500000"
+  }
+},
+{
+  "model": "indices.indice",
+  "pk": 12,
+  "fields": {
+    "competencia": "12/2023",
+    "data_indice": "2023-12-01",
+    "valor": "1.05200000"
+  }
+},
+{
+  "model": "indices.indice",
+  "pk": 13,
+  "fields": {
+    "competencia": "01/2024",
+    "data_indice": "2024-01-01",
+    "valor": "1.04900000"
+  }
+},
+{
+  "model": "indices.indice",
+  "pk": 14,
+  "fields": {
+    "competencia": "02/2024",
+    "data_indice": "2024-02-01",
+    "valor": "1.04600000"
+  }
+},
+{
+  "model": "indices.indice",
+  "pk": 15,
+  "fields": {
+    "competencia": "03/2024",
+    "data_indice": "2024-03-01",
+    "valor": "1.04300000"
+  }
+},
+{
+  "model": "indices.indice",
+  "pk": 16,
+  "fields": {
+    "competencia": "04/2024",
+    "data_indice": "2024-04-01",
+    "valor": "1.04000000"
+  }
+},
+{
+  "model": "indices.indice",
+  "pk": 17,
+  "fields": {
+    "competencia": "05/2024",
+    "data_indice": "2024-05-01",
+    "valor": "1.03700000"
+  }
+},
+{
+  "model": "indices.indice",
+  "pk": 18,
+  "fields": {
+    "competencia": "06/2024",
+    "data_indice": "2024-06-01",
+    "valor": "1.03400000"
+  }
+},
+{
+  "model": "indices.indice",
+  "pk": 19,
+  "fields": {
+    "competencia": "07/2024",
+    "data_indice": "2024-07-01",
+    "valor": "1.03100000"
+  }
+},
+{
+  "model": "indices.indice",
+  "pk": 20,
+  "fields": {
+    "competencia": "08/2024",
+    "data_indice": "2024-08-01",
+    "valor": "1.02800000"
+  }
+},
+{
+  "model": "indices.indice",
+  "pk": 21,
+  "fields": {
+    "competencia": "09/2024",
+    "data_indice": "2024-09-01",
+    "valor": "1.02500000"
+  }
+},
+{
+  "model": "indices.indice",
+  "pk": 22,
+  "fields": {
+    "competencia": "10/2024",
+    "data_indice": "2024-10-01",
+    "valor": "1.02200000"
+  }
+},
+{
+  "model": "indices.indice",
+  "pk": 23,
+  "fields": {
+    "competencia": "11/2024",
+    "data_indice": "2024-11-01",
+    "valor": "1.01900000"
+  }
+},
+{
+  "model": "indices.indice",
+  "pk": 24,
+  "fields": {
+    "competencia": "12/2024",
+    "data_indice": "2024-12-01",
+    "valor": "1.01600000"
+  }
+},
+{
+  "model": "indices.indice",
+  "pk": 25,
+  "fields": {
+    "competencia": "01/2025",
+    "data_indice": "2025-01-01",
+    "valor": "1.01300000"
+  }
+},
+{
+  "model": "indices.indice",
+  "pk": 26,
+  "fields": {
+    "competencia": "02/2025",
+    "data_indice": "2025-02-01",
+    "valor": "1.01000000"
+  }
+},
+{
+  "model": "indices.indice",
+  "pk": 27,
+  "fields": {
+    "competencia": "03/2025",
+    "data_indice": "2025-03-01",
+    "valor": "1.00700000"
+  }
+},
+{
+  "model": "indices.indice",
+  "pk": 28,
+  "fields": {
+    "competencia": "04/2025",
+    "data_indice": "2025-04-01",
+    "valor": "1.00400000"
+  }
+},
+{
+  "model": "indices.indice",
+  "pk": 29,
+  "fields": {
+    "competencia": "05/2025",
+    "data_indice": "2025-05-01",
+    "valor": "1.00100000"
+  }
+}

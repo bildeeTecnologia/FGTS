@@ -1,0 +1,260 @@
+{% extends 'base.html' %}
+{% block title %}Contrato de Processamento de Dados (DPA) — FGTS Web{% endblock %}
+
+{% block extra_css %}
+<style>
+  .doc-sidebar { position: sticky; top: 24px; max-height: calc(100vh - 80px); overflow-y: auto; }
+  .doc-nav a { display:block; padding:.4rem .75rem; font-size:.87rem; color:#4a5568; text-decoration:none; border-left:2px solid transparent; transition:all .15s; border-radius:0 4px 4px 0; }
+  .doc-nav a:hover, .doc-nav a.active { color:#005CA9; background:#f0f5ff; border-left-color:#005CA9; }
+  .doc-nav .nav-section { font-size:.75rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:#9aa5b4; padding:.75rem .75rem .25rem; margin-top:.5rem; }
+  .doc-section { scroll-margin-top:32px; }
+  .doc-section h2 { font-size:1.25rem; font-weight:700; color:#005CA9; border-bottom:2px solid #e0e8f0; padding-bottom:.5rem; margin-bottom:1.1rem; }
+  .doc-section h3 { font-size:1rem; font-weight:700; color:#1a2a3a; margin-top:1.25rem; }
+  .doc-section p, .doc-section li { font-size:.95rem; line-height:1.75; color:#374151; }
+  .last-updated { background:#f0f5ff; border-radius:8px; padding:.6rem 1rem; font-size:.83rem; color:#4a5568; margin-bottom:2rem; }
+  .role-box { border-radius:10px; padding:.8rem 1rem; font-size:.9rem; margin-bottom:.6rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="row">
+
+    <!-- Sidebar -->
+    <div class="col-lg-3 d-none d-lg-block">
+      <div class="doc-sidebar doc-nav">
+        <div class="nav-section">DPA — Tratamento de Dados</div>
+        <a href="#escopo">1. Escopo e Partes</a>
+        <a href="#papeis">2. Papéis e Responsabilidades</a>
+        <a href="#dados-tratados">3. Dados Tratados</a>
+        <a href="#obrigacoes-operador">4. Obrigações do Operador</a>
+        <a href="#obrigacoes-controlador">5. Obrigações do Controlador</a>
+        <a href="#suboperadores">6. Suboperadores</a>
+        <a href="#seguranca">7. Segurança</a>
+        <a href="#incidentes">8. Incidentes</a>
+        <a href="#direitos-titulares">9. Direitos dos Titulares</a>
+        <a href="#encerramento">10. Encerramento do Contrato</a>
+        <a href="#auditoria">11. Auditoria e Evidências</a>
+        <a href="#lei-aplicavel">12. Lei Aplicável</a>
+      </div>
+    </div>
+
+    <!-- Conteúdo -->
+    <div class="col-lg-9">
+
+      <div class="d-flex align-items-center gap-3 mb-4">
+        <div>
+          <h1 style="font-size:1.7rem; font-weight:700; color:#005CA9; margin:0;">
+            <i class="bi bi-file-earmark-lock2 me-2"></i>Aditivo de Tratamento de Dados
+          </h1>
+          <span class="text-muted" style="font-size:.9rem;">Data Processing Agreement (DPA) — LGPD, Art. 39</span>
+        </div>
+      </div>
+
+      <div class="last-updated">
+        <i class="bi bi-calendar-check me-2"></i>
+        Última atualização: <strong>[DATA_VIGÊNCIA]</strong> &nbsp;|&nbsp; Versão 1.0
+      </div>
+
+      <div class="alert alert-info border-0 mb-4" style="border-radius:10px; font-size:.9rem;">
+        <i class="bi bi-buildings me-2"></i>
+        <strong>Este documento aplica-se principalmente ao Módulo BPO.</strong> Ele define as obrigações mútuas entre o escritório BPO (Controlador) e a FGTS Web (Operador) no tratamento de dados dos funcionários das empresas clientes gerenciadas pelo BPO.
+      </div>
+
+      <!-- 1. Escopo -->
+      <div class="doc-section mb-5" id="escopo">
+        <h2>1. Escopo e Partes</h2>
+        <p>Este Aditivo de Tratamento de Dados ("DPA") complementa os <a href="{% url 'legal-termos' %}">Termos de Uso</a> da plataforma FGTS Web e aplica-se a todo tratamento de dados pessoais realizado pela FGTS Web em nome do cliente ("Controlador") no contexto da prestação dos serviços contratados.</p>
+        <p><strong>Partes:</strong></p>
+        <div class="role-box" style="background:#f0f5ff; border:1.5px solid #b3d1f5;">
+          <strong>Operador:</strong> [RAZÃO SOCIAL] — CNPJ [CNPJ] — operadora da plataforma FGTS Web.
+        </div>
+        <div class="role-box" style="background:#f5f9f0; border:1.5px solid #b3d9a0;">
+          <strong>Controlador:</strong> o cliente que contratou os serviços, responsável pelos dados pessoais dos funcionários e empresas inseridos na plataforma.
+        </div>
+        <div class="role-box" style="background:#fffde7; border:1.5px solid #ffe082;">
+          <strong>No contexto BPO — relação tripla:</strong><br>
+          • O escritório BPO é <strong>Operador</strong> perante as empresas clientes dele.<br>
+          • A FGTS Web é <strong>Sub-operador</strong> perante o escritório BPO.<br>
+          • Os dados pertencem aos funcionários das empresas clientes do BPO (<strong>Titulares</strong>).
+        </div>
+      </div>
+
+      <!-- 2. Papéis -->
+      <div class="doc-section mb-5" id="papeis">
+        <h2>2. Papéis e Responsabilidades</h2>
+        <p><strong>O Controlador é responsável por:</strong></p>
+        <ul>
+          <li>Garantir que possui base legal adequada (LGPD, Art. 7) para coletar e transferir os dados pessoais à FGTS Web.</li>
+          <li>Informar aos titulares (funcionários) sobre o tratamento realizado por meio da plataforma.</li>
+          <li>Assegurar a exatidão e atualização dos dados inseridos na plataforma.</li>
+          <li>Definir as finalidades e instrução de tratamento dos dados (o quê, como e por qual razão).</li>
+        </ul>
+        <p><strong>A FGTS Web (Operador) é responsável por:</strong></p>
+        <ul>
+          <li>Tratar os dados somente conforme as instruções documentadas do Controlador e nos termos deste DPA.</li>
+          <li>Adotar medidas de segurança adequadas para proteger os dados contra acessos não autorizados, perda ou divulgação.</li>
+          <li>Notificar o Controlador em caso de incidente de segurança que envolva seus dados.</li>
+          <li>Auxiliar o Controlador no atendimento às solicitações de direitos dos titulares, na medida do tecnicamente possível.</li>
+        </ul>
+      </div>
+
+      <!-- 3. Dados -->
+      <div class="doc-section mb-5" id="dados-tratados">
+        <h2>3. Dados Pessoais Tratados</h2>
+        <p>No âmbito deste DPA, a FGTS Web trata as seguintes categorias de dados pessoais em nome do Controlador:</p>
+        <table class="table table-bordered" style="font-size:.88rem;">
+          <thead style="background:#f0f5ff;">
+            <tr><th>Categoria</th><th>Exemplos de Dados</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Dados de identificação do funcionário</td>
+              <td>Nome completo, CPF, data de nascimento, PIS/PASEP</td>
+            </tr>
+            <tr>
+              <td>Dados de vínculo empregatício</td>
+              <td>Data de admissão, data de demissão, tipo de contrato, cargo</td>
+            </tr>
+            <tr>
+              <td>Dados financeiros trabalhistas</td>
+              <td>Salário base, verbas remuneratórias, depósitos FGTS, competências</td>
+            </tr>
+            <tr>
+              <td>Dados bancários (FGTS)</td>
+              <td>Conta vinculada ao FGTS junto à Caixa Econômica Federal</td>
+            </tr>
+            <tr>
+              <td>Dados das empresas clientes</td>
+              <td>Razão social, CNPJ, endereço, responsável legal</td>
+            </tr>
+          </tbody>
+        </table>
+        <p><strong>Finalidade do tratamento:</strong> exclusivamente para prestação dos serviços de gestão e cálculo de FGTS contratados, geração de relatórios, guias e exportação SEFIP.</p>
+        <p><strong>Duração:</strong> pelo período de vigência do contrato de serviços com a FGTS Web, acrescido do prazo necessário para exclusão segura dos dados conforme previsto neste DPA.</p>
+      </div>
+
+      <!-- 4. Obrigações Operador -->
+      <div class="doc-section mb-5" id="obrigacoes-operador">
+        <h2>4. Obrigações do Operador (FGTS Web)</h2>
+        <ul>
+          <li>Tratar os dados pessoais <strong>somente</strong> para as finalidades previstas neste DPA e conforme instruções documentadas do Controlador.</li>
+          <li>Garantir que os colaboradores internos com acesso aos dados estejam submetidos a sigilo e obrigações de confidencialidade.</li>
+          <li>Implementar e manter medidas técnicas e organizacionais adequadas de segurança (ver seção 7).</li>
+          <li>Auxiliar o Controlador no cumprimento das obrigações previstas nos Art. 46 a 49 da LGPD (segurança e boas práticas).</li>
+          <li>Não realizar transferência internacional dos dados sem prévia autorização do Controlador e garantia de proteção equivalente.</li>
+          <li>Permitir e contribuir com auditorias ou inspeções realizadas pelo Controlador ou por auditor por ele designado, mediante aviso prévio de 15 dias.</li>
+          <li>Excluir ou devolver os dados ao Controlador ao término da relação contratual (ver seção 10).</li>
+        </ul>
+      </div>
+
+      <!-- 5. Obrigações Controlador -->
+      <div class="doc-section mb-5" id="obrigacoes-controlador">
+        <h2>5. Obrigações do Controlador</h2>
+        <ul>
+          <li>Garantir que os dados pessoais transferidos à FGTS Web foram coletados com base legal adequada (Art. 7 ou Art. 11 da LGPD).</li>
+          <li>Informar os titulares (funcionários e empresas clientes) sobre o tratamento realizado por meio da plataforma, inclusive sobre a subcontratação de serviços de tecnologia.</li>
+          <li>Não instruir a FGTS Web a realizar processamentos ilegais ou incompatíveis com a LGPD.</li>
+          <li>Notificar prontamente a FGTS Web sobre qualquer reclamação ou solicitação de titular que exija ação por parte do Operador.</li>
+          <li>Manter a confidencialidade de suas credenciais de acesso à plataforma.</li>
+        </ul>
+      </div>
+
+      <!-- 6. Suboperadores -->
+      <div class="doc-section mb-5" id="suboperadores">
+        <h2>6. Suboperadores Autorizados</h2>
+        <p>A FGTS Web autoriza o uso dos seguintes suboperadores para prestação dos serviços. O Controlador concorda com essa subcontratação ao aceitar estes termos:</p>
+        <table class="table table-bordered" style="font-size:.88rem;">
+          <thead style="background:#f0f5ff;">
+            <tr><th>Suboperador</th><th>Finalidade</th><th>País dos Dados</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Supabase / PostgreSQL</strong></td>
+              <td>Banco de dados relacional principal</td>
+              <td>Brasil / EUA (com adequação contratual)</td>
+            </tr>
+            <tr>
+              <td><strong>Coolify / Provedor de hospedagem</strong></td>
+              <td>Hospedagem da aplicação</td>
+              <td>Brasil</td>
+            </tr>
+            <tr>
+              <td><strong>Asaas</strong></td>
+              <td>Processamento de pagamentos</td>
+              <td>Brasil</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>A FGTS Web notificará o Controlador com antecedência mínima de 30 dias sobre qualquer alteração nos suboperadores utilizados, oferecendo a possibilidade de oposição fundamentada.</p>
+      </div>
+
+      <!-- 7. Segurança -->
+      <div class="doc-section mb-5" id="seguranca">
+        <h2>7. Medidas de Segurança</h2>
+        <p>A FGTS Web implementa e mantém as seguintes medidas técnicas e organizacionais para proteção dos dados:</p>
+        <ul>
+          <li><strong>Criptografia em trânsito:</strong> HTTPS/TLS para todas as comunicações entre cliente e servidor</li>
+          <li><strong>Criptografia em repouso:</strong> dados em banco de dados com proteção em nível de infraestrutura</li>
+          <li><strong>Controle de acesso:</strong> autenticação obrigatória, separação de ambientes por empresa, controles de permissão granulares</li>
+          <li><strong>Armazenamento seguro de senhas:</strong> hash com algoritmos modernos (PBKDF2/bcrypt), sem armazenamento em texto plano</li>
+          <li><strong>Logs de auditoria:</strong> registro de ações críticas (acesso, modificação, exclusão de dados)</li>
+          <li><strong>Backups:</strong> cópias de segurança regulares com controle de acesso e testadas periodicamente</li>
+          <li><strong>Monitoramento:</strong> alertas para comportamentos anômalos e tentativas de acesso não autorizado</li>
+        </ul>
+      </div>
+
+      <!-- 8. Incidentes -->
+      <div class="doc-section mb-5" id="incidentes">
+        <h2>8. Incidentes de Segurança</h2>
+        <p>Em caso de incidente de segurança que envolva dados pessoais tratados em nome do Controlador, a FGTS Web:</p>
+        <ul>
+          <li>Notificará o Controlador por e-mail cadastrado em até <strong>72 horas</strong> após tomar conhecimento do incidente.</li>
+          <li>A notificação incluirá: natureza do incidente, categorias e volume aproximado de dados afetados, medidas adotadas e recomendadas.</li>
+          <li>Cooperará com o Controlador para contenção, investigação e comunicação à ANPD, quando aplicável.</li>
+          <li>Documentará o incidente e as medidas tomadas para fins de evidência e auditoria futura.</li>
+        </ul>
+      </div>
+
+      <!-- 9. Direitos dos Titulares -->
+      <div class="doc-section mb-5" id="direitos-titulares">
+        <h2>9. Atendimento a Direitos dos Titulares</h2>
+        <p>Quando um titular (ex.: funcionário) solicitar o exercício de direitos previstos no Art. 18 da LGPD (acesso, correção, exclusão, portabilidade, etc.):</p>
+        <ul>
+          <li>Se a solicitação chegar à FGTS Web, será encaminhada ao Controlador em até 5 dias úteis.</li>
+          <li>A FGTS Web auxiliará tecnicamente o Controlador no atendimento, fornecendo extratos, relatórios ou executando exclusões em acordo com as instruções do Controlador.</li>
+          <li>O Controlador é o responsável por responder oficialmente ao titular dentro do prazo legal de 15 dias úteis.</li>
+        </ul>
+      </div>
+
+      <!-- 10. Encerramento -->
+      <div class="doc-section mb-5" id="encerramento">
+        <h2>10. Encerramento do Contrato</h2>
+        <p>Ao término da relação contratual (por cancelamento, inadimplência ou qualquer outra razão):</p>
+        <ul>
+          <li>Os dados do Controlador ficam disponíveis para exportação por <strong>30 dias corridos</strong> após o encerramento.</li>
+          <li>Decorrido este prazo, <strong>todos os dados pessoais serão excluídos definitivamente</strong> dos sistemas de produção da FGTS Web.</li>
+          <li>Dados em backups são excluídos no próximo ciclo de rotação dos backups, em até 90 dias.</li>
+          <li>Dados retidos por obrigação legal (ex.: dados fiscais) seguirão os prazos mínimos determinados em lei, após o que serão excluídos.</li>
+          <li>A FGTS Web pode emitir certificado de exclusão mediante solicitação expressa do Controlador.</li>
+        </ul>
+      </div>
+
+      <!-- 11. Auditoria -->
+      <div class="doc-section mb-5" id="auditoria">
+        <h2>11. Auditoria e Evidências</h2>
+        <p>A FGTS Web manterá evidências documentadas das medidas de segurança e conformidade adotadas (Art. 37 da LGPD), incluindo registros de operações de tratamento, controles de acesso e logs de segurança.</p>
+        <p>O Controlador pode solicitar evidências de conformidade mediante comunicação prévia ao DPO. Auditorias in-loco requerem aviso de 15 dias e acordos de confidencialidade formalizados.</p>
+      </div>
+
+      <!-- 12. Lei -->
+      <div class="doc-section mb-5" id="lei-aplicavel">
+        <h2>12. Lei Aplicável</h2>
+        <p>Este DPA é regido pela legislação brasileira, especialmente pela <strong>LGPD (Lei 13.709/2018)</strong> e suas regulamentações pela ANPD. Fica eleito o foro de <strong>[CIDADE/UF]</strong> para dirimir eventuais litígios.</p>
+        <p>Este documento é parte integrante dos <a href="{% url 'legal-termos' %}">Termos de Uso</a> da FGTS Web. Em caso de conflito, as disposições deste DPA prevalecem para matérias de proteção de dados.</p>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

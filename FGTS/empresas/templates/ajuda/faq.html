@@ -1,0 +1,276 @@
+{% extends 'base.html' %}
+{% block title %}Perguntas Frequentes — FGTS Web{% endblock %}
+
+{% block content %}
+<div style="max-width: 820px; margin: 0 auto;">
+
+  <!-- Breadcrumb -->
+  <nav class="mb-4" style="font-size: 0.88rem;">
+    <a href="{% url 'ajuda' %}" style="color: #005CA9; text-decoration: none;"><i class="bi bi-question-circle me-1"></i>Ajuda</a>
+    <span class="text-muted mx-2">/</span>
+    <span class="text-muted">Perguntas Frequentes</span>
+  </nav>
+
+  <h1 style="font-size: 1.75rem; font-weight: 700; color: #005CA9; margin-bottom: 0.4rem;">
+    <i class="bi bi-patch-question me-2" style="color: #F7941D;"></i>Perguntas Frequentes
+  </h1>
+  <p class="text-muted mb-5" style="font-size: 1rem;">
+    Dúvidas técnicas sobre cálculos, lançamentos, SEFIP e planos — respondidas de forma direta.
+  </p>
+
+  <!-- Categoria: Cálculos -->
+  <div class="mb-2 pb-1 border-bottom" style="border-color: #e0e8f0 !important;">
+    <span style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #005CA9;">
+      <i class="bi bi-calculator me-1"></i>Cálculos
+    </span>
+  </div>
+  <div class="accordion mb-5" id="faq-calculos">
+
+    <div class="accordion-item border-0 mb-2" style="border-radius: 10px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.07);">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c1" style="font-weight: 600; font-size: 0.93rem; color: #1a2a3a; background: #fff;">
+          O que é Base FGTS e como ela é determinada?
+        </button>
+      </h2>
+      <div id="c1" class="accordion-collapse collapse" data-bs-parent="#faq-calculos">
+        <div class="accordion-body" style="font-size: 0.9rem; color: #3d4f63; line-height: 1.75;">
+          A Base FGTS é o somatório das verbas de natureza salarial habitual pagas ao trabalhador no mês. Inclui: salário fixo, comissões, horas extras, adicionais de insalubridade, de periculosidade e adicional noturno. <strong>Não integram a base</strong>: diárias de viagem, ajuda de custo, participação nos lucros (PLR) e verbas indenizatórias. O sistema recebe a base já calculada pelo usuário — não aplica regras de composição automática de verbas.
+        </div>
+      </div>
+    </div>
+
+    <div class="accordion-item border-0 mb-2" style="border-radius: 10px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.07);">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c2" style="font-weight: 600; font-size: 0.93rem; color: #1a2a3a; background: #fff;">
+          Como o sistema calcula o valor do FGTS?
+        </button>
+      </h2>
+      <div id="c2" class="accordion-collapse collapse" data-bs-parent="#faq-calculos">
+        <div class="accordion-body" style="font-size: 0.9rem; color: #3d4f63; line-height: 1.75;">
+          O valor FGTS é calculado automaticamente como: <code>Valor FGTS = Base FGTS × 8%</code>. O cálculo é refeito sempre que a base é alterada. Para o 13º salário (competência 13/AAAA), aplica-se a mesma alíquota de 8% sobre a base informada para o décimo terceiro.
+        </div>
+      </div>
+    </div>
+
+    <div class="accordion-item border-0 mb-2" style="border-radius: 10px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.07);">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c3" style="font-weight: 600; font-size: 0.93rem; color: #1a2a3a; background: #fff;">
+          O que é a competência 13/AAAA e como lançar o 13º salário?
+        </button>
+      </h2>
+      <div id="c3" class="accordion-collapse collapse" data-bs-parent="#faq-calculos">
+        <div class="accordion-body" style="font-size: 0.9rem; color: #3d4f63; line-height: 1.75;">
+          A competência <code>13/AAAA</code> identifica os lançamentos referentes ao 13º salário do ano. No campo <strong>Competência</strong>, informe <code>13/2024</code> (por exemplo) em vez do formato mensal <code>MM/AAAA</code>. Em seguida, no campo <strong>Parcela 13º</strong>, informe <code>1</code> (primeira parcela) ou <code>2</code> (segunda parcela / saldo). Cada parcela deve ser lançada separadamente.
+        </div>
+      </div>
+    </div>
+
+    <div class="accordion-item border-0 mb-2" style="border-radius: 10px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.07);">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c4" style="font-weight: 600; font-size: 0.93rem; color: #1a2a3a; background: #fff;">
+          O que é JAM e como a correção é calculada?
+        </button>
+      </h2>
+      <div id="c4" class="accordion-collapse collapse" data-bs-parent="#faq-calculos">
+        <div class="accordion-body" style="font-size: 0.9rem; color: #3d4f63; line-height: 1.75;">
+          JAM significa <strong>Juros e Atualização Monetária</strong>. É o índice divulgado mensalmente pela Caixa Econômica Federal que corrige o saldo do FGTS. A taxa é composta de juros de 3% a.a. mais a variação da TR (Taxa Referencial). O sistema aplica os coeficientes JAM acumulados mês a mês desde a competência do depósito até a data de pagamento informada no relatório. A memória de cálculo detalha cada mês individualmente.
+        </div>
+      </div>
+    </div>
+
+    <div class="accordion-item border-0 mb-2" style="border-radius: 10px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.07);">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c5" style="font-weight: 600; font-size: 0.93rem; color: #1a2a3a; background: #fff;">
+          O relatório zerou a correção JAM. O que pode estar errado?
+        </button>
+      </h2>
+      <div id="c5" class="accordion-collapse collapse" data-bs-parent="#faq-calculos">
+        <div class="accordion-body" style="font-size: 0.9rem; color: #3d4f63; line-height: 1.75;">
+          Causas comuns: (1) a data de pagamento é idêntica ao mês de competência — sem intervalo, sem correção; (2) o índice JAM do mês ainda não está cadastrado na tabela de índices (<strong>/indices/</strong>). Verifique se o índice do período está disponível. Caso não esteja, solicite ao administrador o cadastro do coeficiente para o mês correspondente.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Categoria: Lançamentos -->
+  <div class="mb-2 pb-1 border-bottom" style="border-color: #e0e8f0 !important;">
+    <span style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #005CA9;">
+      <i class="bi bi-cash-coin me-1"></i>Lançamentos
+    </span>
+  </div>
+  <div class="accordion mb-5" id="faq-lancamentos">
+
+    <div class="accordion-item border-0 mb-2" style="border-radius: 10px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.07);">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#l1" style="font-weight: 600; font-size: 0.93rem; color: #1a2a3a; background: #fff;">
+          Qual a diferença entre lançamento manual, automático e por importação?
+        </button>
+      </h2>
+      <div id="l1" class="accordion-collapse collapse" data-bs-parent="#faq-lancamentos">
+        <div class="accordion-body" style="font-size: 0.9rem; color: #3d4f63; line-height: 1.75;">
+          <strong>Manual:</strong> o usuário preenche cada campo individualmente em <em>Lançamentos → Novo</em>. Indicado para ajustes pontuais ou competências isoladas.<br><br>
+          <strong>Automático:</strong> o sistema gera todos os lançamentos do período de vigência do vínculo de uma só vez, usando o salário base cadastrado. Competências já existentes são puladas automaticamente.<br><br>
+          <strong>Importação SEFIP.RE:</strong> lê um arquivo <code>SEFIP.RE</code> (360 chars/linha, ISO-8859-1) gerado pelo aplicativo SEFIP da Caixa e cria os lançamentos correspondentes. Acesse em <em>SEFIP → Importar SEFIP.RE</em>. Indicado para migração de histórico de sistemas anteriores.
+        </div>
+      </div>
+    </div>
+
+    <div class="accordion-item border-0 mb-2" style="border-radius: 10px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.07);">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#l2" style="font-weight: 600; font-size: 0.93rem; color: #1a2a3a; background: #fff;">
+          Como corrigir um lançamento com valor errado?
+        </button>
+      </h2>
+      <div id="l2" class="accordion-collapse collapse" data-bs-parent="#faq-lancamentos">
+        <div class="accordion-body" style="font-size: 0.9rem; color: #3d4f63; line-height: 1.75;">
+          Na lista de lançamentos, clique no ícone de edição ao lado do registro. Altere a <strong>Base FGTS</strong> — o sistema recalcula o valor automaticamente ao salvar. Não é necessário excluir e recriar. Lançamentos marcados como <em>Pago</em> também podem ser editados, mas atenção: alterar a base de um lançamento já pago não desfaz o recolhimento real.
+        </div>
+      </div>
+    </div>
+
+    <div class="accordion-item border-0 mb-2" style="border-radius: 10px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.07);">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#l3" style="font-weight: 600; font-size: 0.93rem; color: #1a2a3a; background: #fff;">
+          A geração automática produziu competências a mais. O que fazer?
+        </button>
+      </h2>
+      <div id="l3" class="accordion-collapse collapse" data-bs-parent="#faq-lancamentos">
+        <div class="accordion-body" style="font-size: 0.9rem; color: #3d4f63; line-height: 1.75;">
+          Use a exclusão em massa: na lista de lançamentos, filtre por funcionário e competência, selecione os excedentes via checkbox e clique em <strong>Excluir Selecionados</strong>. Para evitar que isso aconteça no futuro, certifique-se de que a data de demissão do vínculo está corretamente preenchida antes de gerar os lançamentos.
+        </div>
+      </div>
+    </div>
+
+    <div class="accordion-item border-0 mb-2" style="border-radius: 10px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.07);">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#l4" style="font-weight: 600; font-size: 0.93rem; color: #1a2a3a; background: #fff;">
+          O que o sistema lê e importa do arquivo SEFIP.RE?
+        </button>
+      </h2>
+      <div id="l4" class="accordion-collapse collapse" data-bs-parent="#faq-lancamentos">
+        <div class="accordion-body" style="font-size: 0.9rem; color: #3d4f63; line-height: 1.75;">
+          O sistema lê dois tipos de registro: o <strong>registro 00</strong> (cabeçalho) para identificar a competência no formato YYYYMM, e os registros <strong>301</strong> (dados do trabalhador) para extrair PIS e base FGTS. O valor FGTS é recalculado automaticamente como 8% da base. O funcionário é localizado pelo PIS — ele deve estar previamente cadastrado na plataforma. Funcionários sem correspondência geram um aviso e o lançamento é ignorado.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Categoria: SEFIP -->
+  <div class="mb-2 pb-1 border-bottom" style="border-color: #e0e8f0 !important;">
+    <span style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #005CA9;">
+      <i class="bi bi-file-earmark-arrow-down me-1"></i>SEFIP
+    </span>
+  </div>
+  <div class="accordion mb-5" id="faq-sefip">
+
+    <div class="accordion-item border-0 mb-2" style="border-radius: 10px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.07);">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#s1" style="font-weight: 600; font-size: 0.93rem; color: #1a2a3a; background: #fff;">
+          O que é o arquivo SEFIP.RE e para que ele serve?
+        </button>
+      </h2>
+      <div id="s1" class="accordion-collapse collapse" data-bs-parent="#faq-sefip">
+        <div class="accordion-body" style="font-size: 0.9rem; color: #3d4f63; line-height: 1.75;">
+          O SEFIP.RE é o arquivo de declaração mensal do FGTS e das informações à Previdência Social. Contém dados da empresa e de cada trabalhador (base, valor FGTS, contribuições previdenciárias). É transmitido mensalmente pelo aplicativo SEFIP da Caixa Econômica Federal ou pela Conectividade Social. A plataforma gera o arquivo no formato correto — o contador o importa no SEFIP para gerar a GRRF/GRF de recolhimento.
+        </div>
+      </div>
+    </div>
+
+    <div class="accordion-item border-0 mb-2" style="border-radius: 10px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.07);">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#s2" style="font-weight: 600; font-size: 0.93rem; color: #1a2a3a; background: #fff;">
+          Como habilitar o recurso SEFIP para uma empresa?
+        </button>
+      </h2>
+      <div id="s2" class="accordion-collapse collapse" data-bs-parent="#faq-sefip">
+        <div class="accordion-body" style="font-size: 0.9rem; color: #3d4f63; line-height: 1.75;">
+          O recurso SEFIP é habilitado pelo administrador da plataforma via painel Django Admin (<em>/admin/empresas/empresafeature/</em>). Encontre a empresa, marque o campo <strong>gerar_sefip = Sim</strong> e salve. O menu SEFIP aparecerá automaticamente no sidebar para os usuários daquela empresa. Usuários com perfil <em>staff</em> ou <em>superuser</em> têm acesso direto, independente da flag.
+        </div>
+      </div>
+    </div>
+
+    <div class="accordion-item border-0 mb-2" style="border-radius: 10px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.07);">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#s3" style="font-weight: 600; font-size: 0.93rem; color: #1a2a3a; background: #fff;">
+          Quais dados são obrigatórios para gerar o SEFIP.RE?
+        </button>
+      </h2>
+      <div id="s3" class="accordion-collapse collapse" data-bs-parent="#faq-sefip">
+        <div class="accordion-body" style="font-size: 0.9rem; color: #3d4f63; line-height: 1.75;">
+          <strong>Na empresa:</strong> CNPJ, FPAS, CNAE, RAT e Optante Simples.<br>
+          <strong>No funcionário:</strong> PIS/NIS (11 dígitos) e CPF.<br>
+          <strong>Nos lançamentos:</strong> competência e base FGTS preenchidos para o período desejado.<br><br>
+          Se algum dado obrigatório estiver faltando, o sistema exibe uma mensagem de erro indicando qual campo corrigir antes de gerar o arquivo.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Categoria: Conta e Planos -->
+  <div class="mb-2 pb-1 border-bottom" style="border-color: #e0e8f0 !important;">
+    <span style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #005CA9;">
+      <i class="bi bi-credit-card me-1"></i>Conta e Planos
+    </span>
+  </div>
+  <div class="accordion mb-5" id="faq-planos">
+
+    <div class="accordion-item border-0 mb-2" style="border-radius: 10px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.07);">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#p1" style="font-weight: 600; font-size: 0.93rem; color: #1a2a3a; background: #fff;">
+          Quantas empresas e funcionários posso cadastrar?
+        </button>
+      </h2>
+      <div id="p1" class="accordion-collapse collapse" data-bs-parent="#faq-planos">
+        <div class="accordion-body" style="font-size: 0.9rem; color: #3d4f63; line-height: 1.75;">
+          Os limites dependem do plano contratado. Consulte a página de planos (<strong>/billing/pricing/</strong>) para detalhes sobre empresas, funcionários e volume de lançamentos incluídos em cada nível.
+        </div>
+      </div>
+    </div>
+
+    <div class="accordion-item border-0 mb-2" style="border-radius: 10px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.07);">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#p2" style="font-weight: 600; font-size: 0.93rem; color: #1a2a3a; background: #fff;">
+          A Calculadora FGTS tem limite de uso?
+        </button>
+      </h2>
+      <div id="p2" class="accordion-collapse collapse" data-bs-parent="#faq-planos">
+        <div class="accordion-body" style="font-size: 0.9rem; color: #3d4f63; line-height: 1.75;">
+          A calculadora é pública e sem login. O cálculo na tela é ilimitado. O envio do <strong>relatório premium por e-mail</strong> (com memória de cálculo em PDF) pode ter limitação por endereço de e-mail, dependendo da configuração da plataforma.
+        </div>
+      </div>
+    </div>
+
+    <div class="accordion-item border-0 mb-2" style="border-radius: 10px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.07);">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#p3" style="font-weight: 600; font-size: 0.93rem; color: #1a2a3a; background: #fff;">
+          Como enviar uma dúvida ou sugestão para a equipe?
+        </button>
+      </h2>
+      <div id="p3" class="accordion-collapse collapse" data-bs-parent="#faq-planos">
+        <div class="accordion-body" style="font-size: 0.9rem; color: #3d4f63; line-height: 1.75;">
+          Use o formulário de feedback em <strong>Feedback</strong> no menu lateral. Descreva a dúvida, problema ou sugestão — a equipe recebe e analisa cada resposta para guiar as melhorias da plataforma.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Link para glossário -->
+  <div class="card p-4" style="border-radius: 12px; border: 1.5px solid #e0e8f0;">
+    <div class="d-flex align-items-center gap-3">
+      <i class="bi bi-alphabet" style="font-size: 2rem; color: #F7941D;"></i>
+      <div>
+        <div style="font-weight: 700; color: #1a2a3a;">Precisa de definições técnicas?</div>
+        <p class="text-muted mb-2" style="font-size: 0.9rem;">Consulte o glossário — termos como JAM, FPAS, RAT, CBO e SEFIP explicados de forma objetiva.</p>
+        <a href="{% url 'ajuda-glossario' %}" class="btn btn-sm" style="background: #005CA9; color: #fff; border-radius: 6px; font-weight: 600;">
+          Ver Glossário
+        </a>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

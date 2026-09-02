@@ -1,0 +1,319 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Importando Lançamentos...{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="mb-3">
+                <h1 class="h4 fw-bold text-dark">
+                    <i class="bi bi-upload text-primary me-2"></i>
+                    Importar Lançamentos
+                </h1>
+                <p class="text-muted mb-0 small">Arquivo: <strong>{{ importacao.nome_arquivo }}</strong></p>
+            </div>
+
+            <div class="card border-0 shadow-lg">
+                <div class="card-header bg-gradient-primary text-white py-3 border-0">
+                    <h2 class="h6 mb-0">
+                        <i class="bi bi-hourglass-split me-2"></i>
+                        Status da Importação
+                    </h2>
+                </div>
+
+                <div class="card-body p-4">
+
+                    <!-- Estado: Aguardando / Processando -->
+                    <div id="state-processing" style="display:none;">
+
+                        <div class="d-flex align-items-center gap-3 mb-4">
+                            <div class="spinner-border text-primary flex-shrink-0" role="status">
+                                <span class="visually-hidden">Processando...</span>
+                            </div>
+                            <div>
+                                <div id="state-processing-title" class="fw-semibold">Aguardando processamento...</div>
+                                <div class="text-muted small">Não feche esta aba.</div>
+                            </div>
+                            <div class="ms-auto text-end">
+                                <div class="text-muted small">Tempo decorrido</div>
+                                <div id="elapsed-time" class="fw-bold text-primary font-monospace">0:00</div>
+                            </div>
+                        </div>
+
+                        <!-- Barra de progresso -->
+                        <div class="mb-1 d-flex justify-content-between small">
+                            <span id="progress-label">Aguardando início...</span>
+                            <span id="progress-pct" class="fw-bold text-primary">—</span>
+                        </div>
+                        <div class="progress mb-1" style="height: 18px; border-radius: 9px;">
+                            <div id="progress-bar"
+                                 class="progress-bar progress-bar-striped progress-bar-animated bg-primary"
+                                 role="progressbar"
+                                 style="width: 0%; border-radius: 9px;"
+                                 aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                            </div>
+                        </div>
+                        <div id="eta-label" class="text-muted small mb-0" style="min-height: 1.2em;"></div>
+
+                    </div>
+
+                    <!-- Estado: Concluído -->
+                    <div id="state-done" style="display:none;">
+                        <div class="alert alert-success border-0 d-flex align-items-center mb-3">
+                            <i class="bi bi-check-circle-fill fs-4 me-3"></i>
+                            <div>
+                                <strong>Importação concluída!</strong>
+                                <div class="small" id="done-tempo"></div>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-4 text-center">
+                                <div class="border rounded-3 p-3">
+                                    <div class="fs-3 fw-bold text-success" id="result-created">-</div>
+                                    <div class="small text-muted">Criados</div>
+                                </div>
+                            </div>
+                            <div class="col-4 text-center">
+                                <div class="border rounded-3 p-3">
+                                    <div class="fs-3 fw-bold text-primary" id="result-updated">-</div>
+                                    <div class="small text-muted">Atualizados</div>
+                                </div>
+                            </div>
+                            <div class="col-4 text-center">
+                                <div class="border rounded-3 p-3">
+                                    <div class="fs-3 fw-bold text-danger" id="result-errors">-</div>
+                                    <div class="small text-muted">Erros</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="error-list-container" style="display:none;">
+                            <p class="fw-semibold text-danger small mb-1">Erros encontrados:</p>
+                            <ul id="error-list" class="small text-danger ps-3 mb-0"></ul>
+                            <p id="more-errors" class="small text-muted mt-1 mb-0"></p>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 pt-3 border-top mt-3">
+                            <a href="{% url 'lancamento-import' %}" class="btn btn-outline-secondary rounded-3">
+                                <i class="bi bi-upload me-1"></i>
+                                Nova Importação
+                            </a>
+                            <a id="btn-relatorio"
+                               href="{% url 'lancamento-import-relatorio' pk=importacao.pk %}"
+                               class="btn btn-success rounded-3" style="display:none;">
+                                <i class="bi bi-file-earmark-spreadsheet me-1"></i>
+                                Baixar Relatório XLSX
+                            </a>
+                            <a href="{% url 'lancamento-list' %}" class="btn btn-primary rounded-3">
+                                <i class="bi bi-list-ul me-1"></i>
+                                Ver Lançamentos
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Estado: Erro -->
+                    <div id="state-error" style="display:none;">
+                        <div class="alert alert-danger border-0 mb-3">
+                            <i class="bi bi-x-circle-fill me-2"></i>
+                            <strong>Erro na importação</strong>
+                            <p id="error-message" class="mb-0 mt-1 small"></p>
+                        </div>
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="{% url 'lancamento-import' %}" class="btn btn-primary rounded-3">
+                                <i class="bi bi-arrow-left me-1"></i>
+                                Tentar Novamente
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-gradient-primary { background: linear-gradient(135deg, #005CA9 0%, #003A78 100%); }
+    .font-monospace { font-family: var(--bs-font-monospace); }
+</style>
+
+<script>
+(function () {
+    var statusUrl = "{% url 'lancamento-import-status-json' pk=importacao.pk %}";
+    var startTime = Date.now();
+    var pollingId = null;
+    var elapsedId = null;
+
+    /* ---- Elementos ---- */
+    var elProcessing = document.getElementById('state-processing');
+    var elDone       = document.getElementById('state-done');
+    var elError      = document.getElementById('state-error');
+    var elTitle      = document.getElementById('state-processing-title');
+    var elElapsed    = document.getElementById('elapsed-time');
+    var elBar        = document.getElementById('progress-bar');
+    var elPct        = document.getElementById('progress-pct');
+    var elLabel      = document.getElementById('progress-label');
+    var elEta        = document.getElementById('eta-label');
+
+    /* ---- Helpers ---- */
+    function fmtSeconds(s) {
+        s = Math.round(s);
+        var m = Math.floor(s / 60);
+        var ss = s % 60;
+        return m + ':' + (ss < 10 ? '0' : '') + ss;
+    }
+
+    function fmtNum(n) {
+        return (n || 0).toLocaleString('pt-BR');
+    }
+
+    function tickElapsed() {
+        elElapsed.textContent = fmtSeconds((Date.now() - startTime) / 1000);
+    }
+
+    function startElapsedCounter() {
+        if (elapsedId) return;
+        tickElapsed();
+        elapsedId = setInterval(tickElapsed, 1000);
+    }
+
+    function stopElapsedCounter() {
+        if (elapsedId) { clearInterval(elapsedId); elapsedId = null; }
+    }
+
+    /* ---- Atualizar barra de progresso ---- */
+    function updateProgress(processados, total) {
+        if (!total || total <= 0) {
+            elLabel.textContent = elTitle.textContent === 'Processando...' ? 'Processando...' : 'Calculando total...';
+            return;
+        }
+
+        var pct = Math.min(Math.round((processados / total) * 100), 100);
+        elBar.style.width = pct + '%';
+        elBar.setAttribute('aria-valuenow', pct);
+        elPct.textContent = pct + '%';
+        elLabel.textContent = fmtNum(processados) + ' de ' + fmtNum(total) + ' linhas processadas';
+
+        /* ETA */
+        var elapsedSec = (Date.now() - startTime) / 1000;
+        if (processados > 0 && pct < 100 && elapsedSec > 2) {
+            var rate = processados / elapsedSec;       /* linhas/segundo */
+            var restantes = total - processados;
+            var etaSec = restantes / rate;
+            elEta.textContent = 'Tempo restante estimado: ~' + fmtSeconds(etaSec);
+        } else {
+            elEta.textContent = '';
+        }
+    }
+
+    /* ---- Exibir estados ---- */
+    function showProcessing(status, data) {
+        elProcessing.style.display = '';
+        elDone.style.display = 'none';
+        elError.style.display  = 'none';
+        elTitle.textContent = status === 'pending' ? 'Aguardando processamento...' : 'Processando...';
+        startElapsedCounter();
+        if (data) updateProgress(data.linhas_processadas || 0, data.linhas_total);
+    }
+
+    function showDone(data) {
+        stopElapsedCounter();
+        elProcessing.style.display = 'none';
+        elError.style.display      = 'none';
+        elDone.style.display       = '';
+
+        var totalSec = Math.round((Date.now() - startTime) / 1000);
+        document.getElementById('done-tempo').textContent = 'Processado em ' + fmtSeconds(totalSec);
+
+        var resultado = data.resultado || {};
+        document.getElementById('result-created').textContent = fmtNum(resultado.created);
+        document.getElementById('result-updated').textContent = fmtNum(resultado.updated);
+        var erros = resultado.errors || [];
+        document.getElementById('result-errors').textContent  = fmtNum(erros.length);
+
+        if (erros.length > 0) {
+            var listEl = document.getElementById('error-list');
+            listEl.innerHTML = '';
+            erros.slice(0, 5).forEach(function (e) {
+                var li = document.createElement('li');
+                li.textContent = 'Linha ' + e.row + ': ' + e.error;
+                listEl.appendChild(li);
+            });
+            if (erros.length > 5) {
+                document.getElementById('more-errors').textContent = 'E mais ' + (erros.length - 5) + ' erro(s)...';
+            }
+            document.getElementById('error-list-container').style.display = '';
+        }
+
+        document.getElementById('btn-relatorio').style.display = '';
+    }
+
+    function showError(msg) {
+        stopElapsedCounter();
+        elProcessing.style.display = 'none';
+        elDone.style.display       = 'none';
+        elError.style.display      = '';
+        document.getElementById('error-message').textContent = msg || 'Erro desconhecido. Contate o suporte.';
+    }
+
+    /* ---- Aplicar estado recebido do servidor ---- */
+    function applyStatus(data) {
+        var s = data.status;
+        if (s === 'pending' || s === 'processing') {
+            showProcessing(s, data);
+            return false; /* continua polling */
+        } else if (s === 'done') {
+            showDone(data);
+            return true;
+        } else if (s === 'error') {
+            showError(data.erro);
+            return true;
+        }
+        return false;
+    }
+
+    /* ---- Polling ---- */
+    function fetchStatus() {
+        fetch(statusUrl, { credentials: 'same-origin' })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                var done = applyStatus(data);
+                if (!done && !pollingId) poll();
+            })
+            .catch(function () { /* ignora erros de rede temporários */ });
+    }
+
+    function poll() {
+        if (pollingId) return;
+        pollingId = setInterval(function () {
+            fetch(statusUrl, { credentials: 'same-origin' })
+                .then(function (r) { return r.json(); })
+                .then(function (data) {
+                    var done = applyStatus(data);
+                    if (done) { clearInterval(pollingId); pollingId = null; }
+                })
+                .catch(function () {});
+        }, 3000);
+    }
+
+    /* ---- Inicializar ---- */
+    var initialStatus = "{{ importacao.status }}";
+    if (initialStatus === 'done') {
+        fetchStatus();
+    } else if (initialStatus === 'error') {
+        fetchStatus();
+    } else {
+        showProcessing(initialStatus, null);
+        poll();
+    }
+
+    /* Mostra botão imediatamente se a página carregou já no estado done */
+    if (initialStatus === 'done') {
+        document.getElementById('btn-relatorio').style.display = '';
+    }
+})();
+</script>
+{% endblock %}

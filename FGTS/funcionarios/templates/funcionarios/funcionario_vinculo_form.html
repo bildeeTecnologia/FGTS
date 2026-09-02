@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Novo Vínculo - FGTS Web{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="mb-3">
+        <h1 class="h4 fw-bold text-dark">Novo vínculo (cadeira)</h1>
+        <p class="text-muted mb-0 small">
+          Funcionário: <strong>{{ funcionario.nome }}</strong> (CPF {{ funcionario.cpf }})
+        </p>
+      </div>
+
+      <div class="alert alert-info border-0 small">
+        <strong>O que é vínculo?</strong> É a “cadeira” do colaborador na empresa (empresa + matrícula + período).
+        Para importar lançamentos sem ambiguidade, a <strong>matrícula é obrigatória</strong>.
+      </div>
+
+      <div class="card border-0 shadow-lg">
+        <div class="card-header bg-light border-0 py-3">
+          <h2 class="h6 mb-0">Dados do vínculo</h2>
+        </div>
+        <div class="card-body p-4">
+          <form method="post" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+              <div class="alert alert-danger border-0" role="alert">
+                {{ form.non_field_errors }}
+              </div>
+            {% endif %}
+
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label fw-bold" for="{{ form.empresa.id_for_label }}">{{ form.empresa.label }}</label>
+                {{ form.empresa }}
+                {% if form.empresa.errors %}<div class="invalid-feedback d-block">{{ form.empresa.errors }}</div>{% endif %}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold" for="{{ form.matricula.id_for_label }}">{{ form.matricula.label }}</label>
+                {{ form.matricula }}
+                {% if form.matricula.help_text %}<small class="form-text text-muted">{{ form.matricula.help_text }}</small>{% endif %}
+                {% if form.matricula.errors %}<div class="invalid-feedback d-block">{{ form.matricula.errors }}</div>{% endif %}
+              </div>
+            </div>
+
+            <div class="row g-3 mt-1">
+              <div class="col-md-4">
+                <label class="form-label fw-bold" for="{{ form.tipo_vinculo.id_for_label }}">{{ form.tipo_vinculo.label }}</label>
+                {{ form.tipo_vinculo }}
+                <small class="form-text text-muted">Aprendiz: FGTS 2%. Padrão = CLT (8%).</small>
+                {% if form.tipo_vinculo.errors %}<div class="invalid-feedback d-block">{{ form.tipo_vinculo.errors }}</div>{% endif %}
+              </div>
+            </div>
+
+            <div class="row g-3 mt-1">
+              <div class="col-md-6">
+                <label class="form-label fw-bold" for="{{ form.data_admissao.id_for_label }}">{{ form.data_admissao.label }}</label>
+                {{ form.data_admissao }}
+                {% if form.data_admissao.errors %}<div class="invalid-feedback d-block">{{ form.data_admissao.errors }}</div>{% endif %}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold" for="{{ form.data_demissao.id_for_label }}">{{ form.data_demissao.label }}</label>
+                {{ form.data_demissao }}
+                {% if form.data_demissao.errors %}<div class="invalid-feedback d-block">{{ form.data_demissao.errors }}</div>{% endif %}
+              </div>
+            </div>
+
+            <div class="row g-3 mt-1">
+              <div class="col-md-6">
+                <label class="form-label fw-bold" for="{{ form.cargo.id_for_label }}">{{ form.cargo.label }}</label>
+                {{ form.cargo }}
+                {% if form.cargo.errors %}<div class="invalid-feedback d-block">{{ form.cargo.errors }}</div>{% endif %}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold" for="{{ form.salario.id_for_label }}">{{ form.salario.label }}</label>
+                {{ form.salario }}
+                {% if form.salario.errors %}<div class="invalid-feedback d-block">{{ form.salario.errors }}</div>{% endif %}
+              </div>
+            </div>
+
+            <div class="mt-3">
+              <label class="form-label fw-bold" for="{{ form.observacoes.id_for_label }}">{{ form.observacoes.label }}</label>
+              {{ form.observacoes }}
+              {% if form.observacoes.errors %}<div class="invalid-feedback d-block">{{ form.observacoes.errors }}</div>{% endif %}
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 pt-4 border-top mt-4">
+              <a href="{% url 'funcionario-detail' funcionario.id %}" class="btn btn-outline-secondary">Cancelar</a>
+              <button type="submit" class="btn btn-primary">Salvar vínculo</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

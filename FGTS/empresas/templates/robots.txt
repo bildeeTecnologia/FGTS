@@ -1,0 +1,21 @@
+User-agent: *
+Allow: /$
+Allow: /calculadora-fgts/
+
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /empresas/
+Disallow: /funcionarios/
+Disallow: /lancamentos/
+Disallow: /indices/
+Disallow: /coefjam/
+Disallow: /configuracoes/
+Disallow: /auditoria/
+Disallow: /monitoring/
+Disallow: /billing/
+Disallow: /usuario/
+Disallow: /login/
+Disallow: /logout/
+Disallow: /ajuda/
+
+Sitemap: https://fgts.bildee.com.br/sitemap.xml

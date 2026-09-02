@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Resultado — Posição FGTS{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+        <div>
+            <h1 class="h4 fw-bold text-dark mb-0">
+                <i class="bi bi-file-earmark-spreadsheet text-primary me-2"></i>
+                Posição FGTS — {{ resultado.empresa_nome }}
+            </h1>
+            <p class="text-muted small mb-0">
+                Período: <strong>{{ resultado.competencia_inicio }}</strong> a <strong>{{ resultado.competencia_fim }}</strong>
+                {% if data_ref %}&nbsp;·&nbsp; Referência valor atualizado: <strong>{{ data_ref }}</strong>{% endif %}
+                &nbsp;·&nbsp; {{ total_linhas }} lançamento{{ total_linhas|pluralize }}
+            </p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'relatorio-posicao' %}" class="btn btn-outline-secondary btn-sm rounded-3">
+                <i class="bi bi-arrow-left me-1"></i>Novo relatório
+            </a>
+            <a href="{% url 'relatorio-posicao-xlsx' pk=task.pk %}" class="btn btn-success btn-sm rounded-3">
+                <i class="bi bi-file-earmark-excel me-1"></i>Download XLSX
+            </a>
+        </div>
+    </div>
+
+    {% if total_linhas > 50 %}
+    <div class="alert alert-info border-0 small mb-3">
+        <i class="bi bi-info-circle me-1"></i>
+        Exibindo os primeiros 50 de {{ total_linhas }} lançamentos. Use o botão <strong>Download XLSX</strong> para obter todos.
+    </div>
+    {% endif %}
+
+    <div class="card border-0 shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-sm table-hover mb-0 small">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Competência</th>
+                        <th>13º</th>
+                        <th>Empresa</th>
+                        <th>Funcionário</th>
+                        <th>Tipo</th>
+                        <th>PIS</th>
+                        <th>Matrícula</th>
+                        <th>Base FGTS</th>
+                        <th>Valor FGTS</th>
+                        <th>Status</th>
+                        <th>Data Pagto</th>
+                        <th>Valor Pago</th>
+                        <th>Valor Atualizado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for l in linhas_preview %}
+                    <tr>
+                        <td>{{ l.competencia }}</td>
+                        <td>{{ l.parcela_13|default:"" }}</td>
+                        <td>{{ l.empresa }}</td>
+                        <td>{{ l.funcionario }}</td>
+                        <td>
+                            {% if l.tipo_vinculo_codigo == "APRENDIZ" %}
+                            <span class="badge bg-warning text-dark rounded-pill" title="Alíquota FGTS 2%"><i class="bi bi-mortarboard me-1"></i>Aprendiz</span>
+                            {% else %}
+                            <span class="text-muted">CLT</span>
+                            {% endif %}
+                        </td>
+                        <td class="font-monospace">{{ l.funcionario_pis }}</td>
+                        <td>{{ l.matricula }}</td>
+                        <td class="text-end font-monospace">{{ l.base_fgts }}</td>
+                        <td class="text-end font-monospace">{{ l.valor_fgts }}</td>
+                        <td>
+                            {% if l.status_pagamento == "Pago" %}
+                            <span class="badge bg-success">Pago</span>
+                            {% else %}
+                            <span class="badge bg-warning text-dark">Em aberto</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ l.data_pagamento|default:"" }}</td>
+                        <td class="text-end font-monospace">{{ l.valor_pago|default:"" }}</td>
+                        <td class="text-end font-monospace fw-semibold">{{ l.valor_atualizado|default:"—" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="13" class="text-center text-muted py-4">Nenhum lançamento encontrado para o período.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

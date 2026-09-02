@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Índices FGTS{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2>📊 Índices FGTS</h2>
+            <p class="text-muted">Listagem de índices para cálculo de atualização FGTS</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="#" class="btn btn-primary">+ Importar Índices</a>
+        </div>
+    </div>
+
+    {% if indices %}
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>Competência</th>
+                    <th>Data Base</th>
+                    <th>Índice</th>
+                    <th>Tabela</th>
+                    <th>Data Criação</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for indice in indices %}
+                <tr>
+                    <td>{{ indice.competencia }}</td>
+                    <td>{{ indice.data_base|date:"d/m/Y" }}</td>
+                    <td><code>{{ indice.indice }}</code></td>
+                    <td>{{ indice.tabela }}</td>
+                    <td>{{ indice.created_at|date:"d/m/Y H:i" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Paginação -->
+    {% if is_paginated %}
+    <nav aria-label="Paginação">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1">Primeira</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+            </li>
+            {% endif %}
+            <li class="page-item active">
+                <span class="page-link">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+            </li>
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Próxima</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Última</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+
+    {% else %}
+    <div class="alert alert-info">
+        <strong>Nenhum índice encontrado.</strong> Importe dados para começar.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

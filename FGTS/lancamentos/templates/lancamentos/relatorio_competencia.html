@@ -1,0 +1,539 @@
+{% extends 'base.html' %}
+<style>
+  .col-funcionario {
+    width: 350px !important;
+    max-width: 350px !important;
+    min-width: 350px !important;
+    white-space: normal;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+    display: table-cell;
+  }
+  .no-break {
+    white-space: nowrap !important;
+    min-width: 120px;
+    max-width: 180px;
+    width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+    display: table-cell;
+    font-size: 1.05em;
+  }
+</style>
+{% load lancamento_extras %}
+{% if debug_alert %}
+  <div class="alert alert-info" style="white-space: pre-line;">
+    <strong>DEBUG:</strong><br>
+    {{ debug_alert }}
+  </div>
+{% endif %}
+{% block title %}Relatório por Competência{% endblock %}
+{% block content %}
+  {% if debug_lancamentos %}
+  <div class="alert alert-warning">
+    <b>DEBUG DETALHADO DOS LANÇAMENTOS:</b>
+    <table class="table table-sm table-bordered mt-2">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Colaborador</th>
+          <th>Competência</th>
+          <th>Empresa</th>
+          <th>Motivo</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for l in debug_lancamentos %}
+        <tr>
+          <td>{{ l.id }}</td>
+          <td>{{ l.colaborador }}</td>
+          <td>{{ l.competencia }}</td>
+          <td>{{ l.empresa }}</td>
+          <td>{{ l.motivo }}</td>
+          <td><b>{{ l.status }}</b></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+<div class="container mt-4">
+  <div id="loading-overlay" class="d-none" style="position: fixed; inset: 0; background: rgba(255,255,255,0.7); z-index: 1050; display: flex; align-items: center; justify-content: center;">
+    <div class="text-center">
+      <div class="spinner-border text-primary" role="status"></div>
+      <div class="mt-2 text-primary fw-semibold">Processando relatório...</div>
+    </div>
+  </div>
+
+  {% if erro_limite %}
+  <div class="card border-danger mb-4">
+    <div class="card-header bg-danger text-white">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i>
+      <strong>Volume de dados muito alto para exibição em tela</strong>
+    </div>
+    <div class="card-body">
+      {% if erro_limite.tipo == 'competencias' %}
+        <p class="mb-2">Foram encontradas <strong>{{ erro_limite.total }} competências</strong> em aberto para os filtros selecionados. O limite para exibição em tela é de <strong>{{ erro_limite.limite }} competências</strong>.</p>
+      {% elif erro_limite.tipo == 'ids' %}
+        <p class="mb-2">Você selecionou <strong>{{ erro_limite.total }} lançamentos</strong>. O limite para geração de relatório em tela é de <strong>{{ erro_limite.limite }} lançamentos</strong>.</p>
+      {% else %}
+        <p class="mb-2">Foram encontrados <strong>{{ erro_limite.total }} lançamentos</strong> para os filtros selecionados. O limite para exibição em tela é de <strong>{{ erro_limite.limite }} lançamentos</strong>.</p>
+      {% endif %}
+      <p class="mb-3 text-muted">Relatórios com volume muito alto podem travar o sistema. Para acessar esses dados, use uma das opções abaixo:</p>
+      <ul class="mb-0">
+        <li><strong>Filtre por um funcionário específico</strong> — selecione um colaborador no campo "Funcionário" e gere o relatório individual.</li>
+        <li><strong>Reduza o período</strong> — informe uma competência única (ex: <code>01/2025</code>) ou um conjunto menor de competências.</li>
+        <li><strong>Exporte CSV ou PDF</strong> — os exportadores suportam volumes maiores e não travam a tela.</li>
+      </ul>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if not from_selection %}
+  <div class="card shadow-lg mb-4">
+    <div class="card-header bg-dark text-white">Filtros</div>
+    <div class="card-body">
+      <form method="post" class="row g-3" autocomplete="off">
+        {% csrf_token %}
+        <div class="col-12 col-lg-4">
+          <label class="form-label">Empresa</label>
+          {{ form.empresa }}
+        </div>
+        <div class="col-12 col-lg-4">
+          <label class="form-label">Matrícula (opcional)</label>
+          {{ form.matricula }}
+          <div class="form-text text-muted">{{ form.matricula.help_text }}</div>
+        </div>
+        <div class="col-12 col-lg-4">
+          <label class="form-label">Funcionário (opcional)</label>
+          <div class="autocomplete-wrapper position-relative">
+            <input type="text" id="funcionario_display_rel" class="form-control"
+                   placeholder="Selecione uma empresa primeiro" autocomplete="off" disabled>
+            {{ form.funcionario }}
+            <div id="funcionario_dropdown_rel" class="autocomplete-dropdown list-group position-absolute d-none"
+                 style="z-index:1050;max-height:220px;overflow-y:auto;width:100%;top:100%;left:0;"></div>
+          </div>
+        </div>
+
+        <div class="col-12 col-lg-3">
+          <label class="form-label">Data Pagamento</label>
+          {{ form.data_pagamento }}
+        </div>
+        <div class="col-12 col-lg-3">
+          <label class="form-label">Agrupar por</label>
+          {{ form.agrupamento }}
+        </div>
+        <div class="col-12 col-lg-6">
+          <label class="form-label">Competência Única (MM/YYYY)</label>
+          {{ form.competencia }}
+          <div class="form-text text-muted">{{ form.competencia.help_text }}</div>
+        </div>
+
+        <div class="col-12">
+          <label class="form-label">Múltiplas competências (uma por linha)</label>
+          {{ form.competencias }}
+          <div class="form-text text-muted">{{ form.competencias.help_text }}</div>
+        </div>
+
+        <div class="col-12">
+          {% if relatorio_bloqueado %}
+          <div class="alert alert-warning d-flex align-items-center mb-2" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <div>{{ relatorio_bloqueio_motivo|default:"Trial expirado e nenhum plano ativo. Assine um plano para gerar relatórios." }}</div>
+          </div>
+          {% endif %}
+          <button
+            id="btnGerar"
+            class="btn btn-primary"
+            type="submit"
+            {% if relatorio_bloqueado %}disabled title="{{ relatorio_bloqueio_motivo|default:'Trial expirado e nenhum plano ativo.'|escape }}"{% endif %}
+          >
+            <i class="bi bi-file-bar-graph"></i> Gerar
+          </button>
+        </div>
+      </form>
+      
+      <!-- Aviso sobre FGTS não pagos -->
+      <div class="alert alert-info mt-3 border-0" role="alert">
+        <i class="bi bi-info-circle-fill me-2"></i>
+        <strong>Importante:</strong> Este relatório calcula apenas os lançamentos com FGTS <strong>não pago</strong>. 
+        Lançamentos já marcados como pagos não aparecem no cálculo.
+      </div>
+      
+      {% if erro %}
+        <div class="alert alert-warning mt-3">{{ erro }}</div>
+      {% endif %}
+
+      <!-- Bloco de avisos -->
+      {% if avisos %}
+        <div class="alert alert-warning mt-3 border-0" role="alert">
+          <strong><i class="bi bi-exclamation-triangle-fill me-2"></i>Avisos durante o processamento:</strong>
+          <ul class="mb-0 mt-2">
+            {% for aviso in avisos %}
+              <li>{{ aviso }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if resultados %}
+  <div class="card shadow-lg">
+    <div class="card-header bg-gradient text-white" style="background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);">
+      <div class="d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">
+          {{ empresa.nome }} — 
+          {% if competencias|length > 5 %}
+            {{ competencias|length }} competências
+          {% else %}
+            {{ competencias|join:', ' }}
+          {% endif %}
+          (pagamento: {{ data_pagamento|date:"d/m/Y" }})
+        </h5>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="mb-3 d-flex flex-wrap align-items-center gap-2">
+        <span class="badge bg-info">Agrupado por: {{ agrupamento|title }}</span>
+        {% if from_selection %}
+        {% if from_task %}
+        {# Relatório gerado via task assíncrona: apenas altera agrupamento na URL da task, sem reenviar IDs #}
+        <form method="get" class="d-flex align-items-center gap-2">
+          <label class="form-label mb-0">Agrupar por</label>
+          <select name="agrupamento" class="form-select form-select-sm" onchange="this.form.submit()">
+            <option value="competencia" {% if agrupamento == 'competencia' %}selected{% endif %}>Competência</option>
+            <option value="ano" {% if agrupamento == 'ano' %}selected{% endif %}>Ano</option>
+            <option value="funcionario" {% if agrupamento == 'funcionario' %}selected{% endif %}>Funcionário</option>
+            <option value="vinculo" {% if agrupamento == 'vinculo' %}selected{% endif %}>Vínculo / Matrícula</option>
+          </select>
+        </form>
+        {% else %}
+        {# Relatório síncrono por seleção: reenvia IDs com novo agrupamento #}
+        <form method="get" class="d-flex align-items-center gap-2">
+          <input type="hidden" name="ids" value="{{ ids_param }}">
+          <label class="form-label mb-0">Agrupar por</label>
+          <select name="agrupamento" class="form-select form-select-sm" onchange="this.form.submit()">
+            <option value="competencia" {% if agrupamento == 'competencia' %}selected{% endif %}>Competência</option>
+            <option value="ano" {% if agrupamento == 'ano' %}selected{% endif %}>Ano</option>
+            <option value="funcionario" {% if agrupamento == 'funcionario' %}selected{% endif %}>Funcionário</option>
+            <option value="vinculo" {% if agrupamento == 'vinculo' %}selected{% endif %}>Vínculo / Matrícula</option>
+          </select>
+        </form>
+        {% endif %}
+        {% endif %}
+        {% if from_task %}
+        <a class="btn btn-outline-secondary btn-sm" href="{% url 'relatorio-competencia-export-xlsx' %}?task_id={{ task_id }}&agrupamento={{ agrupamento }}" target="_blank">Exportar XLSX</a>
+        <a class="btn btn-outline-secondary btn-sm" href="{% url 'relatorio-competencia-export-pdf' %}?task_id={{ task_id }}&agrupamento={{ agrupamento }}" target="_blank">Exportar PDF</a>
+        {% else %}
+        <a class="btn btn-outline-secondary btn-sm" href="{% url 'relatorio-competencia-export-xlsx' %}?empresa={{ empresa.pk }}&data_pagamento={{ data_pagamento|date:'Y-m-d' }}&competencias={{ competencias_param|join:'%0A' }}&agrupamento={{ agrupamento }}{% if funcionario %}&funcionario={{ funcionario.pk }}{% endif %}{% if matricula %}&matricula={{ matricula|urlencode }}{% endif %}{% if from_selection and ids_param %}&ids={{ ids_param }}{% endif %}" target="_blank">Exportar XLSX</a>
+        <a class="btn btn-outline-secondary btn-sm" href="{% url 'relatorio-competencia-export-pdf' %}?empresa={{ empresa.pk }}&data_pagamento={{ data_pagamento|date:'Y-m-d' }}&competencias={{ competencias_param|join:'%0A' }}&agrupamento={{ agrupamento }}{% if funcionario %}&funcionario={{ funcionario.pk }}{% endif %}{% if matricula %}&matricula={{ matricula|urlencode }}{% endif %}{% if from_selection and ids_param %}&ids={{ ids_param }}{% endif %}" target="_blank">Exportar PDF</a>
+        {% endif %}
+      </div>
+
+      {% if resultados_agrupados %}
+        <!-- Visualização Agrupada -->
+        {% for grupo_key, grupo_data in resultados_agrupados %}
+        <div class="mb-4">
+          <h5 class="bg-light p-2 rounded">
+            <i class="bi bi-folder-fill text-primary"></i> {{ grupo_data.label }}
+            <span class="badge bg-secondary float-end">{{ grupo_data.items|length }} lançamento(s)</span>
+          </h5>
+          
+          <div class="table-responsive">
+            <table class="table table-sm table-hover">
+              <thead class="table-light">
+                <tr>
+                  <th>Competência</th>
+                  {% if agrupamento != 'funcionario' %}<th class="col-funcionario">Funcionário</th>{% endif %}
+                  <th class="no-break">Matrícula</th>
+                  <th class="no-break">Demissão</th>
+                  <th class="no-break">Base FGTS</th>
+                  <th class="no-break">FGTS Valor</th>
+                  {% if exibir_indice %}<th class="no-break">Índice</th>{% endif %}
+                  {% if exibir_correcao %}<th class="no-break">Correção</th>{% endif %}
+                  {% if exibir_jam %}<th class="no-break">JAM</th>{% endif %}
+                  <th class="no-break">Total</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for item in grupo_data.items %}
+                <tr>
+                  <td><span class="badge bg-info">{{ item.competencia_display|default:item.competencia }}</span></td>
+                  {% if agrupamento != 'funcionario' %}<td class="col-funcionario">{{ item.lancamento.funcionario.nome }}</td>{% endif %}
+                  <td class="no-break">{% if item.lancamento.vinculo %}{{ item.lancamento.vinculo.matricula|default:item.lancamento.vinculo.id }}{% endif %}</td>
+                  {% if item.lancamento.vinculo %}
+                    <td class="no-break">{% if item.lancamento.vinculo.data_demissao %}{{ item.lancamento.vinculo.data_demissao|date:'d/m/Y' }}{% endif %}</td>
+                  {% else %}
+                    {% get_vinculo_for_competencia item.lancamento.funcionario.vinculos.all item.lancamento.empresa item.competencia as vinculo %}
+                    <td class="no-break">{% if vinculo and vinculo.data_demissao %}{{ vinculo.data_demissao|date:'d/m/Y' }}{% endif %}</td>
+                  {% endif %}
+                  <td class="no-break">{{ item.lancamento.base_fgts|brl }}</td>
+                  <td class="no-break">{{ item.lancamento.valor_fgts|brl }}</td>
+                  {% if exibir_indice %}<td class="no-break">{{ item.calc.indice }}</td>{% endif %}
+                  {% if exibir_correcao %}<td class="no-break">{{ item.calc.valor_corrigido|brl }}</td>{% endif %}
+                  {% if exibir_jam %}<td class="no-break">{{ item.calc.valor_jam|brl }}</td>{% endif %}
+                  <td class="no-break"><strong>{{ item.calc.valor_deposito_fgts|brl }}</strong></td>
+                  <td>
+                    <a href="{% url 'relatorio-memoria-calculo' %}?empresa={{ empresa.pk }}&funcionario={{ item.lancamento.funcionario.pk }}{% if item.lancamento.vinculo %}&vinculo={{ item.lancamento.vinculo.pk }}{% endif %}&competencia={{ item.competencia }}&data_pagamento={{ data_pagamento|date:'Y-m-d' }}{% if item.lancamento.parcela_13 %}&parcela_13={{ item.lancamento.parcela_13 }}{% endif %}"
+                       class="btn btn-sm btn-info"
+                       title="Baixar Memória de Cálculo">
+                      <i class="bi bi-calculator"></i>
+                    </a>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+              <tfoot class="table-light">
+                <tr>
+                  <th colspan="{% if exibir_indice %}7{% else %}6{% endif %}" class="text-end">Subtotal {{ grupo_data.label }}:</th>
+                  {% if exibir_correcao %}<th>{{ grupo_data.totais.valor_corrigido|brl }}</th>{% endif %}
+                  {% if exibir_jam %}<th>{{ grupo_data.totais.valor_jam|brl }}</th>{% endif %}
+                  <th><strong>{{ grupo_data.totais.valor_deposito_fgts|brl }}</strong></th>
+                  <th></th>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+        {% endfor %}
+
+        <!-- Totais Gerais -->
+        <div class="card bg-success text-white mt-4">
+          <div class="card-body">
+            <h5 class="card-title">💰 Totais Gerais</h5>
+            <div class="row">
+              <div class="col">
+                <strong>Valor sem juros:</strong><br>
+                <h4>{{ totais.valor_fgts|brl }}</h4>
+              </div>
+              {% if exibir_correcao %}
+              <div class="col">
+                <strong>Correção Total:</strong><br>
+                <h4>{{ totais.valor_corrigido|brl }}</h4>
+              </div>
+              {% endif %}
+              {% if exibir_jam %}
+              <div class="col">
+                <strong>JAM (juros da mora):</strong><br>
+                <h4>{{ totais.valor_jam|brl }}</h4>
+              </div>
+              {% endif %}
+              <div class="col">
+                <strong>Total (sem JAM):</strong><br>
+                <h3>{{ totais.valor_deposito_fgts|brl }}</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      {% else %}
+        <!-- Visualização Simples (fallback) -->
+        <div class="table-responsive">
+          <table class="table table-striped">
+              <thead class="table-dark">
+                <tr>
+                  <th>Competência</th>
+                  <th class="col-funcionario">Funcionário</th>
+                  <th class="no-break">Matrícula</th>
+                  <th class="no-break">Demissão</th>
+                  <th class="no-break">FGTS Valor</th>
+                  {% if exibir_indice %}<th class="no-break">Índice</th>{% endif %}
+                  {% if exibir_correcao %}<th class="no-break">Correção</th>{% endif %}
+                  {% if exibir_jam %}<th class="no-break">JAM</th>{% endif %}
+                  <th class="no-break">Total</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+            <tbody>
+              {% for item in resultados %}
+              <tr>
+                <td><span class="badge bg-info">{{ item.competencia_display|default:item.competencia }}</span></td>
+                <td class="col-funcionario">{{ item.lancamento.funcionario.nome }}</td>
+                <td class="no-break">{% if item.lancamento.vinculo %}{{ item.lancamento.vinculo.matricula|default:item.lancamento.vinculo.id }}{% endif %}</td>
+                {% if item.lancamento.vinculo %}
+                  <td class="no-break">{% if item.lancamento.vinculo.data_demissao %}{{ item.lancamento.vinculo.data_demissao|date:'d/m/Y' }}{% endif %}</td>
+                {% else %}
+                  {% get_vinculo_for_competencia item.lancamento.funcionario.vinculos.all item.lancamento.empresa item.competencia as vinculo %}
+                  <td class="no-break">{% if vinculo and vinculo.data_demissao %}{{ vinculo.data_demissao|date:'d/m/Y' }}{% endif %}</td>
+                {% endif %}
+                <td class="no-break">{{ item.lancamento.valor_fgts|brl }}</td>
+                {% if exibir_indice %}<td class="no-break">{{ item.calc.indice }}</td>{% endif %}
+                {% if exibir_correcao %}<td class="no-break">{{ item.calc.valor_corrigido|brl }}</td>{% endif %}
+                {% if exibir_jam %}<td class="no-break">{{ item.calc.valor_jam|brl }}</td>{% endif %}
+                <td class="no-break"><strong>{{ item.calc.valor_deposito_fgts|brl }}</strong></td>
+                <td>
+                  <a href="{% url 'relatorio-memoria-calculo' %}?empresa={{ empresa.pk }}&funcionario={{ item.lancamento.funcionario.pk }}{% if item.lancamento.vinculo %}&vinculo={{ item.lancamento.vinculo.pk }}{% endif %}&competencia={{ item.competencia }}&data_pagamento={{ data_pagamento|date:'Y-m-d' }}{% if item.lancamento.parcela_13 %}&parcela_13={{ item.lancamento.parcela_13 }}{% endif %}"
+                     class="btn btn-sm btn-info"
+                     title="Baixar Memória de Cálculo">
+                    <i class="bi bi-calculator"></i> Memória
+                  </a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+            <tfoot>
+              <tr class="table-secondary">
+                <th class="text-end" colspan="{% if exibir_indice %}6{% else %}5{% endif %}">Totais:</th>
+                  {% if exibir_correcao %}<th>{{ totais.valor_corrigido|brl }}</th>{% endif %}
+                  {% if exibir_jam %}<th>{{ totais.valor_jam|brl }}</th>{% endif %}
+                  <th><strong>{{ totais.valor_deposito_fgts|brl }}</strong></th>
+                <th></th>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<script>
+// Mantém a função simples por compatibilidade com futuros upgrades
+function mostrarProcessando() {
+  // Função vazia - não interfere com o formulário
+}
+
+// Spinner e overlay durante o processamento
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.querySelector('form');
+  const btn = document.getElementById('btnGerar');
+  const overlay = document.getElementById('loading-overlay');
+  if (form && btn && overlay) {
+    form.addEventListener('submit', function() {
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Processando...';
+      overlay.classList.remove('d-none');
+    });
+  }
+});
+
+// Filtro em cascata: empresa → funcionário
+(function () {
+  var JSON_URL = '{% url "funcionarios-json" %}';
+  var empresaEl = document.getElementById('id_empresa');
+  var funcEl    = document.getElementById('id_funcionario');
+  if (!empresaEl || !funcEl) return;
+
+  function popularFuncionarios(empresaId) {
+    var currentVal = funcEl.value;
+    if (!empresaId) {
+      funcEl.innerHTML = '<option value="">---------</option>';
+      return;
+    }
+    fetch(JSON_URL + '?empresa_id=' + encodeURIComponent(empresaId))
+      .then(function (r) { return r.json(); })
+      .then(function (lista) {
+        funcEl.innerHTML = '<option value="">---------</option>';
+        lista.forEach(function (f) {
+          var opt = document.createElement('option');
+          opt.value = f.id;
+          opt.textContent = f.nome;
+          if (String(f.id) === String(currentVal)) opt.selected = true;
+          funcEl.appendChild(opt);
+        });
+      });
+  }
+
+  empresaEl.addEventListener('change', function () {
+    popularFuncionarios(this.value);
+  });
+
+  // Ao carregar, se empresa já está selecionada (ex: na volta do POST), refiltra mantendo seleção
+  if (empresaEl.value) {
+    popularFuncionarios(empresaEl.value);
+  }
+})();
+</script>
+
+<script>
+// Autocomplete empresa → funcionário (relatorio_competencia)
+(function () {
+  var AUTOCOMPLETE_URL = '{% url "funcionarios-autocomplete" %}';
+  var empresaEl  = document.getElementById('id_empresa');
+  var funcEl     = document.getElementById('id_funcionario');
+  var displayEl  = document.getElementById('funcionario_display_rel');
+  var dropEl     = document.getElementById('funcionario_dropdown_rel');
+  if (!empresaEl || !funcEl || !displayEl || !dropEl) return;
+
+  // Ocultar o select original — o hidden value será submetido junto
+  funcEl.style.display = 'none';
+
+  var debounce = null;
+
+  function setPlaceholder() {
+    displayEl.placeholder = empresaEl.value ? 'Digite para buscar...' : 'Selecione uma empresa primeiro';
+    displayEl.disabled = !empresaEl.value && empresaEl.options.length > 1;
+  }
+
+  function hide() { dropEl.classList.add('d-none'); dropEl.innerHTML = ''; }
+
+  function show(results) {
+    dropEl.innerHTML = '';
+    if (!results || !results.length) {
+      var el = document.createElement('div');
+      el.className = 'list-group-item text-muted small py-2 px-3';
+      el.textContent = 'Nenhum funcionário encontrado';
+      dropEl.appendChild(el);
+    } else {
+      results.forEach(function (r) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'list-group-item list-group-item-action small py-2';
+        btn.textContent = r.label;
+        btn.addEventListener('mousedown', function (e) {
+          e.preventDefault();
+          displayEl.value = r.label;
+          funcEl.value = r.id;
+          hide();
+        });
+        dropEl.appendChild(btn);
+      });
+    }
+    dropEl.classList.remove('d-none');
+  }
+
+  displayEl.addEventListener('input', function () {
+    funcEl.value = '';
+    var q = this.value.trim();
+    clearTimeout(debounce);
+    if (q.length < 2) { hide(); return; }
+    debounce = setTimeout(function () {
+      var url = AUTOCOMPLETE_URL + '?q=' + encodeURIComponent(q);
+      if (empresaEl.value) url += '&empresa_id=' + encodeURIComponent(empresaEl.value);
+      fetch(url)
+        .then(function (r) { if (!r.ok) { show([]); return null; } return r.json(); })
+        .then(function (d) { if (d !== null) show(d); })
+        .catch(function (err) { console.error('[Autocomplete]', err); show([]); });
+    }, 150);
+  });
+
+  displayEl.addEventListener('blur', function () { setTimeout(hide, 300); });
+
+  empresaEl.addEventListener('change', function () {
+    displayEl.value = '';
+    funcEl.value = '';
+    hide();
+    setPlaceholder();
+  });
+
+  setPlaceholder();
+})();
+</script>
+{% endblock %}
+
+{% if kpi_fim or kpi_tempo or kpi_lancamentos or kpi_competencias %}
+  <div class="alert alert-secondary mt-3" role="alert">
+    <strong>KPIs de Performance:</strong><br>
+    {% if kpi_fim %}Fim: <b>{{ kpi_fim }}</b><br>{% endif %}
+    {% if kpi_tempo %}Tempo total: <b>{{ kpi_tempo }}</b><br>{% endif %}
+    {% if kpi_lancamentos is not None %}Lançamentos processados: <b>{{ kpi_lancamentos }}</b><br>{% endif %}
+    {% if kpi_competencias is not None %}Competências processadas: <b>{{ kpi_competencias }}</b><br>{% endif %}
+  </div>
+{% endif %}

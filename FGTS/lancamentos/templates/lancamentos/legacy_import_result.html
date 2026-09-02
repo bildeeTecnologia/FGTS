@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+
+{% block title %}Resultado da Importação - FGTS Web{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Card Principal -->
+            <div class="card border-0 shadow-lg">
+                <!-- Header -->
+                <div class="card-header {% if success %}bg-gradient-success{% else %}bg-gradient-danger{% endif %} text-white py-4 border-0">
+                    <div class="d-flex align-items-center">
+                        {% if success %}
+                            <i class="bi bi-check-circle fs-4 me-3"></i>
+                            <div>
+                                <h4 class="mb-0 fw-bold">Importação Realizada com Sucesso! ✅</h4>
+                                <small class="opacity-75">Todos os dados foram processados sem erros</small>
+                            </div>
+                        {% else %}
+                            <i class="bi bi-exclamation-circle fs-4 me-3"></i>
+                            <div>
+                                <h4 class="mb-0 fw-bold">Importação Concluída com Avisos</h4>
+                                <small class="opacity-75">Alguns registros tiveram problemas durante o processamento</small>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Body -->
+                <div class="card-body p-5">
+                    <!-- Estatísticas Principais -->
+                    <div class="row mb-5">
+                        <div class="col-md-3 mb-3">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body text-center">
+                                    <div class="fs-3 fw-bold text-primary">{{ relatorio.linhas_processadas }}</div>
+                                    <div class="text-muted small">Linhas Processadas</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body text-center">
+                                    <div class="fs-3 fw-bold text-success">{{ relatorio.registros_criados }}</div>
+                                    <div class="text-muted small">Registros Criados</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body text-center">
+                                    <div class="fs-3 fw-bold text-warning">{{ relatorio.registros_duplicados }}</div>
+                                    <div class="text-muted small">Duplicados Ignorados</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body text-center">
+                                    <div class="fs-3 fw-bold text-danger">{{ relatorio.total_erros }}</div>
+                                    <div class="text-muted small">Erros</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tipo de Importação -->
+                    <div class="alert alert-info border-0 bg-light mb-4">
+                        <div class="d-flex">
+                            <i class="bi bi-info-circle-fill text-info me-3 mt-1"></i>
+                            <div>
+                                <strong>Tipo de Importação:</strong>
+                                <div class="mt-2">
+                                    {% if relatorio.import_type == 'empresas' %}
+                                        <span class="badge bg-primary"><i class="bi bi-building me-1"></i>Empresas</span>
+                                    {% elif relatorio.import_type == 'funcionarios' %}
+                                        <span class="badge bg-success"><i class="bi bi-people me-1"></i>Funcionários</span>
+                                    {% elif relatorio.import_type == 'lancamentos' %}
+                                        <span class="badge bg-info"><i class="bi bi-file-text me-1"></i>Lançamentos</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Erros (se houver) -->
+                    {% if relatorio.erros %}
+                    <div class="mb-4">
+                        <h6 class="text-uppercase fw-bold text-muted mb-3">
+                            <i class="bi bi-exclamation-triangle text-danger me-2"></i>Erros Encontrados ({{ relatorio.total_erros }})
+                        </h6>
+                        <div class="alert alert-danger border-0" role="alert">
+                            <div class="list-group list-group-flush">
+                                {% for erro in relatorio.erros %}
+                                <div class="list-group-item px-0 py-2 border-0">
+                                    <small><strong>Linha {{ forloop.counter }}:</strong> {{ erro }}</small>
+                                </div>
+                                {% endfor %}
+                                {% if relatorio.total_erros > relatorio.erros|length %}
+                                <div class="list-group-item px-0 py-2 border-0">
+                                    <small class="text-muted">... e mais {{ relatorio.total_erros|add:relatorio.erros|length|add:-1 }} erros</small>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Avisos (se houver) -->
+                    {% if relatorio.avisos %}
+                    <div class="mb-4">
+                        <h6 class="text-uppercase fw-bold text-muted mb-3">
+                            <i class="bi bi-info-circle text-warning me-2"></i>Avisos ({{ relatorio.avisos|length }})
+                        </h6>
+                        <div class="alert alert-warning border-0" role="alert">
+                            <div class="list-group list-group-flush">
+                                {% for aviso in relatorio.avisos %}
+                                <div class="list-group-item px-0 py-2 border-0">
+                                    <small>{{ aviso }}</small>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Recomendações -->
+                    <div class="alert alert-primary border-0 bg-light mb-4">
+                        <div class="d-flex">
+                            <i class="bi bi-lightbulb text-primary me-3 mt-1"></i>
+                            <div>
+                                <strong>Próximos Passos:</strong>
+                                <ul class="mb-0 mt-2 ms-3">
+                                    {% if relatorio.total_erros > 0 %}
+                                    <li><small>Revise os erros acima e corrija o arquivo CSV</small></li>
+                                    <li><small>Repita a importação com o arquivo corrigido</small></li>
+                                    {% else %}
+                                    <li><small>Valide os dados importados no sistema</small></li>
+                                    {% endif %}
+                                    <li><small>Consulte o relatório de dados para verificar integridade</small></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botões de Ação -->
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-between pt-4">
+                        <a href="{% url 'legacy-import' %}" class="btn btn-outline-primary">
+                            <i class="bi bi-arrow-clockwise me-2"></i>Nova Importação
+                        </a>
+                        <a href="{% url 'lancamento-list' %}" class="btn btn-success">
+                            <i class="bi bi-check me-2"></i>Ir para Lançamentos
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-gradient-success {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+    }
+
+    .bg-gradient-danger {
+        background: linear-gradient(135deg, #dc3545 0%, #e74c3c 100%) !important;
+    }
+
+    .list-group-item {
+        background-color: transparent !important;
+    }
+
+    .list-group-item:not(:last-child) {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1) !important;
+    }
+</style>
+{% endblock %}

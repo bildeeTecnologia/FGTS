@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+{% load lancamento_extras %}
+<html lang="pt-BR">
+<head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#f4f8fb;font-family:Arial,sans-serif;">
+
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f8fb;padding:32px 0;">
+  <tr>
+    <td align="center">
+      <table width="540" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.07);">
+
+        <!-- Cabeçalho -->
+        <tr>
+          <td style="background:linear-gradient(135deg,#005CA9 0%,#003A78 100%);padding:32px 40px 24px;text-align:center;">
+            <p style="margin:0;font-size:13px;color:rgba(255,255,255,0.8);letter-spacing:1px;text-transform:uppercase;">FGTS Web</p>
+            <h1 style="margin:8px 0 0;font-size:22px;color:#fff;font-weight:700;line-height:1.3;">
+              Seu FGTS corrigido com<br>memória auditável está pronto
+            </h1>
+          </td>
+        </tr>
+
+        <!-- Corpo -->
+        <tr>
+          <td style="padding:32px 40px 0;">
+            <p style="margin:0 0 20px;font-size:15px;color:#333;line-height:1.6;">Olá,</p>
+            <p style="margin:0 0 24px;font-size:15px;color:#333;line-height:1.6;">
+              Seu cálculo de FGTS corrigido foi processado com sucesso.<br>
+              Confira abaixo a <strong>memória detalhada do cálculo</strong>.
+            </p>
+
+            <!-- Cabeçalho do relatório -->
+            {% if memoria.relatorio_posicao and memoria.relatorio_total %}
+            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:8px;">
+              <tr>
+                <td style="font-size:12px;color:#005CA9;font-weight:700;text-transform:uppercase;letter-spacing:1px;">
+                  Relatório {{ memoria.relatorio_posicao }} de {{ memoria.relatorio_total }}
+                </td>
+              </tr>
+            </table>
+            {% endif %}
+
+            <!-- Tabela de memória de cálculo -->
+            <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f8fb;border-radius:8px;margin-bottom:28px;">
+              <tr>
+                <td style="padding:20px 24px;">
+                  <p style="margin:0 0 12px;font-size:13px;font-weight:700;color:#005CA9;text-transform:uppercase;letter-spacing:1px;">Memória de Cálculo</p>
+                  <table width="100%" cellpadding="4" cellspacing="0">
+                    <tr>
+                      <td style="font-size:14px;color:#555;">Competência</td>
+                      <td style="font-size:14px;color:#222;font-weight:700;text-align:right;">{{ memoria.competencia }}</td>
+                    </tr>
+                    <tr>
+                      <td style="font-size:14px;color:#555;">Data de pagamento</td>
+                      <td style="font-size:14px;color:#222;font-weight:700;text-align:right;">{{ memoria.data_pagamento }}</td>
+                    </tr>
+                    <tr>
+                      <td colspan="2" style="padding-top:14px;padding-bottom:6px;border-top:2px solid #dde3f0;font-size:11px;color:#005CA9;font-weight:700;text-transform:uppercase;letter-spacing:1px;">
+                        Detalhes do Cálculo
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="font-size:14px;color:#555;">Base FGTS</td>
+                      <td style="font-size:14px;color:#222;text-align:right;">{{ memoria.base_fgts|brl }}</td>
+                    </tr>
+                    <tr>
+                      <td style="font-size:14px;color:#555;">FGTS do mês (8%)</td>
+                      <td style="font-size:14px;color:#222;text-align:right;">{{ memoria.fgts_mes|brl }}</td>
+                    </tr>
+                    <tr>
+                      <td style="font-size:14px;color:#555;">Correção monetária</td>
+                      <td style="font-size:14px;color:#1a7f3c;text-align:right;">{{ memoria.correcao|brl }}</td>
+                    </tr>
+                    <tr>
+                      <td style="font-size:15px;color:#222;font-weight:700;padding-top:10px;border-top:2px solid #dde3f0;">Total atualizado</td>
+                      <td style="font-size:15px;color:#005CA9;font-weight:700;text-align:right;padding-top:10px;border-top:2px solid #dde3f0;">{{ memoria.deposito_fgts|brl }}</td>
+                    </tr>
+                    <tr>
+                      <td colspan="2" style="padding-top:14px;padding-bottom:6px;border-top:2px solid #dde3f0;font-size:11px;color:#888;font-weight:700;text-transform:uppercase;letter-spacing:1px;">
+                        Juros de Mora (JAM)
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="font-size:14px;color:#555;">JAM acumulado</td>
+                      <td style="font-size:14px;color:#222;text-align:right;">{{ memoria.jam|brl }}</td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+
+            <!-- Texto de contexto -->
+            <p style="margin:0 0 16px;font-size:15px;color:#333;line-height:1.6;">
+              Esse relatório foi gerado automaticamente em segundos, com memória técnica mês a mês pronta para conferência ou auditoria.
+            </p>
+            <p style="margin:0 0 8px;font-size:15px;color:#333;">Agora imagine aplicar essa organização para:</p>
+            <table cellpadding="0" cellspacing="0" style="margin-bottom:28px;">
+              <tr><td style="padding:4px 0;font-size:14px;color:#333;">
+                <span style="color:#F7941D;font-weight:700;">✔</span>&nbsp; Múltiplas empresas
+              </td></tr>
+              <tr><td style="padding:4px 0;font-size:14px;color:#333;">
+                <span style="color:#F7941D;font-weight:700;">✔</span>&nbsp; Diversos funcionários
+              </td></tr>
+              <tr><td style="padding:4px 0;font-size:14px;color:#333;">
+                <span style="color:#F7941D;font-weight:700;">✔</span>&nbsp; Vários períodos em atraso
+              </td></tr>
+              <tr><td style="padding:4px 0;font-size:14px;color:#333;">
+                <span style="color:#F7941D;font-weight:700;">✔</span>&nbsp; Histórico completo armazenado
+              </td></tr>
+              <tr><td style="padding:4px 0;font-size:14px;color:#333;">
+                <span style="color:#F7941D;font-weight:700;">✔</span>&nbsp; Relatórios profissionais em um clique
+              </td></tr>
+            </table>
+
+            <p style="margin:0 0 28px;font-size:15px;color:#333;line-height:1.6;">
+              O <strong>FGTS Web</strong> foi criado para escritórios que precisam de precisão e escala operacional.
+            </p>
+          </td>
+        </tr>
+
+        <!-- CTA -->
+        <tr>
+          <td style="padding:0 40px 36px;text-align:center;">
+            <a href="{{ plataforma_url }}/billing/checkout/"
+               style="display:inline-block;background:linear-gradient(90deg,#005CA9 0%,#F7941D 100%);color:#fff;font-size:16px;font-weight:700;text-decoration:none;padding:14px 36px;border-radius:8px;">
+              Criar Conta Gratuita — 7 dias grátis
+            </a>
+          </td>
+        </tr>
+
+        <!-- Rodapé -->
+        <tr>
+          <td style="background:#f4f8fb;padding:20px 40px;border-top:1px solid #e8edf5;text-align:center;">
+            <p style="margin:0;font-size:12px;color:#999;line-height:1.6;">
+              Este e-mail foi enviado automaticamente. Não responda.<br>
+              <a href="{{ plataforma_url }}" style="color:#005CA9;text-decoration:none;">FGTS Web</a>
+            </p>
+          </td>
+        </tr>
+
+      </table>
+    </td>
+  </tr>
+</table>
+
+</body>
+</html>

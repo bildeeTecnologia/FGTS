@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Transferir Colaborador{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h2 class="fw-bold mb-3">Transferir {{ funcionario.nome }}</h2>
+  <form method="post">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label for="id_empresa_destino" class="form-label">Empresa de Destino</label>
+      {{ form.empresa_destino }}
+    </div>
+    <div class="mb-3">
+      <label for="id_data_transferencia" class="form-label">Data da Transferência</label>
+      {{ form.data_transferencia }}
+    </div>
+    <div class="mb-3">
+      <label for="id_cargo" class="form-label">Cargo na nova empresa</label>
+      {{ form.cargo }}
+    </div>
+    <div class="mb-3">
+      <label for="id_salario" class="form-label">Salário na nova empresa</label>
+      {{ form.salario }}
+    </div>
+    <div class="mb-3">
+      <label for="id_observacoes" class="form-label">Observações</label>
+      {{ form.observacoes }}
+    </div>
+    <button type="submit" class="btn btn-primary">Transferir</button>
+    <a href="{% url 'funcionario-detail' funcionario.id %}" class="btn btn-secondary">Cancelar</a>
+    <a href="{% url 'funcionario-list' %}" class="btn btn-outline-dark ms-2">Voltar para lista de funcionários</a>
+  </form>
+</div>
+{% endblock %}

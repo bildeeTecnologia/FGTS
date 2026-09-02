@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+{% load lancamento_extras %}
+
+{% block title %}Conferir Lançamento - FGTS Web{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Card Principal -->
+            <div class="card border-0 shadow-lg">
+                <!-- Header -->
+                <div class="card-header bg-gradient-success text-white py-4">
+                    <h4 class="mb-0 fw-bold">
+                        <i class="bi bi-check-circle me-2"></i>Conferir Lançamento #{{ conferencia.id }}
+                    </h4>
+                </div>
+
+                <!-- Body -->
+                <div class="card-body p-5">
+                    {% if messages %}
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <!-- Informações do Lançamento -->
+                    <div class="card border-0 bg-light mb-4">
+                        <div class="card-body">
+                            <h6 class="text-muted text-uppercase fw-bold mb-3">Dados do Lançamento</h6>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <strong>Funcionário:</strong><br>
+                                    {{ lancamento.funcionario.nome }}<br>
+                                    <small class="text-muted">PIS: {{ lancamento.funcionario.pis }}</small>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <strong>Competência:</strong><br>
+                                    <span class="badge bg-info fs-6">{{ lancamento.competencia }}</span>
+                                    {% if lancamento.parcela_13 %}
+                                    <span class="badge bg-warning fs-6">13º Salário</span>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <strong>Status Atual:</strong><br>
+                                    {% if conferencia.status == 'PENDENTE' %}
+                                    <span class="badge bg-warning fs-6">Pendente</span>
+                                    {% elif conferencia.status == 'CONFERIDO' %}
+                                    <span class="badge bg-success fs-6">Conferido</span>
+                                    {% elif conferencia.status == 'PROBLEMA' %}
+                                    <span class="badge bg-danger fs-6">Com Problema</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <strong>Base FGTS:</strong><br>
+                                    <span class="fs-5">R$ {{ lancamento.base_fgts|brl }}</span>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <strong>Valor FGTS (Calculado):</strong><br>
+                                    <span class="fs-5 text-primary">R$ {{ lancamento.valor_fgts|brl }}</span><br>
+                                    <small class="text-muted">8% sobre base</small>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <strong>Data de Pagamento:</strong><br>
+                                    {% if lancamento.data_pagamento %}
+                                    {{ lancamento.data_pagamento|date:"d/m/Y" }}
+                                    {% else %}
+                                    <span class="text-muted">Não informada</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Validações Automáticas -->
+                    {% if problemas %}
+                    <div class="alert alert-danger border-0 mb-4">
+                        <h6 class="alert-heading">
+                            <i class="bi bi-exclamation-triangle me-2"></i>Problemas Detectados
+                        </h6>
+                        <ul class="mb-0">
+                            {% for problema in problemas %}
+                            <li>{{ problema }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-success border-0 mb-4">
+                        <i class="bi bi-check-circle me-2"></i>
+                        <strong>Todas as validações automáticas passaram!</strong>
+                    </div>
+                    {% endif %}
+
+                    <!-- Formulário de Conferência -->
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+
+                        <h6 class="text-muted text-uppercase fw-bold mb-3">Conferência Manual</h6>
+
+                        <!-- Valor Conferido -->
+                        <div class="mb-4">
+                            <label for="{{ form.valor_conferido.id_for_label }}" class="form-label">
+                                {{ form.valor_conferido.label }}
+                            </label>
+                            {{ form.valor_conferido }}
+                            <small class="form-text text-muted d-block mt-2">
+                                {{ form.valor_conferido.help_text }}
+                            </small>
+                            {% if form.valor_conferido.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.valor_conferido.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Observações -->
+                        <div class="mb-4">
+                            <label for="{{ form.observacoes.id_for_label }}" class="form-label">
+                                {{ form.observacoes.label }}
+                            </label>
+                            {{ form.observacoes }}
+                            <small class="form-text text-muted d-block mt-2">
+                                {{ form.observacoes.help_text }}
+                            </small>
+                            {% if form.observacoes.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.observacoes.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Informações sobre Conferência -->
+                        <div class="alert alert-info border-0 bg-light mb-4">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <strong>Ao conferir:</strong>
+                            <ul class="mb-0 mt-2">
+                                <li>O sistema registrará sua validação automaticamente</li>
+                                <li>Se houver problemas detectados, o status será "COM PROBLEMA"</li>
+                                <li>Caso contrário, o status será "CONFERIDO - OK"</li>
+                                <li>Você pode adicionar um valor conferido diferente se necessário</li>
+                            </ul>
+                        </div>
+
+                        <!-- Botões de Ação -->
+                        <div class="d-flex justify-content-between pt-4">
+                            <a href="{% url 'conferencia-list' lancamento.empresa.pk %}" 
+                               class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>Voltar
+                            </a>
+                            <div>
+                                <a href="{% url 'conferencia-rejeitar' conferencia.id %}" 
+                                   class="btn btn-danger me-2">
+                                    <i class="bi bi-x-circle me-2"></i>Rejeitar
+                                </a>
+                                <button type="submit" class="btn btn-success btn-lg">
+                                    <i class="bi bi-check-circle me-2"></i>Confirmar Conferência
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-gradient-success {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+    }
+</style>
+{% endblock %}

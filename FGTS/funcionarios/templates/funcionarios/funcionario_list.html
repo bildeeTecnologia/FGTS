@@ -1,0 +1,359 @@
+{% extends 'base.html' %}
+
+{% block title %}Funcionários - FGTS Web{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5 px-4 px-xl-5">
+    <!-- Header Section -->
+    <div class="mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="fw-bold text-dark mb-1">
+                    <i class="bi bi-people-fill text-primary"></i> Funcionários
+                </h2>
+                <p class="text-muted mb-0">Gerencie todos os colaboradores do sistema</p>
+            </div>
+            {% if can_add_funcionario %}
+                <div class="d-flex gap-2">
+                    <a href="{% url 'funcionario-create' %}?tab=atualizacao" class="btn btn-outline-primary btn-lg rounded-3">
+                        <i class="bi bi-pencil-square me-2"></i> Atualizar em Lote
+                    </a>
+                    <a href="{% url 'funcionario-create' %}" class="btn btn-primary btn-lg rounded-3">
+                        <i class="bi bi-person-plus-fill me-2"></i> Novo Funcionário
+                    </a>
+                </div>
+            {% else %}
+                <button class="btn btn-secondary btn-lg rounded-3" disabled title="Função bloqueada para empresas sem plano">
+                    <i class="bi bi-person-plus-fill me-2"></i> Novo Funcionário
+                </button>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- ALERTA DE DEBUG -->
+    <!-- Alertas de debug removidos -->
+
+    <!-- Stats Cards -->
+    <div class="row mb-4 g-3">
+        <div class="col-md-3">
+            <div class="card border-0 bg-light h-100">
+                <div class="card-body py-3 px-4">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-success bg-opacity-10 rounded-3 p-3 me-3">
+                            <i class="bi bi-check-circle text-success fs-5"></i>
+                        </div>
+                        <div>
+                            <small class="text-muted">Funcionários Ativos</small>
+                            <h5 class="mb-0 fw-bold">{{ ativos_count|default:0 }}</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 bg-light h-100">
+                <div class="card-body py-3 px-4">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-warning bg-opacity-10 rounded-3 p-3 me-3">
+                            <i class="bi bi-arrow-repeat text-warning fs-5"></i>
+                        </div>
+                        <div>
+                            <small class="text-muted">Funcionários Transferidos</small>
+                            <h5 class="mb-0 fw-bold">{{ transferidos_count|default:0 }}</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 bg-light h-100">
+                <div class="card-body py-3 px-4">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-danger bg-opacity-10 rounded-3 p-3 me-3">
+                            <i class="bi bi-x-circle text-danger fs-5"></i>
+                        </div>
+                        <div>
+                            <small class="text-muted">Funcionários Demitidos</small>
+                            <h5 class="mb-0 fw-bold">{{ demitidos_count|default:0 }}</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 bg-light h-100">
+                <div class="card-body py-3 px-4">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-info bg-opacity-10 rounded-3 p-3 me-3">
+                            <i class="bi bi-people text-info fs-5"></i>
+                        </div>
+                        <div>
+                            <small class="text-muted">Total de Funcionários</small>
+                            <h5 class="mb-0 fw-bold">{{ total_count|default:0 }}</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Card -->
+    <div class="card border-0 shadow-lg">
+        <!-- Header -->
+        <div class="card-header bg-gradient-primary text-white py-4 border-0">
+            <h5 class="mb-0 fw-bold">
+                <i class="bi bi-list-ul me-2"></i>Listagem Completa
+            </h5>
+        </div>
+
+        <!-- Body -->
+        <div class="card-body p-4">
+            <div class="mb-4">
+                <div class="card border-0 shadow-sm bg-white p-4">
+                    <form method="get">
+                        <div class="row g-2 align-items-end">
+                            <div class="col-lg-3 col-md-6">
+                                <label class="form-label text-muted small">Buscar <i class="bi bi-search ms-1" title="Buscar por nome, CPF, PIS ou matrícula"></i></label>
+                                <input type="text" name="q" value="{{ filtro_busca }}" class="form-control" placeholder="Digite para buscar">
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <label class="form-label text-muted small">Empresa <i class="bi bi-building ms-1" title="Filtrar por empresa"></i></label>
+                                <select name="empresa" class="form-select">
+                                    <option value="">Todas</option>
+                                    {% for emp in empresas_permitidas %}
+                                        <option value="{{ emp.codigo }}" {% if emp.codigo|stringformat:'s' == filtro_empresa %}selected{% endif %}>{{ emp.nome }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-lg-2 col-md-6">
+                                <label class="form-label text-muted small">Status <i class="bi bi-circle-half ms-1" title="Filtrar por status"></i></label>
+                                <select name="status" class="form-select">
+                                    <option value="">Todos</option>
+                                    <option value="ativo" {% if filtro_status == 'ativo' %}selected{% endif %}>Ativos</option>
+                                    <option value="transferido" {% if filtro_status == 'transferido' %}selected{% endif %}>Transferidos</option>
+                                    <option value="demitido" {% if filtro_status == 'demitido' %}selected{% endif %}>Demitidos</option>
+                                </select>
+                            </div>
+                            <div class="col-lg-2 col-md-6">
+                                <label class="form-label text-muted small">Ordenar <i class="bi bi-arrow-down-up ms-1" title="Ordenar resultados"></i></label>
+                                <select name="ordenar" class="form-select">
+                                    <option value="">Ordenar por...</option>
+                                    <option value="nome" {% if request.GET.ordenar == 'nome' %}selected{% endif %}>Nome</option>
+                                    <option value="matricula" {% if request.GET.ordenar == 'matricula' %}selected{% endif %}>Matrícula</option>
+                                    <option value="empresa" {% if request.GET.ordenar == 'empresa' %}selected{% endif %}>Empresa</option>
+                                    <option value="admissao" {% if request.GET.ordenar == 'admissao' %}selected{% endif %}>Admissão</option>
+                                </select>
+                            </div>
+                            <div class="col-lg-2 col-md-6 d-flex gap-2">
+                                <button type="submit" class="btn btn-primary w-100" title="Aplicar filtros"><i class="bi bi-funnel"></i> Filtrar</button>
+                                <a href="?" class="btn btn-outline-secondary w-100" title="Limpar filtros"><i class="bi bi-x-circle"></i> Limpar</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            {% if funcionarios %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light border-bottom border-2">
+                        <tr>
+                            <th class="py-3 px-4 fw-bold text-dark text-nowrap" style="width: 120px;">Matrícula</th>
+                            <th class="py-3 px-4 fw-bold text-dark" style="width: 280px;">Nome</th>
+                            <th class="py-3 px-4 fw-bold text-dark text-nowrap" style="width: 160px;">CPF</th>
+                            <th class="py-3 px-4 fw-bold text-dark" style="width: 300px;">Empresa</th>
+                            <th class="py-3 px-4 fw-bold text-dark text-nowrap" style="width: 120px;">Admissão</th>
+                            <th class="py-3 px-4 fw-bold text-dark text-nowrap" style="width: 120px;">Demissão</th>
+                            <th class="py-3 px-4 fw-bold text-dark text-nowrap" style="width: 140px;">Status</th>
+                            <th class="py-3 px-4 fw-bold text-dark text-nowrap" style="width: 200px;">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody class="border-top-0">
+                        {% for funcionario in funcionarios %}
+                        <tr class="align-middle">
+                            <td class="py-3 px-4">
+                                {% with vinculo_atual=funcionario.vinculo_atual %}
+                                    {% if vinculo_atual and vinculo_atual.matricula %}
+                                        <a href="{% url 'funcionario-detail' funcionario.id %}" class="badge bg-light text-dark fw-bold text-decoration-none">{{ vinculo_atual.matricula }}</a>
+                                    {% else %}
+                                        <span class="text-muted">—</span>
+                                    {% endif %}
+                                {% endwith %}
+                            </td>
+                            <td class="py-3 px-4 text-break">
+                                <div class="fw-bold text-dark mb-1">
+                                    <a href="{% url 'funcionario-detail' funcionario.id %}" class="text-dark text-decoration-none">{{ funcionario.nome }}</a>
+                                    {% with va=funcionario.vinculo_atual %}
+                                        {% if va and va.tipo_vinculo and va.tipo_vinculo.codigo == 'APRENDIZ' %}
+                                            <span class="badge bg-warning text-dark rounded-pill ms-1" title="Aprendiz — alíquota FGTS 2%">
+                                                <i class="bi bi-mortarboard me-1"></i>Aprendiz
+                                            </span>
+                                        {% endif %}
+                                    {% endwith %}
+                                </div>
+                                <small class="text-muted">{{ funcionario.pis|default:"Sem PIS" }}</small>
+                            </td>
+                            <td class="py-3 px-4 text-nowrap">
+                                <span class="badge bg-light text-dark fw-semibold px-3 py-2">{{ funcionario.cpf }}</span>
+                            </td>
+                            <!-- Matrícula removida: campo não existe -->
+                            <td class="py-3 px-4 text-break">
+                                {% if funcionario.empresa %}
+                                    <div class="fw-bold text-dark mb-1">{{ funcionario.empresa.nome }}</div>
+                                    <small class="text-muted">CNPJ: {{ funcionario.empresa.cnpj }}</small>
+                                {% else %}
+                                    <span class="text-muted">—</span>
+                                {% endif %}
+                            </td>
+                            <td class="py-3 px-4 text-nowrap">
+                                {% if funcionario.data_admissao %}
+                                    {{ funcionario.data_admissao|date:"d/m/Y" }}
+                                {% else %}
+                                    <span class="text-muted">—</span>
+                                {% endif %}
+                            </td>
+                            <td class="py-3 px-4 text-nowrap">
+                                {% if funcionario.data_demissao %}
+                                    {{ funcionario.data_demissao|date:"d/m/Y" }}
+                                {% else %}
+                                    <span class="text-muted">—</span>
+                                {% endif %}
+                            </td>
+                            <td class="py-3 px-4">
+                                {% if funcionario.status == 'demitido' %}
+                                    <span class="badge bg-danger rounded-pill">
+                                        <i class="bi bi-x-circle me-1"></i>Demitido
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-success rounded-pill">
+                                        <i class="bi bi-check-circle me-1"></i>Ativo
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="py-3 px-4">
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="{% url 'funcionario-update' funcionario.id %}" class="btn btn-outline-primary" title="Editar" data-bs-toggle="tooltip">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a href="{% url 'funcionario-delete' funcionario.id %}" class="btn btn-outline-danger" title="Excluir" data-bs-toggle="tooltip">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                    {% if can_transfer_funcionario %}
+                                    <a href="{% url 'funcionario-transferir' funcionario.id %}" class="btn btn-outline-secondary" title="Transferir" data-bs-toggle="tooltip">
+                                        <i class="bi bi-arrow-left-right"></i>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                        </div>
+                        {% if is_paginated %}
+                        <nav aria-label="Navegação de páginas">
+                            <ul class="pagination justify-content-center mt-4">
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?{% if filtro_busca %}q={{ filtro_busca }}&{% endif %}{% if filtro_empresa %}empresa={{ filtro_empresa }}&{% endif %}{% if filtro_status %}status={{ filtro_status }}&{% endif %}{% if filtro_ordenar %}ordenar={{ filtro_ordenar }}&{% endif %}page={{ page_obj.previous_page_number }}" aria-label="Anterior">
+                                            <span aria-hidden="true">&laquo;</span>
+                                        </a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+                                {% endif %}
+                                {% for num in paginator.page_range %}
+                                    {% if page_obj.number == num %}
+                                        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                        <li class="page-item"><a class="page-link" href="?{% if filtro_busca %}q={{ filtro_busca }}&{% endif %}{% if filtro_empresa %}empresa={{ filtro_empresa }}&{% endif %}{% if filtro_status %}status={{ filtro_status }}&{% endif %}{% if filtro_ordenar %}ordenar={{ filtro_ordenar }}&{% endif %}page={{ num }}">{{ num }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                                {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?{% if filtro_busca %}q={{ filtro_busca }}&{% endif %}{% if filtro_empresa %}empresa={{ filtro_empresa }}&{% endif %}{% if filtro_status %}status={{ filtro_status }}&{% endif %}{% if filtro_ordenar %}ordenar={{ filtro_ordenar }}&{% endif %}page={{ page_obj.next_page_number }}" aria-label="Próxima">
+                                            <span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                        {% endif %}
+            {% else %}
+            <div class="text-center py-5">
+                <div class="mb-4">
+                    <i class="bi bi-inbox fs-1 text-muted"></i>
+                </div>
+                <h5 class="text-dark mb-2">Nenhum funcionário cadastrado</h5>
+                <p class="text-muted mb-4">Comece adicionando o primeiro colaborador ao sistema</p>
+                <a href="{% url 'funcionario-create' %}" class="btn btn-primary btn-lg rounded-3">
+                    <i class="bi bi-person-plus-fill me-2"></i> Cadastrar Primeiro Funcionário
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Help Section -->
+    <div class="card border-0 bg-light mt-4">
+        <div class="card-body py-3 px-4">
+            <p class="mb-0">
+                <i class="bi bi-lightbulb-fill text-warning me-2"></i>
+                <strong>Dica:</strong> Um mesmo CPF pode ter mais de um vínculo (cadeira). Abra o funcionário e clique em <strong>"Novo vínculo"</strong> para cadastrar outra matrícula/empresa.
+            </p>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #005CA9 0%, #003A78 100%);
+    }
+
+    .table tbody tr {
+        transition: background-color 0.2s ease;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    .btn-group-sm .btn {
+        padding: 0.4rem 0.7rem;
+    }
+
+    /* Larguras mínimas para evitar informações comprimidas em Nome/Empresa */
+    .table th:nth-child(2),
+    .table td:nth-child(2) {
+        min-width: 240px;
+    }
+
+    .table th:nth-child(4),
+    .table td:nth-child(4) {
+        min-width: 260px;
+    }
+
+    @media (max-width: 1200px) {
+        .table th:nth-child(2),
+        .table td:nth-child(2) {
+            min-width: 200px;
+        }
+
+        .table th:nth-child(4),
+        .table td:nth-child(4) {
+            min-width: 220px;
+        }
+    }
+</style>
+
+<script>
+    // Inicializar tooltips
+    document.addEventListener('DOMContentLoaded', function() {
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function(tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+</script>
+{% endblock %}

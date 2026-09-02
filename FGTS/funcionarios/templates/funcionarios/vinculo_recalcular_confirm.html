@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Recalcular Histórico de FGTS — {{ funcionario.nome }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-7 col-lg-6">
+
+      <div class="d-flex align-items-center gap-2 mb-4">
+        <a href="{% url 'funcionario-detail' funcionario.id %}" class="btn btn-sm btn-outline-secondary">
+          <i class="bi bi-arrow-left me-1"></i>Voltar
+        </a>
+        <h4 class="mb-0">Recalcular Histórico de FGTS</h4>
+      </div>
+
+      <div class="card border-0 shadow-lg">
+        <div class="card-header bg-warning bg-opacity-10 border-0 py-3">
+          <h5 class="mb-0 text-warning-emphasis">
+            <i class="bi bi-arrow-repeat me-2"></i>Atualizar lançamentos existentes?
+          </h5>
+        </div>
+        <div class="card-body p-4">
+
+          <p>
+            O tipo de vínculo de <strong>{{ funcionario.nome }}</strong> foi alterado para
+            <strong>
+              {% if vinculo.tipo_vinculo %}
+                {{ vinculo.tipo_vinculo.descricao }} ({{ vinculo.tipo_vinculo.percentual_fgts }}%)
+              {% else %}
+                CLT (8%)
+              {% endif %}
+            </strong>.
+          </p>
+
+          <div class="alert alert-info border-0 small">
+            <i class="bi bi-info-circle me-1"></i>
+            Este vínculo possui <strong>{{ total_lancamentos }}</strong> lançamento(s).
+            {% if sem_base %}
+              <span class="text-warning ms-1">
+                <i class="bi bi-exclamation-triangle me-1"></i>
+                <strong>{{ sem_base }}</strong> lançamento(s) não possuem base FGTS e <strong>não serão recalculados</strong>.
+              </span>
+            {% endif %}
+          </div>
+
+          <p class="mb-1">Deseja recalcular o valor FGTS de todos os lançamentos deste vínculo usando a nova alíquota?</p>
+          <p class="text-muted small">Essa ação é registrada no log de auditoria.</p>
+
+          <form method="post" class="d-flex gap-3 mt-4">
+            {% csrf_token %}
+            <button type="submit" name="confirmar" value="1" class="btn btn-warning">
+              <i class="bi bi-arrow-repeat me-1"></i>Sim, recalcular
+            </button>
+            <button type="submit" class="btn btn-outline-secondary">
+              <i class="bi bi-x me-1"></i>Não, manter como está
+            </button>
+          </form>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

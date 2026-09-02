@@ -1,0 +1,20 @@
+CREATE TABLE empresas_empresa (
+    id SERIAL PRIMARY KEY,
+    razao_social VARCHAR(255) NOT NULL,
+    nome_fantasia VARCHAR(255),
+    cnpj VARCHAR(20) UNIQUE,
+    ie VARCHAR(30),
+    endereco VARCHAR(255),
+    numero VARCHAR(10),
+    complemento VARCHAR(255),
+    bairro VARCHAR(100),
+    cidade VARCHAR(100),
+    estado VARCHAR(2),
+    cep VARCHAR(9),
+    telefone VARCHAR(20),
+    email VARCHAR(254),
+    responsavel VARCHAR(150),
+    ativa BOOLEAN NOT NULL DEFAULT TRUE,
+    criada_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    atualizada_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);

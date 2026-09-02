@@ -1,0 +1,59 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block title %}Confirmar limpeza de funcionários órfãos{% endblock %}
+
+{% block content %}
+<style>
+  .conf-box   { border:2px solid #e74c3c; border-radius:6px; padding:1rem 1.5rem; margin-bottom:1.5rem; background:color-mix(in srgb,#e74c3c 6%,var(--body-bg,#fff)); }
+  .conf-table { border-collapse:collapse; width:100%; font-size:.875em; margin-bottom:1rem; }
+  .conf-table th { background:var(--primary,#417690); color:var(--header-color,#fff); padding:.35rem .75rem; text-align:left; }
+  .conf-table td { padding:.35rem .75rem; border-bottom:1px solid var(--hairline-color,#e0e0e0); color:var(--body-fg,#333); background:var(--body-bg,#fff); }
+  .conf-table tr:nth-child(even) td { background:var(--darkened-bg,#f9f9f9); }
+  .btn-cancel  { background:var(--darkened-bg,#eee); color:var(--body-fg,#333); border:1px solid var(--border-color,#ccc); padding:.5rem 1.2rem; border-radius:4px; text-decoration:none; display:inline-block; }
+  .btn-confirm { background:#e74c3c; color:#fff; border:none; padding:.5rem 1.2rem; border-radius:4px; cursor:pointer; font-weight:bold; margin-left:.75rem; }
+  .btn-confirm:hover { background:#c0392b; }
+</style>
+
+<div class="conf-box">
+  <h2 style="color:#e74c3c;margin-top:0;">⚠ Atenção: esta ação é irreversível</h2>
+  <p>
+    Você está prestes a excluir <strong>{{ candidatos|length }} funcionário(s)</strong>
+    que não possuem vínculo nem lançamentos.<br>
+    A lista abaixo é gerada no momento desta tela — se tiver qualquer dúvida, clique em
+    <strong>Cancelar</strong>.
+  </p>
+  <p style="font-size:.85em;color:var(--body-quiet-color,#666);">
+    Garantias técnicas desta operação:
+    <br>• A query de seleção exclui automaticamente qualquer funcionário com vínculo ou lançamento.
+    <br>• No momento do clique em "Confirmar", a lista é recalculada — registros que mudaram desde esta tela são preservados.
+    <br>• Toda a exclusão ocorre dentro de uma transação — se algo falhar, nada é deletado.
+  </p>
+</div>
+
+{% if candidatos %}
+<h3>Funcionários que serão excluídos ({{ candidatos|length }})</h3>
+<div style="overflow-x:auto;max-height:400px;overflow-y:auto;border:1px solid var(--hairline-color,#e0e0e0);border-radius:4px;">
+<table class="conf-table">
+  <thead><tr>{% for col in candidatos_cols %}<th>{{ col }}</th>{% endfor %}</tr></thead>
+  <tbody>
+    {% for row in candidatos %}
+    <tr>{% for cell in row %}<td>{% if cell is not None %}{{ cell }}{% else %}—{% endif %}</td>{% endfor %}</tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+
+<form method="post" style="margin-top:1.5rem;">
+  {% csrf_token %}
+  <input type="hidden" name="confirmar" value="sim">
+  <a href=".." class="btn-cancel">← Cancelar</a>
+  <button type="submit" class="btn-confirm">🗑 Confirmar exclusão de {{ candidatos|length }} registro(s)</button>
+</form>
+
+{% else %}
+<p style="color:#2ecc71;font-weight:bold;">✔ Não há funcionários órfãos para excluir no momento.</p>
+<a href=".." class="btn-cancel">← Voltar ao diagnóstico</a>
+{% endif %}
+
+{% endblock %}

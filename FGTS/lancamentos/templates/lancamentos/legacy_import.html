@@ -1,0 +1,383 @@
+{% extends "base.html" %}
+
+{% block title %}Importar Dados Legados - FGTS Web{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Card Principal -->
+            <div class="card border-0 shadow-lg">
+                <!-- Header -->
+                <div class="card-header bg-gradient-success text-white py-4 border-0">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-upload fs-4 me-3"></i>
+                        <div>
+                            <h4 class="mb-0 fw-bold">Importar Dados Legados</h4>
+                            <small class="opacity-75">Importe dados históricos do sistema anterior (VB6)</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Body -->
+                <div class="card-body p-5">
+                    {% if messages %}
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags|default:'success' }} alert-dismissible fade show border-0" role="alert">
+                            {% if message.tags == 'success' %}
+                                <i class="bi bi-check-circle me-2"></i>
+                            {% elif message.tags == 'error' %}
+                                <i class="bi bi-exclamation-circle me-2"></i>
+                            {% else %}
+                                <i class="bi bi-info-circle me-2"></i>
+                            {% endif %}
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <!-- Último Relatório (se disponível) -->
+                    {% if last_import_report %}
+                    <div class="alert alert-info border-0 bg-light mb-4">
+                        <div class="d-flex">
+                            <i class="bi bi-info-circle-fill text-info me-3 mt-1"></i>
+                            <div>
+                                <strong>Último Resultado:</strong>
+                                <div class="mt-2">
+                                    <small class="d-block">📋 Linhas processadas: <strong>{{ last_import_report.linhas_processadas }}</strong></small>
+                                    <small class="d-block text-success">✅ Registros criados: <strong>{{ last_import_report.registros_criados }}</strong></small>
+                                    {% if last_import_report.registros_duplicados > 0 %}
+                                    <small class="d-block text-warning">⚠️ Duplicados: <strong>{{ last_import_report.registros_duplicados }}</strong></small>
+                                    {% endif %}
+                                    {% if last_import_report.total_erros > 0 %}
+                                    <small class="d-block text-danger">❌ Erros: <strong>{{ last_import_report.total_erros }}</strong></small>
+                                    {% endif %}
+                                </div>
+                                <div class="mt-2">
+                                    <a href="{% url 'legacy-import-result' %}" class="btn btn-sm btn-outline-info">Ver Relatório Detalhado</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Informações de Formato -->
+                    <div class="alert alert-warning border-0 bg-light mb-4">
+                        <div class="d-flex">
+                            <i class="bi bi-exclamation-triangle-fill text-warning me-3 mt-1"></i>
+                            <div>
+                                <strong>Requisitos de Formato:</strong>
+                                <ul class="mb-0 mt-2 ms-3">
+                                    <li><small>Arquivo deve estar em formato <strong>CSV</strong> (separado por vírgula)</small></li>
+                                    <li><small>Codificação: <strong>Latin1 (ISO-8859-1)</strong> - compatível com VB6</small></li>
+                                    <li><small>Máximo de 20MB por arquivo</small></li>
+                                    <li><small>Primeira linha deve conter os nomes das colunas</small></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Guia de Campos por Tipo -->
+                    <div class="mb-4">
+                        <h6 class="text-uppercase fw-bold text-muted mb-3">Campos Esperados por Tipo</h6>
+                        
+                        <!-- Tabs para tipos de importação -->
+                        <ul class="nav nav-tabs mb-3" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="empresas-tab" data-bs-toggle="tab" data-bs-target="#empresas-content" type="button" role="tab">
+                                    <i class="bi bi-building me-2"></i>Empresas
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="funcionarios-tab" data-bs-toggle="tab" data-bs-target="#funcionarios-content" type="button" role="tab">
+                                    <i class="bi bi-people me-2"></i>Funcionários
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="lancamentos-tab" data-bs-toggle="tab" data-bs-target="#lancamentos-content" type="button" role="tab">
+                                    <i class="bi bi-file-text me-2"></i>Lançamentos
+                                </button>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content border p-3 bg-light">
+                            <!-- Empresas -->
+                            <div class="tab-pane fade show active" id="empresas-content" role="tabpanel">
+                                <div class="table-responsive">
+                                    <table class="table table-sm mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Campo CSV</th>
+                                                <th>Tipo</th>
+                                                <th>Exemplo</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><code>cnpj</code></td>
+                                                <td>Texto (14 dígitos)</td>
+                                                <td>12345678000195</td>
+                                            </tr>
+                                            <tr>
+                                                <td><code>razao_social</code></td>
+                                                <td>Texto</td>
+                                                <td>Empresa XYZ Ltda</td>
+                                            </tr>
+                                            <tr>
+                                                <td><code>endereco</code></td>
+                                                <td>Texto</td>
+                                                <td>Rua das Flores, 123</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Funcionários -->
+                            <div class="tab-pane fade" id="funcionarios-content" role="tabpanel">
+                                <div class="table-responsive">
+                                    <table class="table table-sm mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Campo CSV</th>
+                                                <th>Tipo</th>
+                                                <th>Exemplo</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><code>pis</code></td>
+                                                <td>Texto (11 dígitos)</td>
+                                                <td>12345678901</td>
+                                            </tr>
+                                            <tr>
+                                                <td><code>nome</code></td>
+                                                <td>Texto</td>
+                                                <td>João da Silva</td>
+                                            </tr>
+                                            <tr>
+                                                <td><code>data_admissao</code></td>
+                                                <td>Data (DD/MM/YYYY)</td>
+                                                <td>01/01/2020</td>
+                                            </tr>
+                                            <tr>
+                                                <td><code>cpf</code></td>
+                                                <td>Texto (11 dígitos) - Opcional</td>
+                                                <td>12345678901</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Lançamentos -->
+                            <div class="tab-pane fade" id="lancamentos-content" role="tabpanel">
+                                <div class="table-responsive">
+                                    <table class="table table-sm mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Campo CSV</th>
+                                                <th>Tipo</th>
+                                                <th>Exemplo</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><code>pis</code></td>
+                                                <td>Texto (11 dígitos)</td>
+                                                <td>12345678901</td>
+                                            </tr>
+                                            <tr>
+                                                <td><code>competencia</code></td>
+                                                <td>Texto (MM/YYYY ou YYYY-MM)</td>
+                                                <td>01/2025</td>
+                                            </tr>
+                                            <tr>
+                                                <td><code>base_fgts</code></td>
+                                                <td>Decimal</td>
+                                                <td>5000.00</td>
+                                            </tr>
+                                            <tr>
+                                                <td><code>data_pagto</code></td>
+                                                <td>Data (DD/MM/YYYY) - Opcional</td>
+                                                <td>15/01/2025</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Formulário de Importação -->
+                    <form method="post" enctype="multipart/form-data" novalidate id="legacyImportForm">
+                        {% csrf_token %}
+
+                        <!-- Tipo de Importação -->
+                        <div class="mb-4">
+                            <h6 class="text-uppercase fw-bold text-muted mb-3">Tipo de Importação</h6>
+                            <div class="row">
+                                {% for value, label in form.import_type.field.choices %}
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="import_type" id="import_type_{{ value }}" value="{{ value }}" {% if form.import_type.value == value %}checked{% endif %} required>
+                                        <label class="form-check-label" for="import_type_{{ value }}">
+                                            {% if value == 'empresas' %}
+                                                <i class="bi bi-building me-2 text-primary"></i>{{ label }}
+                                            {% elif value == 'funcionarios' %}
+                                                <i class="bi bi-people me-2 text-success"></i>{{ label }}
+                                            {% else %}
+                                                <i class="bi bi-file-text me-2 text-info"></i>{{ label }}
+                                            {% endif %}
+                                        </label>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% if form.import_type.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.import_type.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Seleção de Empresa -->
+                        <div class="mb-4" id="empresa-field">
+                            <label for="{{ form.empresa.id_for_label }}" class="form-label">{{ form.empresa.label }} <span class="text-danger">*</span></label>
+                            {{ form.empresa }}
+                            <small class="form-text text-muted d-block mt-2">Selecione a empresa para associar os dados importados</small>
+                            {% if form.empresa.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.empresa.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Upload de Arquivo -->
+                        <div class="mb-4">
+                            <label for="{{ form.csv_file.id_for_label }}" class="form-label">{{ form.csv_file.label }} <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="file" class="form-control {% if form.csv_file.errors %}is-invalid{% endif %}" id="{{ form.csv_file.id_for_label }}" name="csv_file" accept=".csv" required>
+                                <label class="input-group-text" for="{{ form.csv_file.id_for_label }}">
+                                    <i class="bi bi-file-earmark-arrow-up"></i>
+                                </label>
+                            </div>
+                            <small class="form-text text-muted d-block mt-2">{{ form.csv_file.help_text }}</small>
+                            {% if form.csv_file.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.csv_file.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Opções Avançadas -->
+                        <div class="mb-4">
+                            <div class="form-check">
+                                {{ form.skip_duplicates }}
+                                <label class="form-check-label" for="{{ form.skip_duplicates.id_for_label }}">
+                                    {{ form.skip_duplicates.label }}
+                                </label>
+                            </div>
+                            <small class="form-text text-muted d-block mt-2">Se ativado, registros duplicados serão ignorados sem gerar erros</small>
+                        </div>
+
+                        <!-- Botões de Ação -->
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-between pt-4">
+                            <a href="{% url 'lancamento-list' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-success btn-lg" id="submitBtn">
+                                <i class="bi bi-upload me-2"></i>Iniciar Importação
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Aviso sobre Processa -->
+                    <div class="alert alert-info border-0 bg-light mt-4">
+                        <div class="d-flex">
+                            <i class="bi bi-hourglass-split text-info me-3 mt-1"></i>
+                            <div>
+                                <strong>Processamento:</strong>
+                                <small class="d-block">A importação pode levar alguns minutos dependendo do tamanho do arquivo. Não feche a página até o processo terminar.</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Controla visibilidade do campo de empresa
+    document.addEventListener('DOMContentLoaded', function() {
+        const importTypeRadios = document.querySelectorAll('input[name="import_type"]');
+        const empresaField = document.getElementById('empresa-field');
+
+        function toggleEmpresaField() {
+            const selectedType = document.querySelector('input[name="import_type"]:checked').value;
+            // Mostra empresa apenas para funcionarios e lancamentos
+            empresaField.style.display = selectedType === 'empresas' ? 'none' : 'block';
+            
+            // Torna empresa obrigatória se visível
+            const empresaInput = document.querySelector('#{{ form.empresa.id_for_label }}');
+            if (empresaInput) {
+                empresaInput.required = selectedType !== 'empresas';
+            }
+        }
+
+        importTypeRadios.forEach(radio => {
+            radio.addEventListener('change', toggleEmpresaField);
+        });
+
+        // Inicial
+        toggleEmpresaField();
+
+        // Desabilita botão durante envio
+        const form = document.getElementById('legacyImportForm');
+        const submitBtn = document.getElementById('submitBtn');
+        
+        if (form) {
+            form.addEventListener('submit', function() {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Processando...';
+            });
+        }
+    });
+</script>
+
+<style>
+    .bg-gradient-success {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+    }
+
+    .nav-tabs .nav-link {
+        border: none;
+        border-bottom: 3px solid transparent;
+        color: #6c757d;
+        font-weight: 500;
+    }
+
+    .nav-tabs .nav-link.active {
+        border-color: #28a745 !important;
+        color: #28a745;
+        background-color: transparent;
+    }
+
+    .nav-tabs .nav-link:hover {
+        border-color: #28a745 !important;
+    }
+
+    .table-responsive {
+        border-radius: 0.375rem;
+    }
+
+    code {
+        background-color: #f8f9fa;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-size: 0.875rem;
+    }
+</style>
+{% endblock %}

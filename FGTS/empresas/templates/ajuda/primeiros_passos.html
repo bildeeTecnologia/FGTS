@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+{% block title %}Primeiros Passos — FGTS Web{% endblock %}
+
+{% block content %}
+<div style="max-width: 820px; margin: 0 auto;">
+
+  <!-- Breadcrumb -->
+  <nav class="mb-4" style="font-size: 0.88rem;">
+    <a href="{% url 'ajuda' %}" style="color: #005CA9; text-decoration: none;"><i class="bi bi-question-circle me-1"></i>Ajuda</a>
+    <span class="text-muted mx-2">/</span>
+    <span class="text-muted">Primeiros Passos</span>
+  </nav>
+
+  <h1 style="font-size: 1.75rem; font-weight: 700; color: #005CA9; margin-bottom: 0.4rem;">
+    <i class="bi bi-rocket-takeoff me-2" style="color: #F7941D;"></i>Primeiros Passos
+  </h1>
+  <p class="text-muted mb-5" style="font-size: 1rem;">
+    Configure a plataforma do zero e gere seu primeiro relatório de FGTS em minutos.
+  </p>
+
+  <!-- Linha do tempo de onboarding -->
+  <div class="d-flex flex-column gap-0">
+
+    <!-- Passo 1 -->
+    <div class="d-flex gap-4 mb-1">
+      <div class="d-flex flex-column align-items-center">
+        <div style="width: 40px; height: 40px; border-radius: 50%; background: #005CA9; color: #fff; font-weight: 700; font-size: 1rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">1</div>
+        <div style="flex: 1; width: 2px; background: #e0e8f0; margin: 4px 0;"></div>
+      </div>
+      <div class="pb-4" style="flex: 1;">
+        <h5 style="font-weight: 700; color: #1a2a3a; margin-bottom: 0.4rem;">Criar conta e confirmar e-mail</h5>
+        <p class="text-muted" style="font-size: 0.93rem; line-height: 1.7; margin-bottom: 0.5rem;">
+          Acesse <strong>/usuario/registrar/</strong> e preencha nome, e-mail e senha. Após o cadastro, um link de confirmação é enviado automaticamente para o e-mail informado. O acesso ao sistema só é liberado após a confirmação.
+        </p>
+        <div class="alert alert-info py-2 px-3" style="font-size: 0.88rem; border-radius: 8px;">
+          <i class="bi bi-info-circle me-1"></i> Verifique a caixa de spam caso o e-mail não apareça em alguns minutos.
+        </div>
+      </div>
+    </div>
+
+    <!-- Passo 2 -->
+    <div class="d-flex gap-4 mb-1">
+      <div class="d-flex flex-column align-items-center">
+        <div style="width: 40px; height: 40px; border-radius: 50%; background: #005CA9; color: #fff; font-weight: 700; font-size: 1rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">2</div>
+        <div style="flex: 1; width: 2px; background: #e0e8f0; margin: 4px 0;"></div>
+      </div>
+      <div class="pb-4" style="flex: 1;">
+        <h5 style="font-weight: 700; color: #1a2a3a; margin-bottom: 0.4rem;">Cadastrar a empresa</h5>
+        <p class="text-muted" style="font-size: 0.93rem; line-height: 1.7; margin-bottom: 0.75rem;">
+          No menu lateral, acesse <strong>Administração da Empresa</strong> ou navegue para <strong>/empresas/cadastrar/</strong>. Preencha os dados cadastrais necessários para geração dos lançamentos e do arquivo SEFIP:
+        </p>
+        <table class="table table-sm table-bordered" style="font-size: 0.88rem; background: #fff;">
+          <tbody>
+            <tr><td class="fw-semibold" style="width: 40%">CNPJ</td><td>14 dígitos, apenas números</td></tr>
+            <tr><td class="fw-semibold">RAT</td><td>Risco Ambiental do Trabalho — alíquota padrão: 1,00%</td></tr>
+            <tr><td class="fw-semibold">FPAS</td><td>Código do Fundo de Previdência (ex.: 604 para comércio)</td></tr>
+            <tr><td class="fw-semibold">CNAE</td><td>Código da atividade econômica principal</td></tr>
+            <tr><td class="fw-semibold">Optante Simples</td><td>Informe 1 = Sim ou 2 = Não</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Passo 3 -->
+    <div class="d-flex gap-4 mb-1">
+      <div class="d-flex flex-column align-items-center">
+        <div style="width: 40px; height: 40px; border-radius: 50%; background: #005CA9; color: #fff; font-weight: 700; font-size: 1rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">3</div>
+        <div style="flex: 1; width: 2px; background: #e0e8f0; margin: 4px 0;"></div>
+      </div>
+      <div class="pb-4" style="flex: 1;">
+        <h5 style="font-weight: 700; color: #1a2a3a; margin-bottom: 0.4rem;">Cadastrar funcionários</h5>
+        <p class="text-muted" style="font-size: 0.93rem; line-height: 1.7; margin-bottom: 0.75rem;">
+          Acesse <strong>Funcionários → Novo</strong>. Informe os dados pessoais e, na sequência, crie o <strong>vínculo empregatício</strong> associando o funcionário à empresa com a data de admissão e o salário base.
+        </p>
+        <p class="text-muted" style="font-size: 0.93rem; line-height: 1.7; margin-bottom: 0;">
+          Para múltiplos funcionários, use a <strong>importação por planilha</strong> (<code>Funcionários → Importar</code>). Baixe o modelo Excel, preencha e faça o upload — o sistema valida e cadastra todos de uma só vez.
+        </p>
+      </div>
+    </div>
+
+    <!-- Passo 4 -->
+    <div class="d-flex gap-4 mb-1">
+      <div class="d-flex flex-column align-items-center">
+        <div style="width: 40px; height: 40px; border-radius: 50%; background: #005CA9; color: #fff; font-weight: 700; font-size: 1rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">4</div>
+        <div style="flex: 1; width: 2px; background: #e0e8f0; margin: 4px 0;"></div>
+      </div>
+      <div class="pb-4" style="flex: 1;">
+        <h5 style="font-weight: 700; color: #1a2a3a; margin-bottom: 0.4rem;">Gerar os lançamentos de FGTS</h5>
+        <p class="text-muted" style="font-size: 0.93rem; line-height: 1.7; margin-bottom: 0.75rem;">
+          Existem três formas de registrar lançamentos:
+        </p>
+        <div class="row g-3">
+          <div class="col-md-4">
+            <div class="p-3" style="background: #f4f8fb; border-radius: 10px; height: 100%;">
+              <div class="fw-bold mb-1" style="color: #005CA9; font-size: 0.9rem;"><i class="bi bi-pencil me-1"></i>Manual</div>
+              <p class="text-muted mb-0" style="font-size: 0.82rem; line-height: 1.5;">Lançamentos → Novo. Informe competência, base FGTS e datas. Ideal para ajustes pontuais.</p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="p-3" style="background: #f4f8fb; border-radius: 10px; height: 100%;">
+              <div class="fw-bold mb-1" style="color: #005CA9; font-size: 0.9rem;"><i class="bi bi-lightning me-1"></i>Automático</div>
+              <p class="text-muted mb-0" style="font-size: 0.82rem; line-height: 1.5;">Gerar Lançamentos a partir do vínculo. O sistema calcula 8% sobre a base e preenche os campos automaticamente.</p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="p-3" style="background: #f4f8fb; border-radius: 10px; height: 100%;">
+              <div class="fw-bold mb-1" style="color: #005CA9; font-size: 0.9rem;"><i class="bi bi-file-earmark-text me-1"></i>Importação TXT</div>
+              <p class="text-muted mb-0" style="font-size: 0.82rem; line-height: 1.5;">Importar arquivo SEFIP legado (.RE). O sistema lê os registros e cria os lançamentos correspondentes.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Passo 5 -->
+    <div class="d-flex gap-4 mb-1">
+      <div class="d-flex flex-column align-items-center">
+        <div style="width: 40px; height: 40px; border-radius: 50%; background: #005CA9; color: #fff; font-weight: 700; font-size: 1rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">5</div>
+        <div style="flex: 1; width: 2px; background: #e0e8f0; margin: 4px 0;"></div>
+      </div>
+      <div class="pb-4" style="flex: 1;">
+        <h5 style="font-weight: 700; color: #1a2a3a; margin-bottom: 0.4rem;">Visualizar e exportar o Relatório de Competência</h5>
+        <p class="text-muted" style="font-size: 0.93rem; line-height: 1.7; margin-bottom: 0.5rem;">
+          Acesse <strong>Lançamentos → Relatório</strong>. Filtre por empresa, competência e funcionário. O relatório exibe base FGTS, valor calculado, correção (JAM) e total atualizado para cada trabalhador.
+        </p>
+        <p class="text-muted" style="font-size: 0.93rem; line-height: 1.7; margin-bottom: 0;">
+          Exporte em <span class="badge" style="background: #e8f4e8; color: #1a7f3c;">CSV</span> para importar em outros sistemas, ou em <span class="badge" style="background: #fff0e0; color: #b45f00;">PDF</span> para entrega ao cliente — com memória de cálculo mês a mês incluída.
+        </p>
+      </div>
+    </div>
+
+    <!-- Passo 6 -->
+    <div class="d-flex gap-4 mb-1">
+      <div class="d-flex flex-column align-items-center">
+        <div style="width: 40px; height: 40px; border-radius: 50%; background: #F7941D; color: #fff; font-weight: 700; font-size: 1rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">6</div>
+      </div>
+      <div class="pb-4" style="flex: 1;">
+        <h5 style="font-weight: 700; color: #1a2a3a; margin-bottom: 0.4rem;">Gerar arquivo SEFIP.RE <span class="badge" style="font-size: 0.7rem; background: #fff0e0; color: #b45f00;">Recurso adicional</span></h5>
+        <p class="text-muted" style="font-size: 0.93rem; line-height: 1.7; margin-bottom: 0.5rem;">
+          O SEFIP.RE é habilitado por empresa mediante solicitação. Quando ativo, o menu <strong>SEFIP</strong> aparece na barra lateral. Selecione empresa, competência e intervalo de funcionários — o sistema gera o arquivo no formato fixo de 360 caracteres por linha, pronto para transmissão.
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Próximos passos -->
+  <div class="row g-3 mt-2">
+    <div class="col-md-6">
+      <a href="{% url 'ajuda-manual' %}" class="text-decoration-none">
+        <div class="card p-3 h-100" style="border-radius: 10px; border: 1.5px solid #e0e8f0;">
+          <div class="d-flex align-items-center gap-3">
+            <i class="bi bi-book" style="font-size: 1.5rem; color: #005CA9;"></i>
+            <div>
+              <div style="font-weight: 600; color: #1a2a3a; font-size: 0.92rem;">Manual Completo</div>
+              <div class="text-muted" style="font-size: 0.82rem;">Todos os módulos em detalhe</div>
+            </div>
+          </div>
+        </div>
+      </a>
+    </div>
+    <div class="col-md-6">
+      <a href="{% url 'ajuda-faq' %}" class="text-decoration-none">
+        <div class="card p-3 h-100" style="border-radius: 10px; border: 1.5px solid #e0e8f0;">
+          <div class="d-flex align-items-center gap-3">
+            <i class="bi bi-patch-question" style="font-size: 1.5rem; color: #F7941D;"></i>
+            <div>
+              <div style="font-weight: 600; color: #1a2a3a; font-size: 0.92rem;">Perguntas Frequentes</div>
+              <div class="text-muted" style="font-size: 0.82rem;">Dúvidas sobre cálculos e funcionalidades</div>
+            </div>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

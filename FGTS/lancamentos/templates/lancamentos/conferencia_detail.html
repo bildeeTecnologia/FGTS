@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+{% load lancamento_extras %}
+
+{% block title %}Detalhes da Conferência - FGTS Web{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Card Principal -->
+            <div class="card border-0 shadow-lg">
+                <!-- Header -->
+                <div class="card-header {% if conferencia.status == 'CONFERIDO' %}bg-gradient-success{% elif conferencia.status == 'REJEITADO' %}bg-gradient-danger{% elif conferencia.status == 'PROBLEMA' %}bg-gradient-warning{% else %}bg-gradient-secondary{% endif %} text-white py-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0 fw-bold">
+                            <i class="bi bi-file-text me-2"></i>Conferência #{{ conferencia.id }}
+                        </h4>
+                        <div>
+                            {% if conferencia.status == 'CONFERIDO' %}
+                            <span class="badge bg-white text-success fs-6">✓ Conferido</span>
+                            {% elif conferencia.status == 'REJEITADO' %}
+                            <span class="badge bg-white text-danger fs-6">✗ Rejeitado</span>
+                            {% elif conferencia.status == 'PROBLEMA' %}
+                            <span class="badge bg-white text-warning fs-6">⚠ Problema</span>
+                            {% else %}
+                            <span class="badge bg-white text-secondary fs-6">⏳ Pendente</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Body -->
+                <div class="card-body p-5">
+                    <!-- Dados do Lançamento -->
+                    <div class="card border-0 bg-light mb-4">
+                        <div class="card-body">
+                            <h6 class="text-muted text-uppercase fw-bold mb-3">
+                                <i class="bi bi-file-text me-2"></i>Dados do Lançamento
+                            </h6>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <strong>Funcionário:</strong><br>
+                                    <span class="fs-5">{{ lancamento.funcionario.nome }}</span><br>
+                                    <small class="text-muted">PIS: {{ lancamento.funcionario.pis }}</small>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <strong>Competência:</strong><br>
+                                    <span class="badge bg-info fs-6">{{ lancamento.competencia }}</span>
+                                    {% if lancamento.parcela_13 %}
+                                    <span class="badge bg-warning fs-6">13º</span>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <strong>Empresa:</strong><br>
+                                    {{ lancamento.empresa.razao_social }}
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-md-3 mb-3">
+                                    <strong>Base FGTS:</strong><br>
+                                    <span class="fs-5">{{ lancamento.base_fgts|brl }}</span>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <strong>Valor FGTS:</strong><br>
+                                    <span class="fs-5 text-primary">{{ lancamento.valor_fgts|brl }}</span>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <strong>Data Pagamento:</strong><br>
+                                    {% if lancamento.data_pagamento %}
+                                    {{ lancamento.data_pagamento|date:"d/m/Y" }}
+                                    {% else %}
+                                    <span class="text-muted">Não informada</span>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <strong>Pago:</strong><br>
+                                    {% if lancamento.pago %}
+                                    <span class="badge bg-success">Sim</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">Não</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dados da Conferência -->
+                    <div class="card border-0 bg-light mb-4">
+                        <div class="card-body">
+                            <h6 class="text-muted text-uppercase fw-bold mb-3">
+                                <i class="bi bi-check-circle me-2"></i>Dados da Conferência
+                            </h6>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <strong>Conferido Por:</strong><br>
+                                    {% if conferencia.conferido_por %}
+                                    {{ conferencia.conferido_por.username }}
+                                    {% else %}
+                                    <span class="text-muted">Ainda não conferido</span>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <strong>Data de Conferência:</strong><br>
+                                    {% if conferencia.data_conferencia %}
+                                    {{ conferencia.data_conferencia|date:"d/m/Y" }}
+                                    {% else %}
+                                    <span class="text-muted">-</span>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <strong>Valor Conferido:</strong><br>
+                                    {% if conferencia.valor_conferido %}
+                                    <span class="text-warning fs-5">{{ conferencia.valor_conferido|brl }}</span>
+                                    {% else %}
+                                    <span class="text-muted">Igual ao calculado</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% if conferencia.observacoes %}
+                            <hr>
+                            <div>
+                                <strong>Observações:</strong><br>
+                                <div class="alert alert-info mt-2">
+                                    {{ conferencia.observacoes }}
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Validações Automáticas -->
+                    {% if problemas %}
+                    <div class="alert alert-danger border-0 mb-4">
+                        <h6 class="alert-heading">
+                            <i class="bi bi-exclamation-triangle me-2"></i>Problemas Detectados
+                        </h6>
+                        <ul class="mb-0">
+                            {% for problema in problemas %}
+                            <li>{{ problema }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-success border-0 mb-4">
+                        <i class="bi bi-check-circle me-2"></i>
+                        <strong>Todas as validações automáticas passaram!</strong>
+                    </div>
+                    {% endif %}
+
+                    <!-- Ações -->
+                    <div class="d-flex justify-content-between pt-4">
+                        <a href="{% url 'conferencia-list' lancamento.empresa.pk %}" 
+                           class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-2"></i>Voltar à Lista
+                        </a>
+                        <div>
+                            {% if conferencia.status == 'PENDENTE' or conferencia.status == 'PROBLEMA' %}
+                            <a href="{% url 'conferencia-rejeitar' conferencia.id %}" 
+                               class="btn btn-danger me-2">
+                                <i class="bi bi-x-circle me-2"></i>Rejeitar
+                            </a>
+                            <a href="{% url 'conferencia-conferir' conferencia.id %}" 
+                               class="btn btn-success">
+                                <i class="bi bi-check-circle me-2"></i>Conferir
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-gradient-success {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+    }
+    .bg-gradient-danger {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;
+    }
+    .bg-gradient-warning {
+        background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%) !important;
+    }
+    .bg-gradient-secondary {
+        background: linear-gradient(135deg, #6c757d 0%, #545b62 100%) !important;
+    }
+</style>
+{% endblock %}

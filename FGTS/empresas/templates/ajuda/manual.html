@@ -1,0 +1,577 @@
+{% extends 'base.html' %}
+{% block title %}Manual do Usuário — FGTS Web{% endblock %}
+
+{% block extra_css %}
+<style>
+  .doc-sidebar {
+    position: sticky;
+    top: 24px;
+    max-height: calc(100vh - 80px);
+    overflow-y: auto;
+  }
+  .doc-nav a {
+    display: block;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.87rem;
+    color: #4a5568;
+    text-decoration: none;
+    border-left: 2px solid transparent;
+    transition: all 0.15s;
+    border-radius: 0 4px 4px 0;
+  }
+  .doc-nav a:hover {
+    color: #005CA9;
+    background: #f0f5ff;
+    border-left-color: #005CA9;
+  }
+  .doc-nav .nav-section {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #9aa5b4;
+    padding: 0.75rem 0.75rem 0.25rem;
+    margin-top: 0.5rem;
+  }
+  .doc-section {
+    scroll-margin-top: 32px;
+  }
+  .doc-section h2 {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #005CA9;
+    border-bottom: 2px solid #e0e8f0;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.25rem;
+  }
+  .doc-section h3 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #1a2a3a;
+    margin-top: 1.5rem;
+    margin-bottom: 0.6rem;
+  }
+  .doc-section p, .doc-section li {
+    font-size: 0.93rem;
+    color: #3d4f63;
+    line-height: 1.75;
+  }
+  .field-table td:first-child {
+    font-weight: 600;
+    white-space: nowrap;
+    width: 35%;
+    color: #1a2a3a;
+  }
+  .tip-box {
+    background: #f0f5ff;
+    border-left: 4px solid #005CA9;
+    border-radius: 0 8px 8px 0;
+    padding: 0.75rem 1rem;
+    font-size: 0.88rem;
+    color: #2d4a70;
+    margin: 1rem 0;
+  }
+  .warn-box {
+    background: #fff8e8;
+    border-left: 4px solid #F7941D;
+    border-radius: 0 8px 8px 0;
+    padding: 0.75rem 1rem;
+    font-size: 0.88rem;
+    color: #7a4a00;
+    margin: 1rem 0;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="max-width: 1060px; margin: 0 auto;">
+
+  <!-- Breadcrumb -->
+  <nav class="mb-4" style="font-size: 0.88rem;">
+    <a href="{% url 'ajuda' %}" style="color: #005CA9; text-decoration: none;"><i class="bi bi-question-circle me-1"></i>Ajuda</a>
+    <span class="text-muted mx-2">/</span>
+    <span class="text-muted">Manual do Usuário</span>
+  </nav>
+
+  <div class="row g-5">
+
+    <!-- Navegação lateral interna -->
+    <div class="col-lg-3 d-none d-lg-block">
+      <div class="doc-sidebar doc-nav">
+        <div class="nav-section">Módulos</div>
+        <a href="#empresas">Empresas</a>
+        <a href="#funcionarios">Funcionários</a>
+        <a href="#vinculos">Vínculos Empregatícios</a>
+        <a href="#tipo-vinculo">Tipo de Vínculo (CLT / Aprendiz)</a>
+        <a href="#lancamentos">Lançamentos</a>
+        <a href="#geracao-auto">Geração Automática</a>
+        <a href="#importacao-txt">Importação TXT (SEFIP)</a>
+        <a href="#conferencia">Conferência de Lançamentos</a>
+        <div class="nav-section">Saídas</div>
+        <a href="#relatorios">Relatórios</a>
+        <a href="#exportacao">Exportações (CSV / PDF)</a>
+        <a href="#memoria-calculo">Memória de Cálculo</a>
+        <a href="#sefip">SEFIP.RE</a>
+        <div class="nav-section">Ferramentas</div>
+        <a href="#calculadora">Calculadora FGTS</a>
+        <a href="#indices">Índices JAM</a>
+        <a href="#bpo">Escritórios BPO</a>
+      </div>
+    </div>
+
+    <!-- Conteúdo principal -->
+    <div class="col-lg-9">
+
+      <h1 style="font-size: 1.75rem; font-weight: 700; color: #005CA9; margin-bottom: 0.4rem;">
+        <i class="bi bi-book me-2" style="color: #F7941D;"></i>Manual do Usuário
+      </h1>
+      <p class="text-muted mb-5" style="font-size: 0.95rem;">
+        Documentação técnica de cada módulo da plataforma. Use o índice lateral para navegar diretamente ao tópico desejado.
+      </p>
+
+      <!-- ===================== EMPRESAS ===================== -->
+      <section id="empresas" class="doc-section mb-5">
+        <h2><i class="bi bi-building me-2"></i>Empresas</h2>
+
+        <h3>Cadastrar uma empresa</h3>
+        <p>
+          Acesse <strong>Administração da Empresa → Cadastrar</strong>. Cada empresa é independente no sistema — lançamentos, funcionários e relatórios são sempre segregados por empresa.
+        </p>
+        <table class="table table-sm table-bordered field-table" style="font-size: 0.88rem;">
+          <thead style="background: #f0f5ff;"><tr><th>Campo</th><th>Descrição</th></tr></thead>
+          <tbody>
+            <tr><td>CNPJ</td><td>14 dígitos sem formatação. Obrigatório e único no sistema.</td></tr>
+            <tr><td>Código Folha</td><td>Código interno do cliente no escritório. Livre preenchimento.</td></tr>
+            <tr><td>CNAE</td><td>Código da atividade econômica principal (7 dígitos com dígito verificador).</td></tr>
+            <tr><td>FPAS</td><td>Código do Fundo de Previdência e Assistência Social. Ex.: 604 (comércio), 612 (indústria).</td></tr>
+            <tr><td>RAT</td><td>Alíquota do Risco Ambiental do Trabalho. Padrão: 1,00%. Varia de 0,50% a 3,00%.</td></tr>
+            <tr><td>Optante Simples</td><td>1 = Sim (Simples Nacional), 2 = Não.</td></tr>
+            <tr><td>Paga 13º no aniversário</td><td>Marcar quando a empresa antecipa a primeira parcela do 13º no mês de aniversário do funcionário.</td></tr>
+          </tbody>
+        </table>
+
+        <h3>Grupos econômicos</h3>
+        <p>
+          Empresas podem ser agrupadas em um <strong>Grupo Econômico</strong>. A empresa principal do grupo é a matriz. O agrupamento é usado para organizar o painel administrativo e futuros relatórios consolidados.
+        </p>
+      </section>
+
+      <!-- ===================== FUNCIONÁRIOS ===================== -->
+      <section id="funcionarios" class="doc-section mb-5">
+        <h2><i class="bi bi-people me-2"></i>Funcionários</h2>
+
+        <h3>Cadastrar funcionário</h3>
+        <p>
+          Acesse <strong>Funcionários → Novo</strong>. O cadastro registra os dados pessoais e o número de PIS — indispensável para o arquivo SEFIP.
+        </p>
+        <table class="table table-sm table-bordered field-table" style="font-size: 0.88rem;">
+          <thead style="background: #f0f5ff;"><tr><th>Campo</th><th>Descrição</th></tr></thead>
+          <tbody>
+            <tr><td>Nome</td><td>Nome completo do trabalhador.</td></tr>
+            <tr><td>PIS / NIS</td><td>11 dígitos. Identificação no FGTS. Obrigatório para SEFIP.</td></tr>
+            <tr><td>CPF</td><td>11 dígitos sem formatação.</td></tr>
+            <tr><td>CBO</td><td>Classificação Brasileira de Ocupações — 6 dígitos.</td></tr>
+            <tr><td>Carteira Profissional / Série</td><td>Número e série da CTPS. Opcional, mas exigido pelo SEFIP.</td></tr>
+            <tr><td>Data de nascimento</td><td>Usada em cálculos de aniversário do 13º salário.</td></tr>
+          </tbody>
+        </table>
+
+        <h3>Importação em lote</h3>
+        <p>
+          Para múltiplos funcionários, use <strong>Funcionários → Importar</strong>. Baixe o modelo (.xlsx), preencha uma linha por funcionário e faça o upload. O sistema valida os dados e apresenta o resultado da importação com detalhes por linha.
+        </p>
+        <div class="warn-box">
+          <i class="bi bi-exclamation-triangle me-1"></i> Não altere as colunas do modelo. Campos fora do padrão serão ignorados ou causarão erro na importação.
+        </div>
+      </section>
+
+      <!-- ===================== VÍNCULOS ===================== -->
+      <section id="vinculos" class="doc-section mb-5">
+        <h2><i class="bi bi-link-45deg me-2"></i>Vínculos Empregatícios</h2>
+
+        <p>
+          O vínculo conecta um funcionário a uma empresa com período definido (admissão / demissão). Um funcionário pode ter vários vínculos ao longo do tempo — inclusive em empresas diferentes.
+        </p>
+
+        <h3>Criar um vínculo</h3>
+        <p>
+          Na tela de detalhe do funcionário, clique em <strong>Novo Vínculo</strong>. Informe:
+        </p>
+        <ul>
+          <li><strong>Empresa</strong> — empresa à qual o funcionário está vinculado naquele período.</li>
+          <li><strong>Data de admissão</strong> — início do contrato.</li>
+          <li><strong>Data de demissão</strong> — deixar em branco se o funcionário ainda está ativo.</li>
+          <li><strong>Salário base</strong> — usado para calcular a base FGTS nos lançamentos automáticos.</li>
+        </ul>
+        <div class="tip-box">
+          <i class="bi bi-lightbulb me-1"></i> O sistema identifica o vínculo ativo pelo campo <em>data de demissão</em> em branco. Ao desligar um funcionário, preencha a data de demissão no vínculo — não exclua.
+        </div>
+
+        <h3>Transferência entre empresas</h3>
+        <p>
+          Em <strong>Funcionários → Transferir</strong>, encerre o vínculo atual e crie um novo para a empresa destino. O histórico de lançamentos anteriores é preservado na empresa de origem.
+        </p>
+      </section>
+
+      <!-- ===================== TIPO DE VÍNCULO ===================== -->
+      <section id="tipo-vinculo" class="doc-section mb-5">
+        <h2><i class="bi bi-mortarboard me-2"></i>Tipo de Vínculo (CLT / Aprendiz)</h2>
+
+        <p>
+          Cada vínculo empregatício possui um <strong>tipo</strong> que determina a alíquota de FGTS aplicada. O tipo é configurado pelo administrador da plataforma via painel Django e <strong>não pode ser alterado livremente pelo usuário</strong> — apenas o sentido CLT → Aprendiz é permitido; o caminho inverso exige encerramento do vínculo.
+        </p>
+
+        <h3>Tipos disponíveis</h3>
+        <table class="table table-sm table-bordered field-table" style="font-size: 0.87rem;">
+          <thead style="background: #f0f5ff;"><tr><th>Código</th><th>Descrição</th><th>Alíquota FGTS</th><th>Observação</th></tr></thead>
+          <tbody>
+            <tr><td>CLT</td><td>Contrato CLT padrão</td><td>8%</td><td>Padrão para vínculos sem tipo definido</td></tr>
+            <tr><td>APRENDIZ</td><td>Contrato de Aprendizagem</td><td>2%</td><td>Lei 10.097/2000 — jovem aprendiz com contrato especial</td></tr>
+          </tbody>
+        </table>
+        <div class="tip-box">
+          <i class="bi bi-lightbulb me-1"></i> Novos tipos de vínculo com percentuais personalizados podem ser criados pelo administrador em <strong>Django Admin → Empresas → Tipos de vínculo</strong>. Isso permite suportar categorias futuras sem alteração de código.
+        </div>
+
+        <h3>Identificação visual</h3>
+        <p>
+          Colaboradores com vínculo do tipo <strong>Aprendiz</strong> são identificados por um badge amarelo
+          <span class="badge bg-warning text-dark rounded-pill" style="font-size:0.8rem;"><i class="bi bi-mortarboard me-1"></i>Aprendiz</span>
+          exibido ao lado do nome na lista de funcionários, no detalhe do funcionário (tabela de vínculos) e no relatório de posição FGTS.
+        </p>
+
+        <h3>Cálculo de FGTS</h3>
+        <p>
+          O sistema determina automaticamente a alíquota correta com base no tipo do vínculo do lançamento:
+        </p>
+        <ul>
+          <li>Lançamentos manuais calculam <code>valor_fgts = base_fgts × alíquota_do_vínculo</code>.</li>
+          <li>Geração automática e atualização em cascata usam a mesma regra.</li>
+          <li>A <strong>Memória de Cálculo</strong> exibe o percentual real (ex.: "2% sobre salário") em vez do genérico 8%.</li>
+        </ul>
+
+        <h3>Importação de planilha</h3>
+        <p>
+          Durante a importação de lançamentos via planilha TXT:
+        </p>
+        <ul>
+          <li><strong>Modo "Recalcular FGTS":</strong> o sistema calcula o valor automaticamente com a alíquota do vínculo (2% para Aprendiz, 8% para CLT).</li>
+          <li><strong>Modo "Manter valor do arquivo":</strong> se o valor no arquivo não corresponde à alíquota do vínculo, a linha é <strong>rejeitada</strong> com mensagem clara no relatório de erros. Exemplo: arquivo com 8% para um Aprendiz (2%) é recusado.</li>
+        </ul>
+        <div class="warn-box">
+          <i class="bi bi-exclamation-triangle me-1"></i> Ao importar histórico de colaboradores Aprendiz, utilize sempre o modo <strong>Recalcular FGTS</strong> ou garanta que os valores do arquivo já estão calculados com 2%.
+        </div>
+
+        <h3>Alterar o tipo de vínculo de um colaborador</h3>
+        <p>
+          Acesse <strong>Funcionários → Editar</strong> e altere o campo <em>Tipo de Vínculo</em> na seção de vínculo atual.
+        </p>
+        <ul>
+          <li>Ao salvar, o sistema registra um <strong>log de auditoria</strong> com o tipo anterior e o novo.</li>
+          <li>Em seguida, exibe uma tela de confirmação perguntando se deseja <strong>recalcular o histórico</strong> de lançamentos com a nova alíquota. Esta ação é opcional e de responsabilidade do usuário.</li>
+          <li>Lançamentos sem base FGTS registrada não são recalculados e são listados separadamente.</li>
+        </ul>
+        <div class="warn-box">
+          <i class="bi bi-exclamation-triangle me-1"></i>
+          <strong>Aprendiz → CLT é bloqueado para usuários comuns.</strong> A efetivação de um aprendiz como CLT representa um novo contrato — o procedimento correto é <em>encerrar o vínculo de Aprendiz</em> (preenchendo a data de demissão) e <em>criar um novo vínculo CLT</em>. Caso um colaborador tenha sido cadastrado com o tipo errado, o administrador da plataforma pode corrigir diretamente pelo <strong>Django Admin → Empresas → Vínculos Empregatícios</strong>.
+        </div>
+
+        <h3>Permissões por perfil</h3>
+        <table class="table table-sm table-bordered field-table" style="font-size: 0.87rem;">
+          <thead style="background: #f0f5ff;"><tr><th>Ação</th><th>Usuário comum</th><th>Admin Django</th></tr></thead>
+          <tbody>
+            <tr><td>Ver tipo do vínculo</td><td>✅ Sim</td><td>✅ Sim</td></tr>
+            <tr><td>Alterar CLT → Aprendiz</td><td>✅ Sim</td><td>✅ Sim</td></tr>
+            <tr><td>Alterar Aprendiz → CLT</td><td>❌ Bloqueado</td><td>✅ Sim (via Admin)</td></tr>
+            <tr><td>Criar novo tipo (ex.: Estágio)</td><td>❌ Não</td><td>✅ Sim (Django Admin)</td></tr>
+            <tr><td>Alterar percentual de um tipo</td><td>❌ Não</td><td>✅ Sim (Django Admin)</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- ===================== LANÇAMENTOS ===================== -->
+      <section id="lancamentos" class="doc-section mb-5">
+        <h2><i class="bi bi-cash-coin me-2"></i>Lançamentos</h2>
+
+        <h3>Conceitos fundamentais</h3>
+        <ul>
+          <li><strong>Base FGTS</strong>: soma das verbas habituais tributáveis (salário, horas extras, adicionais) sobre as quais incide a alíquota de 8%.</li>
+          <li><strong>Valor FGTS</strong>: calculado automaticamente como <code>base_fgts × 8%</code>. Qualquer alteração na base recalcula o valor ao salvar.</li>
+          <li><strong>Competência</strong>: mês e ano de referência no formato <code>MM/AAAA</code>. Para 13º salário, use <code>13/AAAA</code>.</li>
+          <li><strong>Parcela 13º</strong>: somente para competência 13. Informe 1 (primeira parcela) ou 2 (segunda parcela).</li>
+          <li><strong>Pago</strong>: indica se o depósito foi efetuado. Preencha a data e o valor pago quando confirmar o recolhimento.</li>
+        </ul>
+
+        <h3>Lançamento manual</h3>
+        <p>
+          Acesse <strong>Lançamentos → Novo</strong>. Preencha empresa, funcionário, competência e base FGTS. O sistema calcula o valor automaticamente.
+        </p>
+        <div class="tip-box">
+          <i class="bi bi-lightbulb me-1"></i> Use lançamentos manuais para competências específicas, rescisões, ou correção de valores já processados.
+        </div>
+
+        <h3>Exclusão em massa</h3>
+        <p>
+          Na lista de lançamentos, marque os itens desejados (checkbox) e use <strong>Excluir Selecionados</strong>. Funciona para exclusão de competências inteiras ou grupos de funcionários.
+        </p>
+      </section>
+
+      <!-- ===================== GERAÇÃO AUTOMÁTICA ===================== -->
+      <section id="geracao-auto" class="doc-section mb-5">
+        <h2><i class="bi bi-lightning me-2"></i>Geração Automática de Lançamentos</h2>
+
+        <p>
+          O sistema gera lançamentos para toda a vigência do vínculo de uma só vez. Acesse o detalhe do funcionário e clique em <strong>Gerar Lançamentos</strong> — ou use <strong>Gerar por Vínculo</strong> para gerar apenas para um vínculo específico.
+        </p>
+
+        <h3>Regras de geração</h3>
+        <ul>
+          <li>Competências geradas: do mês de admissão até o mês atual (ou mês de demissão, se aplicável).</li>
+          <li>Competências que já possuem lançamento para o mesmo funcionário e vínculo são <strong>ignoradas</strong> — sem duplicatas.</li>
+          <li>A base FGTS é preenchida com o salário base do vínculo. Ajuste manualmente se houver variações (comissões, horas extras).</li>
+          <li>O campo <em>13/AAAA</em> não é gerado automaticamente — deve ser criado manualmente.</li>
+        </ul>
+      </section>
+
+      <!-- ===================== IMPORTAÇÃO TXT ===================== -->
+      <section id="importacao-txt" class="doc-section mb-5">
+        <h2><i class="bi bi-file-earmark-text me-2"></i>Importação de Arquivo SEFIP.RE</h2>
+
+        <p>
+          Permite migrar histórico de lançamentos a partir de arquivos <code>SEFIP.RE</code> gerados pelo aplicativo SEFIP da Caixa Econômica Federal (ou qualquer sistema compatível). Acesse <strong>SEFIP → Importar SEFIP.RE</strong> no menu lateral (<code>/lancamentos/sefip/importar/</code>).
+        </p>
+
+        <h3>Processo</h3>
+        <ol>
+          <li>Selecione a empresa de destino (os lançamentos serão associados a ela).</li>
+          <li>Faça upload do arquivo <code>.RE</code> ou <code>.TXT</code> no formato SEFIP (360 caracteres por linha, ISO-8859-1).</li>
+          <li>O sistema lê o registro <code>00</code> para identificar a competência (YYYYMM) e os registros <code>301</code> para os dados do trabalhador.</li>
+          <li>Ao final, exibe o resultado: lançamentos criados, ignorados (duplicatas ou PIS não encontrado) e erros por linha.</li>
+        </ol>
+
+        <h3>Campos lidos do registro 301</h3>
+        <table class="table table-sm table-bordered field-table" style="font-size: 0.87rem;">
+          <thead style="background: #f0f5ff;"><tr><th>Campo</th><th>Posição</th><th>Uso</th></tr></thead>
+          <tbody>
+            <tr><td>PIS / NIS</td><td>32–42</td><td>Chave para localizar o funcionário no sistema</td></tr>
+            <tr><td>Nome</td><td>53–122</td><td>Exibido nos avisos de PIS não encontrado</td></tr>
+            <tr><td>Base FGTS</td><td>167–181</td><td>15 chars: 13 inteiros + 2 decimais</td></tr>
+            <tr><td>Competência</td><td>Reg. 00 / 291–296</td><td>YYYYMM ou YYYY13 → convertido para MM/AAAA</td></tr>
+          </tbody>
+        </table>
+
+        <div class="warn-box">
+          <i class="bi bi-exclamation-triangle me-1"></i> O PIS é a chave de correspondência. Funcionários não encontrados no sistema são sinalados como aviso e ignorados — o lançamento não é criado. Cadastre os funcionários antes de importar.
+        </div>
+      </section>
+
+      <!-- ===================== CONFERÊNCIA ===================== -->
+      <section id="conferencia" class="doc-section mb-5">
+        <h2><i class="bi bi-clipboard-check me-2"></i>Conferência de Lançamentos</h2>
+
+        <p>
+          O módulo de conferência permite revisar, aprovar ou rejeitar lançamentos antes da geração do SEFIP. Funciona como uma camada de validação interna.
+        </p>
+
+        <h3>Fluxo</h3>
+        <ol>
+          <li>Acesse <strong>Lançamentos → Conferência</strong> e selecione o lançamento a revisar.</li>
+          <li>Analise os campos — competência, base, valor calculado, dados do funcionário.</li>
+          <li>Clique em <strong>Conferir</strong> para aprovar ou <strong>Rejeitar</strong> para devolver com observação.</li>
+          <li>Lançamentos rejeitados ficam sinalizados para o responsável corrigir.</li>
+        </ol>
+      </section>
+
+      <!-- ===================== RELATÓRIOS ===================== -->
+      <section id="relatorios" class="doc-section mb-5">
+        <h2><i class="bi bi-bar-chart me-2"></i>Relatórios</h2>
+
+        <h3>Relatório por Competência</h3>
+        <p>
+          Acesse <strong>Lançamentos → Relatório</strong>. Filtre por empresa, competência e, opcionalmente, funcionário. O relatório exibe:
+        </p>
+        <ul>
+          <li>Base FGTS de cada trabalhador</li>
+          <li>Valor calculado (8% sobre a base)</li>
+          <li>Correção pela tabela JAM (juros e atualização monetária)</li>
+          <li>Total atualizado até a data de pagamento informada</li>
+        </ul>
+
+        <div class="tip-box">
+          <i class="bi bi-lightbulb me-1"></i> O cálculo com JAM só é aplicado quando a data de pagamento é posterior à competência. Para relatórios sem atualização, deixe a data de pagamento no mesmo mês da competência.
+        </div>
+      </section>
+
+      <!-- ===================== EXPORTAÇÕES ===================== -->
+      <section id="exportacao" class="doc-section mb-5">
+        <h2><i class="bi bi-download me-2"></i>Exportações — CSV e PDF</h2>
+
+        <h3>CSV</h3>
+        <p>
+          Exporta os lançamentos filtrados em formato de planilha. Cada linha representa um lançamento com colunas: funcionário, PIS, competência, base FGTS, valor FGTS, correção e total. Compatível com Excel, Google Sheets e sistemas de importação.
+        </p>
+
+        <h3>PDF — Relatório Profissional</h3>
+        <p>
+          Gera um PDF com layout formatado, pronto para entrega ao cliente. Inclui nome da empresa, competência, lista de funcionários e totais consolidados.
+        </p>
+      </section>
+
+      <!-- ===================== MEMÓRIA DE CÁLCULO ===================== -->
+      <section id="memoria-calculo" class="doc-section mb-5">
+        <h2><i class="bi bi-journal-text me-2"></i>Memória de Cálculo</h2>
+
+        <p>
+          O download da memória de cálculo exibe o detalhamento mês a mês da atualização de cada lançamento. Inclui:
+        </p>
+        <ul>
+          <li>Valor original do depósito</li>
+          <li>Índice JAM aplicado a cada mês</li>
+          <li>Saldo acumulado após cada correção</li>
+          <li>Total final com juros e correção monetária</li>
+        </ul>
+        <p>
+          Útil para auditorias, ações trabalhistas e conferência de saldos com o extrato da Caixa Econômica Federal.
+        </p>
+      </section>
+
+      <!-- ===================== SEFIP ===================== -->
+      <section id="sefip" class="doc-section mb-5">
+        <h2><i class="bi bi-file-earmark-arrow-down me-2"></i>SEFIP.RE</h2>
+
+        <h3>O que é</h3>
+        <p>
+          O SEFIP.RE é o arquivo de transmissão das informações de FGTS e previdência social. Formato fixo: <strong>360 caracteres por linha</strong>, codificação ISO-8859-1. Gerado pela plataforma e transmitido via SEFIP/Conectividade Social.
+        </p>
+
+        <h3>Pré-requisitos</h3>
+        <ul>
+          <li>O recurso deve estar habilitado para a empresa (solicitação ao administrador da conta).</li>
+          <li>Funcionários com PIS cadastrado e vínculo ativo na competência desejada.</li>
+          <li>Lançamentos registrados para a competência a exportar.</li>
+        </ul>
+
+        <h3>Como gerar</h3>
+        <ol>
+          <li>Acesse <strong>SEFIP</strong> no menu lateral (só aparece quando habilitado).</li>
+          <li>Selecione empresa, competência (MM/AAAA) e o intervalo de funcionários.</li>
+          <li>Clique em <strong>Gerar</strong>. O download do arquivo <code>SEFIP.RE</code> é iniciado automaticamente.</li>
+        </ol>
+
+        <h3>Estrutura do arquivo</h3>
+        <table class="table table-sm table-bordered field-table" style="font-size: 0.87rem;">
+          <thead style="background: #f0f5ff;"><tr><th>Registro</th><th>Conteúdo</th></tr></thead>
+          <tbody>
+            <tr><td>00</td><td>Cabeçalho do arquivo — identificação</td></tr>
+            <tr><td>10</td><td>Dados da empresa (CNPJ, FPAS, CNAE, RAT)</td></tr>
+            <tr><td>301</td><td>Dados do trabalhador e base FGTS</td></tr>
+            <tr><td>40</td><td>Remunerações variáveis (horas extras, adicionais)</td></tr>
+            <tr><td>50</td><td>Descontos (INSS e IR) — gerado somente se houver valor</td></tr>
+            <tr><td>60</td><td>Contribuição sindical — gerado somente se houver valor</td></tr>
+            <tr><td>90</td><td>Totalizador — contagem real de linhas do arquivo</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- ===================== CALCULADORA ===================== -->
+      <section id="calculadora" class="doc-section mb-5">
+        <h2><i class="bi bi-calculator me-2"></i>Calculadora FGTS</h2>
+
+        <p>
+          Ferramenta pública acessível em <strong>/calculadora-fgts/</strong>, sem necessidade de login. Permite calcular o FGTS corrigido de um trabalhador informando:
+        </p>
+        <ul>
+          <li>Competência de referência</li>
+          <li>Base FGTS (salário bruto)</li>
+          <li>Data de pagamento (para cálculo da correção JAM)</li>
+        </ul>
+        <p>
+          O resultado é exibido na tela. O usuário pode informar um e-mail para receber o <strong>relatório premium em PDF</strong> com memória de cálculo detalhada.
+        </p>
+        <div class="tip-box">
+          <i class="bi bi-lightbulb me-1"></i> Indicada para apresentação rápida a clientes ou conferência de valores antes de ações trabalhistas.
+        </div>
+      </section>
+
+      <!-- ===================== ÍNDICES ===================== -->
+      <section id="indices" class="doc-section mb-5">
+        <h2><i class="bi bi-table me-2"></i>Índices JAM</h2>
+
+        <p>
+          A tabela de índices JAM (Juros e Atualização Monetária) é usada para corrigir o saldo do FGTS de competências passadas até a data de pagamento. Acesse <strong>/indices/</strong> para visualizar os índices cadastrados.
+        </p>
+        <p>
+          Os índices são atualizados mensalmente pela Caixa Econômica Federal. O sistema utiliza os coeficientes acumulados para calcular a correção de forma auditável.
+        </p>
+        <div class="warn-box">
+          <i class="bi bi-exclamation-triangle me-1"></i> Se um lançamento de competência recente mostrar correção zerada, verifique se o índice daquele mês já foi cadastrado na tabela.
+        </div>
+      </section>
+
+      <!-- ===================== BPO ===================== -->
+      <section id="bpo" class="doc-section mb-5">
+        <h2><i class="bi bi-buildings me-2"></i>Escritórios BPO</h2>
+
+        <p>
+          O módulo BPO (Bureau de Processamento de Folha) permite que escritórios de folha gerenciem múltiplas empresas clientes em um único painel, com uma única assinatura.
+        </p>
+        <p>
+          A cobrança é feita por <strong>CNPJ ativo/mês</strong>. Ao adicionar uma empresa no meio do ciclo, o sistema calcula automaticamente o <strong>rateio proporcional</strong> aos dias restantes.
+        </p>
+        <div class="tip-box">
+          <i class="bi bi-buildings me-1"></i>
+          Para o guia completo do módulo BPO — incluindo exemplos de rateio, configuração de acesso do cliente e perguntas frequentes — consulte o
+          <a href="{% url 'ajuda-bpo' %}"><strong>Guia para Escritórios BPO</strong></a>.
+        </div>
+
+        <h3>Acesso do cliente</h3>
+        <p>
+          Por padrão, apenas o operador do escritório acessa as empresas gerenciadas. O BPO pode ativar o acesso empresa por empresa, permitindo que o cliente veja seus próprios dados.
+          Isso é controlado pelo campo <em>Permitir acesso do cliente</em> no painel BPO.
+        </p>
+
+        <h3>URLs do módulo BPO</h3>
+        <table class="table table-sm table-bordered field-table" style="font-size: 0.87rem;">
+          <thead style="background: #f0f5ff;"><tr><th>URL</th><th>Função</th></tr></thead>
+          <tbody>
+            <tr><td><code>/billing/bpo/</code></td><td>Painel de gestão BPO</td></tr>
+            <tr><td><code>/billing/bpo/planos/</code></td><td>Seleção de plano BPO</td></tr>
+            <tr><td><code>/billing/bpo/empresas/adicionar/</code></td><td>Adicionar empresa cliente</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- Navegação final -->
+      <div class="row g-3 pt-3 border-top">
+        <div class="col-md-6">
+          <a href="{% url 'ajuda-faq' %}" class="text-decoration-none">
+            <div class="card p-3" style="border-radius: 10px; border: 1.5px solid #e0e8f0;">
+              <div class="d-flex align-items-center gap-3">
+                <i class="bi bi-patch-question" style="font-size: 1.4rem; color: #F7941D;"></i>
+                <div>
+                  <div style="font-weight: 600; color: #1a2a3a; font-size: 0.92rem;">Perguntas Frequentes</div>
+                  <div class="text-muted" style="font-size: 0.82rem;">Dúvidas sobre cálculos e funcionalidades</div>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+        <div class="col-md-6">
+          <a href="{% url 'ajuda-glossario' %}" class="text-decoration-none">
+            <div class="card p-3" style="border-radius: 10px; border: 1.5px solid #e0e8f0;">
+              <div class="d-flex align-items-center gap-3">
+                <i class="bi bi-alphabet" style="font-size: 1.4rem; color: #F7941D;"></i>
+                <div>
+                  <div style="font-weight: 600; color: #1a2a3a; font-size: 0.92rem;">Glossário Técnico</div>
+                  <div class="text-muted" style="font-size: 0.82rem;">Definições dos termos trabalhistas</div>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

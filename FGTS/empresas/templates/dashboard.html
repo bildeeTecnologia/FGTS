@@ -1,0 +1,161 @@
+{% extends 'base.html' %}
+{% load lancamento_extras %}
+{% block title %}Dashboard — FGTS Web{% endblock %}
+{% block extra_css %}
+<style>
+  .card-standardized {
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .card-standardized .card-body {
+    flex: 1;
+    display: flex;
+    align-items: center;
+  }
+
+  a.card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+
+  a.card-link:hover .card {
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
+    transform: translateY(-2px);
+  }
+
+  .card {
+    transition: box-shadow .15s ease-in-out, transform .15s ease-in-out;
+  }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h2 class="mb-4">
+    Dashboard
+    {% if empresa %}
+      <span class="text-muted fs-5">— {{ empresa.nome }}</span>
+    {% endif %}
+  </h2>
+  
+  <div class="row g-3">
+    <div class="col-md-3">
+      <a href="{% url 'funcionario-list' %}" class="card-link">
+      <div class="card shadow-sm border-left border-primary card-standardized">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center w-100">
+            <div>
+              <div class="text-muted small">Funcionários</div>
+              <div class="h3 mb-0">{{ total_count }}</div>
+            </div>
+            <i class="bi bi-people fs-1 text-primary opacity-50"></i>
+          </div>
+        </div>
+      </div>
+      </a>
+    </div>
+    
+    {% if empresa %}
+    <div class="col-md-3">
+      <a href="{% url 'empresa-update' empresa.pk %}" class="card-link">
+      <div class="card shadow-sm border-left border-success card-standardized">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center w-100">
+            <div>
+              <div class="text-muted small">Empresa</div>
+              <div class="h5 mb-0">{{ empresa.nome }}</div>
+              <small class="text-muted">{{ empresa.cnpj }}</small>
+            </div>
+            <i class="bi bi-building fs-1 text-success opacity-50"></i>
+          </div>
+        </div>
+      </div>
+      </a>
+    </div>
+    {% endif %}
+    
+    <div class="col-md-3">
+      <a href="{% url 'lancamento-list' %}" class="card-link">
+      <div class="card shadow-sm border-left border-info card-standardized">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center w-100">
+            <div>
+              <div class="text-muted small">Lançamentos</div>
+              <div class="h3 mb-0">{{ lancs_total }}</div>
+              <small class="text-warning">⚠️ Pendentes de pagamento: {{ lancs_pendentes }}</small>
+            </div>
+            <i class="bi bi-file-earmark-text fs-1 text-success opacity-50"></i>
+          </div>
+        </div>
+      </div>
+      </a>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card shadow-sm {% if billing_customer.trial_active %}border-left border-warning{% else %}border-left border-info{% endif %} card-standardized">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center w-100">
+            <div>
+              <div class="text-muted small">Plano Atual</div>
+              {% if billing_customer and billing_customer.trial_active %}
+                <div class="h5 mb-0">
+                  <span class="badge bg-warning text-dark">Trial</span>
+                </div>
+                <small class="text-warning">
+                  ⏰ {{ billing_customer.days_remaining_trial }} dia{{ billing_customer.days_remaining_trial|pluralize }} restante{{ billing_customer.days_remaining_trial|pluralize }}
+                </small>
+                <div class="mt-2">
+                  <a class="btn btn-sm btn-primary" href="{% url 'billing:checkout-plano' %}">
+                    Ir para o checkout
+                  </a>
+                </div>
+              {% else %}
+                <div class="h5 mb-0">{{ current_plan.get_plan_type_display|default:"Sem plano" }}</div>
+                {% if current_plan %}
+                  <small class="text-muted">R$ {{ current_plan.price_monthly|brl }} / mês</small>
+                {% else %}
+                  {% if billing_customer and billing_customer.trial_expires %}
+                    <small class="text-muted">Trial expirou em {{ billing_customer.trial_expires|date:'d/m/Y' }}</small>
+                  {% endif %}
+                  <div class="mt-2">
+                    <a class="btn btn-sm btn-outline-primary" href="{% url 'billing:checkout-plano' %}">
+                      Assinar agora
+                    </a>
+                  </div>
+                {% endif %}
+              {% endif %}
+            </div>
+            <i class="bi bi-credit-card fs-1 {% if billing_customer.trial_active %}text-warning{% else %}text-info{% endif %} opacity-50"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="row g-3 mt-2">
+    <div class="col-md-12">
+      <div class="card shadow-sm">
+        <div class="card-header bg-light border-bottom">
+          <h6 class="mb-0">Ações Rápidas</h6>
+        </div>
+        <div class="card-body">
+          <!-- Empresa Action -->
+          {% if empresa %}
+            <a class="btn btn-sm btn-outline-primary" href="{% url 'empresa-update' empresa.pk %}"><i class="bi bi-pencil"></i> Editar Empresa</a>
+          {% else %}
+            <a class="btn btn-sm btn-outline-danger" href="{% url 'empresa-create' %}"><i class="bi bi-plus-circle"></i> Adicionar Empresa</a>
+          {% endif %}
+          
+          <!-- Other Quick Actions -->
+          <a class="btn btn-sm btn-outline-primary" href="{% url 'funcionario-list' %}"><i class="bi bi-people"></i> Ver Funcionários</a>
+          <a class="btn btn-sm btn-outline-success" href="{% url 'lancamento-list' %}"><i class="bi bi-file-text"></i> Ver Lançamentos</a>
+          <a class="btn btn-sm btn-outline-info" href="{% url 'relatorio-competencia' %}"><i class="bi bi-graph-up"></i> Gerar Relatório</a>
+          <a class="btn btn-sm btn-outline-secondary" href="{% url 'ajuda' %}"><i class="bi bi-question-circle"></i> Ajuda</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

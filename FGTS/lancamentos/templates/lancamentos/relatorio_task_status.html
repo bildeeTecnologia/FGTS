@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Gerando Relatório...{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="mb-3">
+                <h1 class="h4 fw-bold text-dark">
+                    <i class="bi bi-bar-chart-fill text-primary me-2"></i>
+                    Relatório por Competência
+                </h1>
+                <p class="text-muted mb-0 small">Empresa: <strong>{{ task.empresa.nome|default:"—" }}</strong></p>
+            </div>
+
+            <div class="card border-0 shadow-lg">
+                <div class="card-header text-white py-3 border-0" style="background: linear-gradient(135deg, #005CA9 0%, #003A78 100%);">
+                    <h2 class="h6 mb-0">
+                        <i class="bi bi-hourglass-split me-2"></i>
+                        Status do Relatório
+                    </h2>
+                </div>
+
+                <div class="card-body p-4">
+
+                    <!-- Estado: Aguardando / Processando -->
+                    <div id="state-processing" style="display:none;">
+                        <div class="d-flex align-items-center gap-3 mb-4">
+                            <div class="spinner-border text-primary flex-shrink-0" role="status">
+                                <span class="visually-hidden">Processando...</span>
+                            </div>
+                            <div>
+                                <div id="state-processing-title" class="fw-semibold">Aguardando processamento...</div>
+                                <div class="text-muted small">Não feche esta aba. O cálculo está sendo realizado em segundo plano.</div>
+                            </div>
+                            <div class="ms-auto text-end">
+                                <div class="text-muted small">Tempo decorrido</div>
+                                <div id="elapsed-time" class="fw-bold text-primary font-monospace">0:00</div>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info border-0 small mb-0">
+                            <i class="bi bi-info-circle me-1"></i>
+                            O relatório está sendo calculado em background. Você pode manter esta página aberta ou voltar mais tarde — o resultado ficará disponível quando concluído.
+                        </div>
+                    </div>
+
+                    <!-- Estado: Concluído -->
+                    <div id="state-done" style="display:none;">
+                        <div class="alert alert-success border-0 d-flex align-items-center mb-3">
+                            <i class="bi bi-check-circle-fill fs-4 me-3"></i>
+                            <div>
+                                <strong>Relatório gerado com sucesso!</strong>
+                                <div class="small" id="done-tempo"></div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 pt-3 border-top mt-3">
+                            <a href="{% url 'relatorio-competencia' %}" class="btn btn-outline-secondary rounded-3">
+                                <i class="bi bi-arrow-left me-1"></i>
+                                Novo Relatório
+                            </a>
+                            <a id="btn-resultado" href="{% url 'relatorio-task-resultado' pk=task.pk %}" class="btn btn-primary rounded-3">
+                                <i class="bi bi-bar-chart me-1"></i>
+                                Ver Relatório
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Estado: Erro -->
+                    <div id="state-error" style="display:none;">
+                        <div class="alert alert-danger border-0 mb-3">
+                            <i class="bi bi-x-circle-fill me-2"></i>
+                            <strong>Erro ao gerar relatório</strong>
+                            <p id="error-message" class="mb-0 mt-1 small"></p>
+                        </div>
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="{% url 'relatorio-competencia' %}" class="btn btn-primary rounded-3">
+                                <i class="bi bi-arrow-left me-1"></i>
+                                Tentar Novamente
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .font-monospace { font-family: var(--bs-font-monospace); }
+</style>
+
+<script>
+(function () {
+    var statusUrl = "{% url 'relatorio-task-status-json' pk=task.pk %}";
+    var resultadoUrl = "{% url 'relatorio-task-resultado' pk=task.pk %}";
+    var startTime = Date.now();
+    var pollingId = null;
+    var elapsedId = null;
+
+    var elProcessing = document.getElementById('state-processing');
+    var elDone       = document.getElementById('state-done');
+    var elError      = document.getElementById('state-error');
+    var elTitle      = document.getElementById('state-processing-title');
+    var elElapsed    = document.getElementById('elapsed-time');
+
+    function fmtSeconds(s) {
+        s = Math.round(s);
+        var m = Math.floor(s / 60);
+        var ss = s % 60;
+        return m + ':' + (ss < 10 ? '0' : '') + ss;
+    }
+
+    function tickElapsed() {
+        elElapsed.textContent = fmtSeconds((Date.now() - startTime) / 1000);
+    }
+
+    function startElapsedCounter() {
+        if (elapsedId) return;
+        tickElapsed();
+        elapsedId = setInterval(tickElapsed, 1000);
+    }
+
+    function stopElapsedCounter() {
+        if (elapsedId) { clearInterval(elapsedId); elapsedId = null; }
+    }
+
+    function showProcessing(status) {
+        elProcessing.style.display = '';
+        elDone.style.display = 'none';
+        elError.style.display = 'none';
+        elTitle.textContent = status === 'pending' ? 'Aguardando processamento...' : 'Calculando relatório...';
+        startElapsedCounter();
+    }
+
+    function showDone(redirectUrl) {
+        stopElapsedCounter();
+        elProcessing.style.display = 'none';
+        elError.style.display = 'none';
+        elDone.style.display = '';
+        var totalSec = Math.round((Date.now() - startTime) / 1000);
+        document.getElementById('done-tempo').textContent = 'Processado em ' + fmtSeconds(totalSec);
+        var dest = redirectUrl || resultadoUrl;
+        document.getElementById('btn-resultado').href = dest;
+        // Redireciona automaticamente após 1.5s
+        setTimeout(function() { window.location.href = dest; }, 1500);
+    }
+
+    function showError(msg) {
+        stopElapsedCounter();
+        elProcessing.style.display = 'none';
+        elDone.style.display = 'none';
+        elError.style.display = '';
+        document.getElementById('error-message').textContent = msg || 'Erro desconhecido. Contate o suporte.';
+    }
+
+    function applyStatus(data) {
+        var s = data.status;
+        if (s === 'pending' || s === 'processing') {
+            showProcessing(s);
+            return false;
+        } else if (s === 'done') {
+            showDone(data.redirect_url);
+            return true;
+        } else if (s === 'error') {
+            showError(data.erro);
+            return true;
+        }
+        return false;
+    }
+
+    function poll() {
+        if (pollingId) return;
+        pollingId = setInterval(function () {
+            fetch(statusUrl, { credentials: 'same-origin' })
+                .then(function (r) { return r.json(); })
+                .then(function (data) {
+                    var done = applyStatus(data);
+                    if (done) { clearInterval(pollingId); pollingId = null; }
+                })
+                .catch(function () {});
+        }, 3000);
+    }
+
+    var initialStatus = "{{ task.status }}";
+    if (initialStatus === 'done') {
+        showDone(null);
+    } else if (initialStatus === 'error') {
+        fetch(statusUrl, { credentials: 'same-origin' })
+            .then(function(r) { return r.json(); })
+            .then(function(data) { showError(data.erro); });
+    } else {
+        showProcessing(initialStatus);
+        poll();
+    }
+})();
+</script>
+{% endblock %}

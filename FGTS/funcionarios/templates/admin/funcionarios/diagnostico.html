@@ -1,0 +1,251 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block title %}Diagnóstico de Dados Órfãos{% endblock %}
+
+{% block content %}
+<style>
+  /* Usa variáveis CSS do Django admin — funcionam em modo claro e escuro */
+  .diag-aviso {
+    background: var(--darkened-bg, #fff3cd);
+    border: 1px solid var(--border-color, #ffc107);
+    border-radius: 4px;
+    padding: .75rem 1rem;
+    margin-bottom: 1rem;
+    color: var(--body-fg, #333);
+  }
+  .diag-ok    { color: #2ecc71; font-weight: bold; }
+  .diag-warn  { color: #f39c12; font-weight: bold; }
+  .diag-error { color: #e74c3c; font-weight: bold; }
+
+  .diag-table { border-collapse: collapse; width: 100%; margin-bottom: 2rem; font-size: .875em; }
+  .diag-table th {
+    background: var(--primary, #417690);
+    color: var(--header-color, #fff);
+    padding: .35rem .75rem;
+    text-align: left;
+    white-space: nowrap;
+  }
+  .diag-table td {
+    padding: .35rem .75rem;
+    border-bottom: 1px solid var(--hairline-color, #e0e0e0);
+    white-space: nowrap;
+    color: var(--body-fg, #333);
+    background: var(--body-bg, #fff);
+  }
+  .diag-table tr:nth-child(even) td { background: var(--darkened-bg, #f9f9f9); }
+
+  .diag-table-danger th { background: #c0392b; color: #fff; }
+  .diag-table-danger td { background: color-mix(in srgb, #c0392b 8%, var(--body-bg, #fff)) !important; }
+
+  .diag-btn {
+    background: var(--primary, #417690);
+    color: var(--header-color, #fff);
+    border: none;
+    padding: .4rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    margin-bottom: 1.5rem;
+  }
+  .diag-btn:hover { background: var(--primary-dark, #205067); color: #fff; }
+
+  /* Resumo: célula com valor zero fica com cor suave */
+  .diag-summary-zero { color: var(--body-quiet-color, #666); }
+</style>
+
+<div class="diag-aviso">
+  <strong>Somente leitura.</strong>
+  Esta página exibe apenas consultas diagnósticas. Nenhum dado é modificado ou excluído por aqui.
+</div>
+
+<a href="." class="diag-btn">↻ Atualizar diagnóstico</a>
+
+{# ── Resumo ── #}
+<h2>Resumo</h2>
+<table class="diag-table" style="width:auto;">
+  <thead>
+    <tr><th>Categoria</th><th style="text-align:right;">Qtd</th></tr>
+  </thead>
+  <tbody>
+    {% for label, count, anchor, is_error in summaries %}
+    <tr>
+      <td><a href="#{{ anchor }}">{{ label }}</a></td>
+      <td style="text-align:right;" class="{% if count > 0 and is_error %}diag-error{% elif count > 0 %}diag-warn{% else %}diag-summary-zero{% endif %}">
+        {% if count > 0 %}<strong>{% endif %}{{ count }}{% if count > 0 %}</strong>{% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{# ──────────────────────────────────────────── #}
+{# Seção 1: Funcionários sem vínculo            #}
+{# ──────────────────────────────────────────── #}
+<h2 id="sec1">1. Funcionários sem nenhum vínculo</h2>
+<p style="color:var(--body-quiet-color,#555);font-size:.9em;">
+  Funcionários que perderam o vínculo quando a empresa foi excluída, ou criados sem empresa.
+  Aparecem com "—" na tela de funcionários.
+  <strong>Veja as subseções abaixo antes de qualquer limpeza.</strong>
+</p>
+{% if func_sem_vinculo %}
+  <p class="diag-warn">⚠ {{ func_sem_vinculo|length }} funcionário(s) sem vínculo no total</p>
+  <details style="margin-bottom:1rem;">
+    <summary style="cursor:pointer;color:var(--link-fg,#417690);">Ver lista completa ({{ func_sem_vinculo|length }} registros)</summary>
+    <div style="overflow-x:auto;margin-top:.5rem;">
+    <table class="diag-table">
+      <thead><tr>{% for col in func_sem_vinculo_cols %}<th>{{ col }}</th>{% endfor %}</tr></thead>
+      <tbody>
+        {% for row in func_sem_vinculo %}
+        <tr>{% for cell in row %}<td>{% if cell is not None %}{{ cell }}{% else %}—{% endif %}</td>{% endfor %}</tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    </div>
+  </details>
+{% else %}
+  <p class="diag-ok">✔ Nenhum funcionário sem vínculo.</p>
+{% endif %}
+
+{# ──────────────────────────────────────────────────────────── #}
+{# Seção 1b: Sem vínculo MAS com lançamentos — NÃO deletar     #}
+{# ──────────────────────────────────────────────────────────── #}
+<h3 id="sec1b" style="margin-top:1.5rem;">
+  1b. ⛔ Sem vínculo, MAS com lançamentos — <span class="diag-error">NÃO deletar</span>
+</h3>
+<p style="color:var(--body-quiet-color,#555);font-size:.9em;">
+  Esses funcionários perderam o vínculo (empresa deletada), mas ainda possuem lançamentos em
+  <strong>outra empresa que ainda existe</strong>. Deletá-los apagaria o histórico FGTS do cliente via CASCADE.<br>
+  <strong>Ação recomendada: investigar e recriar o vínculo correto manualmente.</strong>
+</p>
+{% if func_sem_vinculo_com_lanc %}
+  <p class="diag-error">🚨 {{ func_sem_vinculo_com_lanc|length }} funcionário(s) em risco — NÃO deletar!</p>
+  <div style="overflow-x:auto;">
+  <table class="diag-table diag-table-danger">
+    <thead><tr>{% for col in func_sem_vinculo_com_lanc_cols %}<th>{{ col }}</th>{% endfor %}</tr></thead>
+    <tbody>
+      {% for row in func_sem_vinculo_com_lanc %}
+      <tr>{% for cell in row %}<td>{% if cell is not None %}{{ cell }}{% else %}—{% endif %}</td>{% endfor %}</tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+{% else %}
+  <p class="diag-ok">✔ Nenhum funcionário sem vínculo possui lançamentos ativos. Seguro prosseguir.</p>
+{% endif %}
+
+{# ──────────────────────────────────────────────────────────────── #}
+{# Seção 1c: Sem vínculo E sem lançamentos — candidatos à limpeza  #}
+{# ──────────────────────────────────────────────────────────────── #}
+<h3 id="sec1c" style="margin-top:1.5rem;">
+  1c. ✔ Sem vínculo e sem lançamentos — candidatos à limpeza
+</h3>
+<p style="color:var(--body-quiet-color,#555);font-size:.9em;">
+  Esses funcionários não possuem vínculo nem lançamentos. São registros sem nenhuma informação útil para
+  os clientes e podem ser excluídos com segurança.<br>
+  <strong>Mesmo assim, confirme com o cliente antes de executar qualquer limpeza em massa.</strong>
+</p>
+{% if func_sem_vinculo_sem_lanc %}
+  <p class="diag-warn">⚠ {{ func_sem_vinculo_sem_lanc|length }} funcionário(s) candidatos à limpeza</p>
+  <details style="margin-bottom:1rem;">
+    <summary style="cursor:pointer;color:var(--link-fg,#417690);">Ver lista ({{ func_sem_vinculo_sem_lanc|length }} registros)</summary>
+    <div style="overflow-x:auto;margin-top:.5rem;">
+    <table class="diag-table">
+      <thead><tr>{% for col in func_sem_vinculo_sem_lanc_cols %}<th>{{ col }}</th>{% endfor %}</tr></thead>
+      <tbody>
+        {% for row in func_sem_vinculo_sem_lanc %}
+        <tr>{% for cell in row %}<td>{% if cell is not None %}{{ cell }}{% else %}—{% endif %}</td>{% endfor %}</tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    </div>
+  </details>
+  {% if not func_sem_vinculo_com_lanc %}
+  <a href="{{ limpar_url }}"
+     style="display:inline-block;background:#e74c3c;color:#fff;padding:.45rem 1.1rem;border-radius:4px;text-decoration:none;font-weight:bold;">
+    🗑 Iniciar limpeza de {{ func_sem_vinculo_sem_lanc|length }} registro(s)
+  </a>
+  {% else %}
+  <p class="diag-error" style="font-size:.9em;">
+    ⛔ Limpeza bloqueada: ainda existem funcionários da seção 1b (com lançamentos) que precisam ser investigados antes de prosseguir.
+  </p>
+  {% endif %}
+{% else %}
+  <p class="diag-ok">✔ Nenhum funcionário sem vínculo e sem lançamentos.</p>
+{% endif %}
+
+{# ──────────────────────────────────────────── #}
+{# Seção 2: Vínculos com empresa inexistente    #}
+{# ──────────────────────────────────────────── #}
+<h2 id="sec2">2. Vínculos com empresa inexistente</h2>
+<p style="color:var(--body-quiet-color,#555);font-size:.9em;">
+  <code>FuncionarioVinculo</code> cujo <code>empresa_id</code> não corresponde a nenhuma empresa no banco.<br>
+  <strong>Não deveria ocorrer</strong> (CASCADE deveria ter removido junto com a empresa).
+  Se houver registros, indica que alguma exclusão foi feita fora do ORM Django.
+</p>
+{% if vinculos_orfaos %}
+  <p class="diag-error">🚨 {{ vinculos_orfaos|length }} registro(s) — problema de integridade referencial!</p>
+  <div style="overflow-x:auto;">
+  <table class="diag-table diag-table-danger">
+    <thead><tr>{% for col in vinculos_orfaos_cols %}<th>{{ col }}</th>{% endfor %}</tr></thead>
+    <tbody>
+      {% for row in vinculos_orfaos %}
+      <tr>{% for cell in row %}<td>{% if cell is not None %}{{ cell }}{% else %}—{% endif %}</td>{% endfor %}</tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+{% else %}
+  <p class="diag-ok">✔ Nenhum vínculo órfão.</p>
+{% endif %}
+
+{# ──────────────────────────────────────────── #}
+{# Seção 3: Lançamentos com empresa inexistente #}
+{# ──────────────────────────────────────────── #}
+<h2 id="sec3">3. Lançamentos com empresa inexistente</h2>
+<p style="color:var(--body-quiet-color,#555);font-size:.9em;">
+  Lançamentos cujo <code>empresa_id</code> não corresponde a nenhuma empresa.<br>
+  <strong>Não deveria ocorrer</strong> (CASCADE). Se houver, indica exclusão manual fora do ORM.
+</p>
+{% if lanc_empresa_orfa %}
+  <p class="diag-error">🚨 {{ lanc_empresa_orfa|length }} lançamento(s) — problema de integridade referencial!</p>
+  <div style="overflow-x:auto;">
+  <table class="diag-table diag-table-danger">
+    <thead><tr>{% for col in lanc_empresa_orfa_cols %}<th>{{ col }}</th>{% endfor %}</tr></thead>
+    <tbody>
+      {% for row in lanc_empresa_orfa %}
+      <tr>{% for cell in row %}<td>{% if cell is not None %}{{ cell }}{% else %}—{% endif %}</td>{% endfor %}</tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+{% else %}
+  <p class="diag-ok">✔ Nenhum lançamento com empresa inexistente.</p>
+{% endif %}
+
+{# ────────────────────────────────────────────────── #}
+{# Seção 4: Lançamentos com funcionário inexistente  #}
+{# ────────────────────────────────────────────────── #}
+<h2 id="sec4">4. Lançamentos com funcionário inexistente</h2>
+<p style="color:var(--body-quiet-color,#555);font-size:.9em;">
+  Lançamentos cujo <code>funcionario_id</code> não corresponde a nenhum funcionário.<br>
+  <strong>Não deveria ocorrer</strong> (CASCADE). Se houver, indica exclusão manual fora do ORM.
+</p>
+{% if lanc_func_orfao %}
+  <p class="diag-error">🚨 {{ lanc_func_orfao|length }} lançamento(s) — problema de integridade referencial!</p>
+  <div style="overflow-x:auto;">
+  <table class="diag-table diag-table-danger">
+    <thead><tr>{% for col in lanc_func_orfao_cols %}<th>{{ col }}</th>{% endfor %}</tr></thead>
+    <tbody>
+      {% for row in lanc_func_orfao %}
+      <tr>{% for cell in row %}<td>{% if cell is not None %}{{ cell }}{% else %}—{% endif %}</td>{% endfor %}</tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+{% else %}
+  <p class="diag-ok">✔ Nenhum lançamento com funcionário inexistente.</p>
+{% endif %}
+
+{% endblock %}

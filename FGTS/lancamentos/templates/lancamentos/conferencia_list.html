@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+{% load lancamento_extras %}
+
+{% block title %}Conferência de Lançamentos - FGTS Web{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <!-- Header -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-gradient-primary text-white py-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-0 fw-bold">
+                                <i class="bi bi-check-circle me-2"></i>Conferência de Lançamentos
+                            </h4>
+                            <small class="opacity-75">{{ empresa.razao_social }}</small>
+                        </div>
+                        <div>
+                            <a href="{% url 'conferencia-relatorio' empresa.pk %}" class="btn btn-light btn-sm">
+                                <i class="bi bi-file-text me-1"></i>Relatório
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dashboard de Estatísticas -->
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-3">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body text-center">
+                                    <div class="fs-3 fw-bold text-primary">{{ relatorio.total_lancamentos }}</div>
+                                    <div class="text-muted small">Total de Lançamentos</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body text-center">
+                                    <div class="fs-3 fw-bold text-warning">{{ relatorio.pendentes }}</div>
+                                    <div class="text-muted small">Pendentes</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body text-center">
+                                    <div class="fs-3 fw-bold text-success">{{ relatorio.conferidos }}</div>
+                                    <div class="text-muted small">Conferidos</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body text-center">
+                                    <div class="fs-3 fw-bold text-danger">{{ relatorio.rejeitados }}</div>
+                                    <div class="text-muted small">Rejeitados</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filtros -->
+                    <form method="get" class="row g-3 mb-4">
+                        <div class="col-md-3">
+                            {{ filtro_form.competencia }}
+                        </div>
+                        <div class="col-md-3">
+                            {{ filtro_form.status }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ filtro_form.funcionario }}
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="bi bi-funnel me-1"></i>Filtrar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Lista de Conferências -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    {% if conferencias %}
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Funcionário</th>
+                                    <th>Competência</th>
+                                    <th>Base FGTS</th>
+                                    <th>Valor FGTS</th>
+                                    <th>Status</th>
+                                    <th>Conferido Por</th>
+                                    <th>Data</th>
+                                    <th class="text-end">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for conf in conferencias %}
+                                <tr>
+                                    <td><span class="badge bg-secondary">#{{ conf.id }}</span></td>
+                                    <td>
+                                        <strong>{{ conf.lancamento.funcionario.nome }}</strong><br>
+                                        <small class="text-muted">PIS: {{ conf.lancamento.funcionario.pis }}</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">{{ conf.lancamento.competencia }}</span>
+                                        {% if conf.lancamento.parcela_13 %}
+                                        <span class="badge bg-warning">13º</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ conf.lancamento.base_fgts|brl }}</td>
+                                    <td>
+                                        <strong>{{ conf.lancamento.valor_fgts|brl }}</strong>
+                                        {% if conf.valor_conferido %}
+                                        <br><small class="text-warning">Conferido: {{ conf.valor_conferido|brl }}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if conf.status == 'PENDENTE' %}
+                                        <span class="badge bg-warning">⏳ Pendente</span>
+                                        {% elif conf.status == 'CONFERIDO' %}
+                                        <span class="badge bg-success">✓ Conferido</span>
+                                        {% elif conf.status == 'PROBLEMA' %}
+                                        <span class="badge bg-danger">⚠ Problema</span>
+                                        {% elif conf.status == 'REJEITADO' %}
+                                        <span class="badge bg-dark">✗ Rejeitado</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if conf.conferido_por %}
+                                        <small>{{ conf.conferido_por.username }}</small>
+                                        {% else %}
+                                        <small class="text-muted">-</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if conf.data_conferencia %}
+                                        <small>{{ conf.data_conferencia|date:"d/m/Y" }}</small>
+                                        {% else %}
+                                        <small class="text-muted">-</small>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{% url 'conferencia-detail' conf.id %}" 
+                                               class="btn btn-outline-info" 
+                                               title="Ver Detalhes">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            {% if conf.status == 'PENDENTE' or conf.status == 'PROBLEMA' %}
+                                            <a href="{% url 'conferencia-conferir' conf.id %}" 
+                                               class="btn btn-outline-success" 
+                                               title="Conferir">
+                                                <i class="bi bi-check-circle"></i>
+                                            </a>
+                                            <a href="{% url 'conferencia-rejeitar' conf.id %}" 
+                                               class="btn btn-outline-danger" 
+                                               title="Rejeitar">
+                                                <i class="bi bi-x-circle"></i>
+                                            </a>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Paginação -->
+                    {% if is_paginated %}
+                    <nav aria-label="Paginação">
+                        <ul class="pagination justify-content-center">
+                            {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                            </li>
+                            {% endif %}
+                            
+                            <li class="page-item active">
+                                <span class="page-link">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+                            </li>
+                            
+                            {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Próxima</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+
+                    {% else %}
+                    <div class="alert alert-info text-center">
+                        <i class="bi bi-info-circle fs-3 d-block mb-2"></i>
+                        <p class="mb-0">Nenhum lançamento encontrado com os filtros selecionados.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%) !important;
+    }
+</style>
+{% endblock %}

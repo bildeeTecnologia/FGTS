@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container-fluid px-4 py-4">
+  <h2 class="mb-4">Painel Administrativo da Empresa</h2>
+
+  {% if is_admin_empresa %}
+    <div class="mb-4 d-flex justify-content-between align-items-start flex-wrap gap-3">
+      <div class="card shadow-sm" style="min-width: 260px;">
+        <div class="card-header bg-light py-2">
+          <strong class="small"><i class="bi bi-sliders me-1"></i>Colunas dos Relatórios</strong>
+        </div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item d-flex justify-content-between align-items-center py-2">
+            <span class="small">Índice CEF</span>
+            <a href="{% url 'toggle-exibir-indice' %}"
+               class="btn btn-sm {% if request.session.exibir_indice %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+              {% if request.session.exibir_indice %}
+                <i class="bi bi-eye me-1"></i>Visível
+              {% else %}
+                <i class="bi bi-eye-slash me-1"></i>Oculta
+              {% endif %}
+            </a>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center py-2">
+            <span class="small">Correção</span>
+            <a href="{% url 'toggle-exibir-correcao' %}"
+               class="btn btn-sm {% if request.session.exibir_correcao|default_if_none:True %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+              {% if request.session.exibir_correcao|default_if_none:True %}
+                <i class="bi bi-eye me-1"></i>Visível
+              {% else %}
+                <i class="bi bi-eye-slash me-1"></i>Oculta
+              {% endif %}
+            </a>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center py-2">
+            <span class="small">JAM</span>
+            <a href="{% url 'toggle-exibir-jam' %}"
+               class="btn btn-sm {% if request.session.exibir_jam|default_if_none:True %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+              {% if request.session.exibir_jam|default_if_none:True %}
+                <i class="bi bi-eye me-1"></i>Visível
+              {% else %}
+                <i class="bi bi-eye-slash me-1"></i>Oculta
+              {% endif %}
+            </a>
+          </li>
+        </ul>
+      </div>
+      <a href="{% url 'empresa-editar' empresa.id %}" class="btn btn-outline-primary">
+        <i class="bi bi-pencil-square me-1"></i> Editar Empresa
+      </a>
+    </div>
+    <div class="mb-5">
+      <h3 class="mb-3">Usuários da Empresa</h3>
+      <table class="table align-middle bg-white rounded shadow-sm">
+        <thead>
+          <tr>
+            <th>Usuário</th>
+            <th>Email</th>
+            <th>Papel</th>
+            <th class="text-center">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for role in empresa.usuarios_roles.all %}
+          <tr>
+            <td>{{ role.usuario.username }}</td>
+            <td>{{ role.usuario.email }}</td>
+            <td>{{ role.get_role_display }}</td>
+            <td class="text-center">
+              <div class="d-flex justify-content-center gap-2">
+                {% if role.role != 'admin' %}
+                  <form method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="promote">
+                    <input type="hidden" name="target_id" value="{{ role.id }}">
+                    <button type="submit" class="btn btn-sm btn-success">Promover a Admin</button>
+                  </form>
+                {% endif %}
+                <form method="post" style="display:inline;">
+                  {% csrf_token %}
+                  <input type="hidden" name="action" value="remove">
+                  <input type="hidden" name="target_id" value="{{ role.id }}">
+                  <button type="submit" class="btn btn-sm btn-danger">Remover</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="mb-5">
+      <h3 class="mb-3">Adicionar Usuário</h3>
+      <form method="post" action="" class="row g-2 align-items-end">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="add">
+        <div class="col-md-6">
+          <input type="text" name="username" placeholder="Usuário ou email" class="form-control" required>
+        </div>
+        <div class="col-md-4">
+          <select name="role" class="form-select">
+            <option value="operador">Operador</option>
+            <option value="gestor">Gestor</option>
+            <option value="admin">Administrador</option>
+          </select>
+        </div>
+        <div class="col-md-2 d-grid">
+          <button type="submit" class="btn btn-primary">Adicionar</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="mb-5">
+      <h3 class="mb-3">Empresas do mesmo Grupo Econômico</h3>
+      {% if grupo %}
+        <ul class="mb-3">
+          {% for emp in grupo.empresas.all %}
+            <li><strong>Codigo {{ emp.codigo_exibicao }}</strong> - {{ emp.nome }} ({{ emp.cnpj }})</li>
+          {% endfor %}
+        </ul>
+        <a href="{% url 'empresa-cadastrar' %}" class="btn btn-secondary">Cadastrar nova empresa ao grupo</a>
+      {% else %}
+        <div class="text-muted">Esta empresa nao esta vinculada a um grupo economico.</div>
+      {% endif %}
+    </div>
+
+  {% else %}
+    <div class="alert alert-danger mt-4">Acesso restrito ao administrador da empresa.</div>
+  {% endif %}
+</div>
+{% endblock %}

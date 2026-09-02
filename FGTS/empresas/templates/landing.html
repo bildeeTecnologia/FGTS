@@ -1,0 +1,663 @@
+{% extends 'base.html' %}
+
+{% block title %}FGTS Web — Gestão de FGTS em Atraso para Contadores e RH{% endblock %}
+
+{% block seo %}
+<meta name="description" content="Sistema online para cálculo e gestão de FGTS em atraso. Importação de SEFIP, índices atualizados, relatórios e muito mais. Ideal para escritórios contábeis e RH.">
+<meta name="keywords" content="FGTS em atraso, cálculo FGTS, sistema FGTS online, SEFIP web, gestão FGTS, calcular FGTS atrasado, software FGTS contador">
+<meta name="robots" content="index, follow">
+<meta name="author" content="FGTS Web">
+{% endblock %}
+
+{% block canonical %}
+<link rel="canonical" href="https://fgts.bildee.com.br/">
+{% endblock %}
+
+{% block og_title %}FGTS Web — Gestão de FGTS em Atraso para Contadores e RH{% endblock %}
+{% block og_description %}Sistema online para cálculo e gestão de FGTS em atraso. Importação de SEFIP, índices atualizados e relatórios completos.{% endblock %}
+{% block og_url %}https://fgts.bildee.com.br/{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://fgts.bildee.com.br/#website",
+      "url": "https://fgts.bildee.com.br/",
+      "name": "FGTS Web",
+      "description": "Sistema online para gestão de FGTS em atraso",
+      "inLanguage": "pt-BR"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://fgts.bildee.com.br/#app",
+      "name": "FGTS Web",
+      "url": "https://fgts.bildee.com.br/",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Web",
+      "description": "Sistema SaaS para cálculo e gestão de FGTS em atraso. Importação de SEFIP, índices atualizados (TR, JAM, SELIC), relatórios de recolhimento e exportação de arquivos.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "BRL",
+        "description": "Trial gratuito disponível"
+      },
+      "featureList": [
+        "Cálculo de FGTS em atraso com índices oficiais",
+        "Importação de arquivos SEFIP",
+        "Relatórios de competência por funcionário",
+        "Gestão multi-empresa",
+        "Exportação de relatórios em PDF e CSV",
+        "Conferência e auditoria de lançamentos"
+      ],
+      "inLanguage": "pt-BR"
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://fgts.bildee.com.br/#organization",
+      "name": "FGTS Web",
+      "url": "https://fgts.bildee.com.br/",
+      "sameAs": []
+    }
+  ]
+}
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+  .hero {
+    min-height: 78vh;
+    display: flex;
+    align-items: center;
+    color: #fff;
+    background: radial-gradient(1200px 600px at 80% -10%, rgba(255,255,255,0.12), rgba(255,255,255,0) 60%),
+                linear-gradient(135deg, #005CA9 0%, #003A78 100%);
+  }
+  .hero h1 { font-weight: 800; letter-spacing: -0.5px; }
+  .hero p.lead { opacity: .95; }
+  .metric {
+    border-radius: 12px; background: rgba(255,255,255,.1); color: #fff;
+    border: 1px solid rgba(255,255,255,.2);
+    min-height: 150px;
+    padding: 18px 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .metric .metric-title {
+    font-size: 0.9rem;
+    line-height: 1.2;
+    opacity: 0.95;
+    white-space: normal;
+  }
+  .metric .metric-subtitle {
+    font-size: 0.85rem;
+    opacity: 0.85;
+  }
+  .metric.highlight {
+    border-color: rgba(255,255,255,0.5);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+    background: rgba(255,255,255,.16);
+  }
+  .hero-login {
+    position: absolute;
+    top: 24px;
+    right: 40px;
+    z-index: 10;
+  }
+  .metrics-row {
+    justify-content: center;
+    row-gap: 1rem;
+    column-gap: 1.2rem;
+    max-width: 1200px;
+    flex-wrap: nowrap;
+  }
+  @media (max-width: 991.98px) {
+    .metrics-row {
+      flex-wrap: wrap;
+    }
+  }
+  .metrics-row > div {
+    display: flex;
+  }
+  .metrics-row .metric {
+    width: 100%;
+    border-radius: 14px;
+  }
+  .hero-header {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 20px 40px;
+    z-index: 10;
+  }
+  .section { padding: 80px 0; background: #fff; }
+  .section-alt { padding: 80px 0; background: #f8f9fb; }
+  .feature-card { border: none; border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,.06); }
+  .feature-card .icon { width: 52px; height: 52px; display: inline-flex; align-items: center; justify-content: center; border-radius: 10px; }
+  .cta-gradient { background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%); }
+
+  /* Pricing (imagem de referência) */
+  .pricing-section {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    padding: 80px 0 60px 0;
+    background: #fff;
+    text-align: center;
+  }
+  .plan {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+    padding: 32px 24px;
+    transition: transform 0.2s;
+  }
+  .plan:hover {
+    transform: translateY(-8px) scale(1.03);
+    box-shadow: 0 6px 24px rgba(0,0,0,0.12);
+  }
+  .plan h3 {
+    font-size: 1.4em;
+    margin-bottom: 12px;
+    color: #0078d7;
+  }
+  .plan .price {
+    font-size: 2em;
+    color: #222;
+    margin-bottom: 18px;
+  }
+  .plan .price span {
+    font-size: 0.6em;
+    color: #666;
+  }
+  .plan ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    text-align: left;
+  }
+  .plan ul li {
+    padding: 7px 0;
+    border-bottom: 1px solid #f0f0f0;
+    color: #333;
+  }
+  .plan ul li.na {
+    color: #bbb;
+    text-decoration: line-through;
+  }
+  .plan.featured {
+    border: 2px solid #0078d7;
+    box-shadow: 0 4px 24px rgba(0,120,215,0.08);
+    position: relative;
+  }
+  .badge-popular {
+    position: absolute;
+    top: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #0078d7;
+    color: #fff;
+    font-size: 0.9em;
+    padding: 2px 14px;
+    border-radius: 12px;
+    font-weight: bold;
+    z-index: 2;
+  }
+  .pricing-addons {
+    margin-top: 24px;
+    text-align: center;
+  }
+  .pricing-addons h4 {
+    margin-bottom: 10px;
+    color: #0078d7;
+  }
+  .pricing-addons ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 8px 0;
+    display: inline-block;
+    text-align: left;
+  }
+  .pricing-addons li {
+    margin-bottom: 4px;
+    color: #333;
+  }
+  @media (max-width: 900px) {
+    .plan {
+      width: 100%;
+      margin-bottom: 24px;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- HERO -->
+<section class="hero" style="position: relative;">
+  <div class="container py-5">
+    {% if request.user.is_authenticated %}
+    <div class="hero-login">
+      <a href="{% url 'dashboard' %}" class="btn btn-light btn-lg px-4 shadow" style="font-weight: 700;">
+        <i class="bi bi-speedometer2 me-2"></i> Dashboard
+      </a>
+    </div>
+    {% else %}
+    <div class="hero-login">
+      <a href="{% url 'login' %}" class="btn btn-light btn-lg px-4 shadow" style="font-weight: 700;">
+        <i class="bi bi-box-arrow-in-right me-2"></i> Login
+      </a>
+    </div>
+    {% endif %}
+    <div class="row align-items-center">
+      <div class="col-lg-7">
+        <h1 class="display-5 mb-3">FGTS em atraso sem erro, sem retrabalho e sem surpresa na Caixa</h1>
+        <p class="lead mb-4">Calcule, audite e valide o FGTS em atraso com base nos índices oficiais da Caixa — antes de gerar a guia oficial.</p>
+
+        {% if not request.user.is_authenticated %}
+        <div class="d-flex flex-column align-items-start gap-3 mb-4">
+          <a href="{% url 'register' %}" class="btn btn-light btn-lg px-5 shadow" style="font-weight: 700;">
+            <i class="bi bi-rocket-takeoff me-2"></i> Testar grátis agora
+          </a>
+          <a href="{% url 'calculadora-fgts' %}" class="btn btn-lg px-5" style="font-weight:700; background:rgba(255,255,255,0.12); color:#fff; border:2px solid rgba(255,255,255,0.6); backdrop-filter:blur(4px);">
+            <i class="bi bi-calculator me-2"></i> Calcular sem cadastro
+          </a>
+          <small class="text-white-75">Sem cartão • Resultados imediatos • Dados protegidos</small>
+        </div>
+        {% endif %}
+      </div>
+
+      <div class="col-lg-5 d-none d-lg-block">
+        {% if not request.user.is_authenticated %}
+        <div class="card feature-card shadow-lg border-0 p-5 text-center">
+          <i class="bi bi-calculator-fill mb-3" style="font-size: 2.8rem; color: #F7941D;"></i>
+          <h4 class="fw-bold mb-2" style="color: #1a1a2e; line-height: 1.35;">
+            Quer ver o poder da plataforma antes de criar conta?
+          </h4>
+          <p class="text-muted mb-4">
+            Experimente nossa calculadora instantânea e receba um relatório profissional em segundos.
+          </p>
+          <a href="{% url 'calculadora-fgts' %}" class="btn btn-lg fw-bold mb-3"
+             style="background: linear-gradient(135deg, #005CA9 0%, #003A78 100%); color: #fff; border: none; border-radius: 10px; padding: 14px 28px;">
+            <i class="bi bi-calculator me-2"></i> Experimentar agora
+          </a>
+          <div class="text-muted" style="font-size: 0.85rem; line-height: 2;">
+            <span class="d-block"><span style="color: #F7941D;">✔</span> Sem cadastro de empresa</span>
+            <span class="d-block"><span style="color: #F7941D;">✔</span> Sem configuração inicial</span>
+            <span class="d-block"><span style="color: #F7941D;">✔</span> Resultado imediato</span>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- POR QUE CONTRATAR AGORA -->
+<section class="section-alt" id="porque-contratar">
+  <div class="container">
+    <h2 class="fw-bold text-center mb-2" style="color: #111827;">
+      Por que contratar o FGTS Web agora?
+    </h2>
+    <p class="text-center mb-5" style="color: #6b7280; font-size: 1.15rem;">
+      Antecipamos as principais dúvidas para que você tome uma decisão com segurança.
+    </p>
+    <div class="row g-4">
+      <div class="col-md-6 col-lg-4">
+        <div class="card feature-card h-100">
+          <div class="card-body">
+            <h5 class="mb-3">Já uso FGTS Digital / SEFIP</h5>
+            <p class="text-muted mb-2">O FGTS Digital é o sistema oficial de envio. O FGTS Web é a camada de gestão e auditoria antes do envio.</p>
+            <ul class="mb-0">
+              <li>✔ Organização multiempresa</li>
+              <li>✔ Memória de cálculo auditável</li>
+              <li>✔ Histórico estruturado</li>
+              <li>✔ Redução de retrabalho</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="card feature-card h-100">
+          <div class="card-body">
+            <h5 class="mb-3">O sistema do governo já calcula</h5>
+            <p class="text-muted mb-2">O sistema oficial calcula. O FGTS Web gerencia.</p>
+            <ul class="mb-0">
+              <li>✔ Relatórios consolidados</li>
+              <li>✔ Controle de usuários</li>
+              <li>✔ Gestão por funcionário e competência</li>
+              <li>✔ Organização profissional</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="card feature-card h-100">
+          <div class="card-body">
+            <h5 class="mb-3">Não quero aumentar meus custos</h5>
+            <p class="text-muted mb-2">Se sua equipe perde horas com recálculo e conferência manual, o sistema já se paga.</p>
+            <ul class="mb-0">
+              <li>✔ Redução de tempo operacional</li>
+              <li>✔ Menos retrabalho</li>
+              <li>✔ Mais margem para o escritório</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="card feature-card h-100">
+          <div class="card-body">
+            <h5 class="mb-3">Tenho medo de erro em sistema novo</h5>
+            <p class="text-muted mb-2">Você valida antes de decidir.</p>
+            <ul class="mb-0">
+              <li>✔ Teste gratuito sem cartão</li>
+              <li>✔ Memória detalhada para conferência</li>
+              <li>✔ Histórico completo por lançamento</li>
+              <li>✔ Ambiente seguro com autenticação</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="card feature-card h-100">
+          <div class="card-body">
+            <h5 class="mb-3">Migrar sistema dá trabalho</h5>
+            <p class="text-muted mb-2">Comece pequeno e evolua com segurança.</p>
+            <ul class="mb-0">
+              <li>✔ Importação automatizada</li>
+              <li>✔ Interface intuitiva</li>
+              <li>✔ Estrutura organizada por empresa</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="card feature-card h-100">
+          <div class="card-body">
+            <h5 class="mb-3">Por que contratar agora?</h5>
+            <p class="text-muted mb-2">Porque o volume de obrigações só aumenta e o risco trabalhista não diminui.</p>
+            <ul class="mb-0">
+              <li>✔ Mais organização</li>
+              <li>✔ Mais produtividade</li>
+              <li>✔ Mais segurança técnica</li>
+              <li>✔ Vantagem competitiva</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="text-center mt-5">
+      <h3 class="fw-bold mb-3" style="color: #111827;">Trabalhe com FGTS de forma profissional.</h3>
+      <p class="text-muted mb-4">Automatize cálculos, tenha memória auditável e gerencie múltiplas empresas com segurança.</p>
+      <a href="{% url 'register' %}" class="btn btn-primary btn-lg px-5 fw-bold" style="border-radius: 8px;">
+        Criar Conta Gratuita
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- PARA QUEM É -->
+<section class="section">
+  <div class="container">
+    <div class="text-center mb-4">
+      <h2 class="fw-bold">Para quem é</h2>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-6">
+        <div class="card feature-card h-100">
+          <div class="card-body">
+            <h5 class="mb-3">Para contadores</h5>
+            <ul class="text-muted mb-0">
+              <li>Elimine cálculo manual e planilhas frágeis</li>
+              <li>Evite divergência na hora de fechar FGTS</li>
+              <li>Ganhe tempo e segurança técnica</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card feature-card h-100">
+          <div class="card-body">
+            <h5 class="mb-3">Para empresas</h5>
+            <ul class="text-muted mb-0">
+              <li>Saiba exatamente quanto deve antes de pagar</li>
+              <li>Evite multa, retrabalho e risco trabalhista</li>
+              <li>Organize passivos antigos com clareza</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- A DOR REAL -->
+<section class="section-alt">
+  <div class="container">
+    <div class="row align-items-center g-4">
+      <div class="col-lg-6">
+        <h2 class="fw-bold mb-3">FGTS em atraso não é só cálculo. É risco.</h2>
+        <ul class="text-muted">
+          <li>Um índice errado mantém o débito ativo</li>
+          <li>Diferença de centavos trava regularização</li>
+          <li>Erro só aparece na fiscalização — tarde demais</li>
+          <li>Planilhas e “estimativas” não seguram auditoria</li>
+        </ul>
+        <p class="mb-0"><strong>É aqui que as pessoas se reconhecem.</strong></p>
+      </div>
+      <div class="col-lg-6">
+        <div class="card feature-card h-100">
+          <div class="card-body">
+            <h5 class="mb-2">O mesmo cálculo da Caixa — com visibilidade total</h5>
+            <p class="text-muted mb-2">O sistema reproduz o cálculo do FGTS utilizando exclusivamente os índices oficiais publicados pela Caixa, inclusive por data de cálculo.</p>
+            <p class="text-muted mb-0">Você vê o valor, entende como ele foi formado e valida tudo antes de entrar no ambiente oficial.</p>
+            <div class="mt-3 p-3 rounded bg-light border">
+              <strong>A Caixa mostra o número final.<br> Nós mostramos o caminho até ele.</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMO FUNCIONA -->
+<section class="section">
+  <div class="container">
+    <div class="text-center mb-4">
+      <h2 class="fw-bold">Como funciona</h2>
+      <p class="text-muted">Sem mágica. Sem caixa-preta.</p>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-3">
+        <div class="text-center">
+          <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3" 
+               style="width: 64px; height: 64px; background: linear-gradient(135deg, #005CA9 0%, #003A78 100%);">
+            <span class="text-white fw-bold fs-4">1</span>
+          </div>
+          <p class="mb-0">Informe salários e competências em atraso</p>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="text-center">
+          <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3" 
+               style="width: 64px; height: 64px; background: linear-gradient(135deg, #005CA9 0%, #003A78 100%);">
+            <span class="text-white fw-bold fs-4">2</span>
+          </div>
+          <p class="mb-0">O sistema aplica as regras e índices oficiais</p>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="text-center">
+          <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3" 
+               style="width: 64px; height: 64px; background: linear-gradient(135deg, #005CA9 0%, #003A78 100%);">
+            <span class="text-white fw-bold fs-4">3</span>
+          </div>
+          <p class="mb-0">Visualize relatório detalhado por empregado</p>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="text-center">
+          <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3" 
+               style="width: 64px; height: 64px; background: linear-gradient(135deg, #005CA9 0%, #003A78 100%);">
+            <span class="text-white fw-bold fs-4">4</span>
+          </div>
+          <p class="mb-0">Valide antes de gerar a guia oficial na Caixa</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- POR QUE CONFIAR -->
+<section class="section-alt">
+  <div class="container">
+    <div class="text-center mb-4">
+      <h2 class="fw-bold">Por que confiar</h2>
+      <p class="text-muted">Isso é o que contador sério procura.</p>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-6 col-lg-3"><div class="card feature-card h-100"><div class="card-body"><strong>Índices oficiais</strong><p class="text-muted mb-0">Da Caixa, inclusive diários.</p></div></div></div>
+      <div class="col-md-6 col-lg-3"><div class="card feature-card h-100"><div class="card-body"><strong>Cálculo auditável</strong><p class="text-muted mb-0">Determinístico e rastreável.</p></div></div></div>
+      <div class="col-md-6 col-lg-3"><div class="card feature-card h-100"><div class="card-body"><strong>Histórico por competência</strong><p class="text-muted mb-0">Linha a linha, sem caixa-preta.</p></div></div></div>
+      <div class="col-md-6 col-lg-3"><div class="card feature-card h-100"><div class="card-body"><strong>Relatórios para defesa</strong><p class="text-muted mb-0">Prontos para fiscalização e auditoria.</p></div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing-section">
+  <div class="container">
+    <div class="text-center mb-4">
+      <h2 class="fw-bold mb-2">Comece a validar seus cálculos hoje</h2>
+      <p class="text-muted">Teste grátis visível • sem cartão • fácil cancelamento</p>
+    </div>
+    <div class="row justify-content-center gy-4 gx-3">
+      <div class="col-12 col-md-6 col-lg-4">
+        <div class="plan h-100 d-flex flex-column align-items-center p-4">
+          <h3 class="text-primary">Essencial</h3>
+          <div class="price mb-2">R$ 199<span>/mês</span></div>
+          <ul class="mb-4">
+            <li>1 CNPJ incluído</li>
+            <li>Até 200 funcionários</li>
+            <li>Até 60 meses de histórico</li>
+            <li>Importação de dados (XLSX)</li>
+            <li>Cálculo de FGTS + JAM</li>
+            <li>Relatórios simples</li>
+            <li class="na">Relatórios detalhados</li>
+            <li class="na">Logs completos</li>
+            <li class="na">MultiGestor</li>
+            <li>1 usuário</li>
+            <li class="na">Suporte prioritário/SLA</li>
+          </ul>
+          <a href="{% url 'register' %}?plano=essencial" class="btn btn-primary w-100 mt-auto">Testar grátis</a>
+        </div>
+      </div>
+      <div class="col-12 col-md-6 col-lg-4">
+        <div class="plan featured h-100 d-flex flex-column align-items-center p-4 position-relative">
+          <span class="badge-popular">Mais Popular</span>
+          <h3 class="text-primary">Profissional</h3>
+          <div class="price mb-2">R$ 699<span>/mês</span></div>
+          <ul class="mb-4">
+            <li>Até 5 CNPJs</li>
+            <li>Até 500 funcionários</li>
+            <li>Até 120 meses de histórico</li>
+            <li>Importação de dados (XLSX)</li>
+            <li>Cálculo de FGTS + JAM</li>
+            <li>Relatórios simples</li>
+            <li>Relatórios detalhados</li>
+            <li>Logs completos</li>
+            <li>MultiGestor</li>
+            <li>5 usuários</li>
+            <li class="na">Suporte prioritário/SLA</li>
+          </ul>
+          <a href="{% url 'register' %}?plano=profissional" class="btn btn-primary w-100 mt-auto">Testar grátis</a>
+        </div>
+      </div>
+      <div class="col-12 col-md-6 col-lg-4">
+        <div class="plan h-100 d-flex flex-column align-items-center p-4">
+          <h3 class="text-primary">Enterprise</h3>
+          <div class="price mb-2">Sob consulta</div>
+          <ul class="mb-4">
+            <li>CNPJs ilimitados</li>
+            <li>Funcionários ilimitados</li>
+            <li>Histórico completo</li>
+            <li>Importação de dados (XLSX)</li>
+            <li>Cálculo de FGTS + JAM</li>
+            <li>Relatórios simples</li>
+            <li>Relatórios detalhados</li>
+            <li>Logs completos</li>
+            <li>MultiGestor</li>
+            <li>Usuários ilimitados</li>
+            <li>Suporte prioritário/SLA</li>
+          </ul>
+          <a href="mailto:comercial@fgtsweb.com.br?subject=Plano%20Enterprise" class="btn btn-dark w-100 mt-auto">Falar com consultor</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="section-alt">
+  <div class="container">
+    <div class="text-center mb-4">
+      <h2 class="fw-bold">FAQ</h2>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-6">
+        <div class="card feature-card h-100"><div class="card-body">
+          <h6 class="fw-bold">O cálculo bate com o da Caixa?</h6>
+          <p class="text-muted mb-0">Sim. O sistema utiliza os mesmos índices oficiais publicados pela Caixa, permitindo validação prévia antes da emissão da guia oficial.</p>
+        </div></div>
+      </div>
+      <div class="col-md-6">
+        <div class="card feature-card h-100"><div class="card-body">
+          <h6 class="fw-bold">Isso substitui a Caixa ou o contador?</h6>
+          <p class="text-muted mb-0">Não. O sistema prepara, valida e audita os cálculos. O recolhimento oficial continua sendo feito no ambiente da Caixa.</p>
+        </div></div>
+      </div>
+      <div class="col-md-6">
+        <div class="card feature-card h-100"><div class="card-body">
+          <h6 class="fw-bold">Posso usar em fiscalizações ou auditorias?</h6>
+          <p class="text-muted mb-0">Sim. Os relatórios são detalhados, rastreáveis e servem como base de conferência técnica.</p>
+        </div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA FINAL -->
+<section class="section">
+  <div class="container">
+    <div class="p-5 rounded-4 text-white cta-gradient d-flex flex-column flex-md-row align-items-center justify-content-between">
+      <div>
+        <h3 class="mb-2">Evite erro antes que vire multa.</h3>
+        <p class="mb-0 opacity-90">Teste agora o sistema de FGTS em atraso.</p>
+      </div>
+      <div class="mt-3 mt-md-0 d-flex gap-2">
+        <a href="{% url 'register' %}" class="btn btn-light btn-lg px-5 shadow" style="font-weight: 700;">
+          <i class="bi bi-rocket-takeoff me-2"></i> Testar grátis
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<section class="py-4" style="background:#fff">
+  <div class="container d-flex flex-column flex-md-row align-items-center justify-content-between">
+    <div class="text-muted small">
+      FGTS Web © 2025 • Gestão profissional de FGTS em atraso
+    </div>
+    <div class="small">
+      <a href="#" class="text-decoration-none me-3">Política de Privacidade</a>
+      <a href="#" class="text-decoration-none me-3">Termos de Uso</a>
+      <a href="{% url 'register' %}" class="text-decoration-none fw-bold" style="color: #27ae60;">
+        <i class="bi bi-gift-fill me-1"></i> Teste Grátis
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}

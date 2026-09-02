@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+{% block title %}Login — FGTS Web{% endblock %}
+
+{% block extra_css %}
+<style>
+  .login-container {
+    min-height: 85vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #005CA9 0%, #003A78 100%);
+    padding: 20px;
+  }
+  
+  .login-card {
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    width: 100%;
+    max-width: 420px;
+    padding: 40px;
+  }
+  
+  .login-card h2 {
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 8px;
+    text-align: center;
+  }
+  
+  .login-card .subtitle {
+    text-align: center;
+    color: #95a5a6;
+    margin-bottom: 30px;
+    font-size: 0.95rem;
+  }
+  
+  .form-group {
+    margin-bottom: 16px;
+  }
+  
+  .form-group label {
+    display: block;
+    font-weight: 500;
+    color: #2c3e50;
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+  }
+  
+  .form-group input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    transition: border-color 0.3s;
+  }
+  
+  .form-group input:focus {
+    outline: none;
+    border-color: #005CA9;
+    box-shadow: 0 0 0 3px rgba(0, 92, 169, 0.1);
+  }
+  
+  .alert {
+    background: #fee;
+    border: 1px solid #fcc;
+    border-radius: 6px;
+    padding: 12px;
+    color: #c33;
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+  }
+  
+  .btn-login {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #005CA9 0%, #003A78 100%);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  
+  .btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 92, 169, 0.3);
+  }
+  
+  .login-footer {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #f0f0f0;
+    justify-content: space-between;
+  }
+  
+  .login-footer a {
+    color: #005CA9;
+    text-decoration: none;
+    font-size: 0.95rem;
+  }
+  
+  .login-footer a:hover {
+    text-decoration: underline;
+  }
+  
+  .login-divider {
+    text-align: center;
+    padding: 20px 0;
+    color: #bbb;
+  }
+  
+  .btn-register {
+    width: 100%;
+    padding: 12px;
+    background: #f0f0f0;
+    color: #2c3e50;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+  }
+  
+  .password-wrapper {
+    position: relative;
+  }
+  .password-wrapper input {
+    padding-right: 42px !important;
+  }
+  .toggle-pw {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #95a5a6;
+    padding: 0;
+    line-height: 1;
+    font-size: 1rem;
+  }
+  .toggle-pw:hover { color: #005CA9; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="login-container">
+  <div class="login-card">
+    <h2>Entrar</h2>
+    <p class="subtitle">Acesse sua conta FGTS Web</p>
+    
+    <form method="post" novalidate>
+      {% csrf_token %}
+      
+      {% if form.errors %}
+        <div class="alert">
+          ⚠️ Usuário ou senha incorretos. Tente novamente.
+        </div>
+      {% endif %}
+      
+      <div class="form-group">
+        <label for="{{ form.username.id_for_label }}">Usuário</label>
+        {{ form.username }}
+      </div>
+      
+      <div class="form-group">
+        <label for="{{ form.password.id_for_label }}">Senha</label>
+        <div class="password-wrapper">
+          {{ form.password }}
+          <button type="button" class="toggle-pw" onclick="togglePw('{{ form.password.id_for_label }}', this)" tabindex="-1" aria-label="Mostrar/ocultar senha">
+            <i class="bi bi-eye"></i>
+          </button>
+        </div>
+      </div>
+      
+      <button type="submit" class="btn-login">Entrar</button>
+    </form>
+    
+    <div class="login-footer">
+      <a href="{% url 'home' %}">← Voltar para home</a>
+    </div>
+    
+    <div class="login-divider">Ou</div>
+    
+    <a href="{% url 'register' %}" class="btn-register">
+      <i class="bi bi-person-plus"></i> Criar Conta
+    </a>
+  </div>
+</div>
+
+<script>
+function togglePw(fieldId, btn) {
+  var input = document.getElementById(fieldId);
+  var icon = btn.querySelector('i');
+  if (input.type === 'password') {
+    input.type = 'text';
+    icon.className = 'bi bi-eye-slash';
+  } else {
+    input.type = 'password';
+    icon.className = 'bi bi-eye';
+  }
+}
+</script>
+
+{% endblock %}
+

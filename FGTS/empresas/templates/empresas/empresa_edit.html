@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+{% block title %}Editar Empresa — FGTS Web{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="card shadow-sm">
+    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+      <div class="d-flex align-items-center gap-3">
+        <h5 class="mb-0"><i class="bi bi-building"></i> Editar Empresa</h5>
+        {% if empresas_permitidas and empresas_permitidas|length > 1 %}
+        <div class="d-flex align-items-center gap-2">
+          <label class="small text-muted mb-0" for="empresa-switch">Empresa</label>
+          <select id="empresa-switch" class="form-select form-select-sm" onchange="if (this.value) { window.location = this.value; }">
+            {% for empresa in empresas_permitidas %}
+              <option value="{% url 'empresa-update' empresa.codigo %}" {% if empresa.codigo == object.codigo %}selected{% endif %}>
+                {{ empresa.codigo_exibicao }} - {{ empresa.nome }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+        {% endif %}
+      </div>
+      <a href="{% url 'empresa-list' %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> Voltar</a>
+    </div>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label for="id_nome" class="form-label">Nome da Empresa *</label>
+            {{ form.nome }}
+            <small class="form-text text-muted">Usado na geracao do SEFIP.RE.</small>
+          </div>
+          <div class="col-md-3">
+            <label for="id_cnpj" class="form-label">CNPJ *</label>
+            {{ form.cnpj }}
+            <small class="form-text text-muted">Usado na geracao do SEFIP.RE.</small>
+          </div>
+          <div class="col-md-3">
+            <label for="id_codigo_folha" class="form-label">Codigo Folha</label>
+            {{ form.codigo_folha }}
+          </div>
+        </div>
+
+        <div class="row g-3 mt-2">
+          <div class="col-md-8">
+            <label for="id_endereco" class="form-label">Endereço</label>
+            {{ form.endereco }}
+            <small class="form-text text-muted">Usado na geracao do SEFIP.RE.</small>
+          </div>
+          <div class="col-md-4">
+            <label for="id_numero" class="form-label">Número</label>
+            {{ form.numero }}
+            <small class="form-text text-muted">Usado na geracao do SEFIP.RE.</small>
+          </div>
+        </div>
+
+        <div class="row g-3 mt-2">
+          <div class="col-md-4">
+            <label for="id_bairro" class="form-label">Bairro</label>
+            {{ form.bairro }}
+            <small class="form-text text-muted">Usado na geracao do SEFIP.RE.</small>
+          </div>
+          <div class="col-md-3">
+            <label for="id_cep" class="form-label">CEP</label>
+            {{ form.cep }}
+            <small class="form-text text-muted">Usado na geracao do SEFIP.RE.</small>
+          </div>
+          <div class="col-md-4">
+            <label for="id_cidade" class="form-label">Cidade</label>
+            {{ form.cidade }}
+            <small class="form-text text-muted">Usado na geracao do SEFIP.RE.</small>
+          </div>
+          <div class="col-md-1">
+            <label for="id_uf" class="form-label">UF</label>
+            {{ form.uf }}
+            <small class="form-text text-muted">SEFIP.RE.</small>
+          </div>
+        </div>
+
+        <div class="row g-3 mt-2">
+          <div class="col-md-6">
+            <label for="id_nome_contato" class="form-label">Nome do Contato</label>
+            {{ form.nome_contato }}
+          </div>
+          <div class="col-md-6">
+            <label for="id_fone_contato" class="form-label">Telefone de Contato</label>
+            {{ form.fone_contato }}
+            <small class="form-text text-muted">Usado na geracao do SEFIP.RE.</small>
+          </div>
+        </div>
+
+        <div class="row g-3 mt-2">
+          <div class="col-md-3">
+            <label for="id_cnae" class="form-label">CNAE</label>
+            {{ form.cnae }}
+            <small class="form-text text-muted">Usado na geracao do SEFIP.RE.</small>
+          </div>
+          <div class="col-md-3">
+            <label for="id_percentual_rat" class="form-label">% RAT</label>
+            {{ form.percentual_rat }}
+            <small class="form-text text-muted">Usado na geracao do SEFIP.RE.</small>
+          </div>
+          <div class="col-md-3">
+            <label for="id_optante_simples" class="form-label">Optante Simples</label>
+            {{ form.optante_simples }}
+            <small class="form-text text-muted">Usado na geracao do SEFIP.RE.</small>
+          </div>
+          <div class="col-md-3">
+            <label for="id_fpas" class="form-label">FPAS</label>
+            {{ form.fpas }}
+            <small class="form-text text-muted">Usado na geracao do SEFIP.RE.</small>
+          </div>
+        </div>
+
+        <div class="row g-3 mt-2">
+          <div class="col-md-3">
+            <label for="id_outras_entidades" class="form-label">Outras Entidades</label>
+            {{ form.outras_entidades }}
+            <small class="form-text text-muted">Usado na geracao do SEFIP.RE.</small>
+          </div>
+          <div class="col-md-5">
+            <label for="id_email" class="form-label">Email</label>
+            {{ form.email }}
+          </div>
+          <div class="col-md-4 d-flex align-items-end">
+            <div class="form-check">
+              {{ form.paga_13_aniversario }}
+              <label class="form-check-label" for="id_paga_13_aniversario">Paga 1ª parcela do 13º no mês de aniversário?</label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer d-flex justify-content-between">
+        <a class="btn btn-outline-secondary" href="{% url 'empresa-list' %}"><i class="bi bi-x-circle"></i> Cancelar</a>
+        <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Salvar Alterações</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

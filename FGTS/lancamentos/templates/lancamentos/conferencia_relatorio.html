@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+{% load lancamento_extras %}
+
+{% block title %}Relatório de Conferências - FGTS Web{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <!-- Header -->
+            <div class="card border-0 shadow-lg mb-4">
+                <div class="card-header bg-gradient-primary text-white py-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-0 fw-bold">
+                                <i class="bi bi-file-earmark-bar-graph me-2"></i>Relatório de Conferências
+                            </h4>
+                            <small class="opacity-75">{{ empresa.razao_social }}</small>
+                        </div>
+                        <div>
+                            <a href="{% url 'conferencia-list' empresa.pk %}" class="btn btn-light btn-sm">
+                                <i class="bi bi-arrow-left me-1"></i>Voltar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Estatísticas Gerais -->
+                <div class="card-body">
+                    {% if competencia %}
+                    <div class="alert alert-info mb-4">
+                        <i class="bi bi-calendar me-2"></i>
+                        Exibindo dados da competência: <strong>{{ competencia }}</strong>
+                    </div>
+                    {% endif %}
+
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-3">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body text-center">
+                                    <div class="fs-1 fw-bold text-primary mb-2">{{ relatorio.total_lancamentos }}</div>
+                                    <div class="text-muted">Total de Lançamentos</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body text-center">
+                                    <div class="fs-1 fw-bold text-success mb-2">{{ relatorio.conferidos }}</div>
+                                    <div class="text-muted">Conferidos</div>
+                                    <small class="text-success">{{ relatorio.taxa_conferencia|floatformat:1 }}%</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body text-center">
+                                    <div class="fs-1 fw-bold text-warning mb-2">{{ relatorio.com_problemas }}</div>
+                                    <div class="text-muted">Com Problemas</div>
+                                    <small class="text-warning">{{ relatorio.percentual_problemas|floatformat:1 }}%</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body text-center">
+                                    <div class="fs-1 fw-bold text-danger mb-2">{{ relatorio.rejeitados }}</div>
+                                    <div class="text-muted">Rejeitados</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Status de Consolidação -->
+                    {% if competencia %}
+                    <div class="card border-0 {% if pode_consolidar %}bg-success{% else %}bg-danger{% endif %} text-white mb-4">
+                        <div class="card-body">
+                            <h5 class="mb-3">
+                                {% if pode_consolidar %}
+                                <i class="bi bi-check-circle me-2"></i>Pronto para Consolidar
+                                {% else %}
+                                <i class="bi bi-x-circle me-2"></i>Não Pode Consolidar
+                                {% endif %}
+                            </h5>
+                            <p class="mb-0">{{ msg_consolidacao }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Detalhes por Status -->
+            <div class="row g-4">
+                <!-- Pendentes -->
+                <div class="col-lg-6">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-header bg-warning text-dark">
+                            <h6 class="mb-0"><i class="bi bi-hourglass-split me-2"></i>Pendentes ({{ conferencias_por_status.PENDENTE.count }})</h6>
+                        </div>
+                        <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                            {% if conferencias_por_status.PENDENTE %}
+                            <div class="list-group list-group-flush">
+                                {% for conf in conferencias_por_status.PENDENTE %}
+                                <a href="{% url 'conferencia-conferir' conf.id %}" class="list-group-item list-group-item-action">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>{{ conf.lancamento.funcionario.nome }}</strong><br>
+                                            <small class="text-muted">{{ conf.lancamento.competencia }} - {{ conf.lancamento.valor_fgts|brl }}</small>
+                                        </div>
+                                        <i class="bi bi-chevron-right"></i>
+                                    </div>
+                                </a>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <p class="text-muted text-center">Nenhum lançamento pendente</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Conferidos -->
+                <div class="col-lg-6">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-header bg-success text-white">
+                            <h6 class="mb-0"><i class="bi bi-check-circle me-2"></i>Conferidos ({{ conferencias_por_status.CONFERIDO.count }})</h6>
+                        </div>
+                        <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                            {% if conferencias_por_status.CONFERIDO %}
+                            <div class="list-group list-group-flush">
+                                {% for conf in conferencias_por_status.CONFERIDO %}
+                                <a href="{% url 'conferencia-detail' conf.id %}" class="list-group-item list-group-item-action">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>{{ conf.lancamento.funcionario.nome }}</strong><br>
+                                            <small class="text-muted">
+                                                {{ conf.lancamento.competencia }} - R$ {{ conf.lancamento.valor_fgts|brl }}<br>
+                                                Por: {{ conf.conferido_por.username }} em {{ conf.data_conferencia|date:"d/m/Y" }}
+                                            </small>
+                                        </div>
+                                        <i class="bi bi-chevron-right"></i>
+                                    </div>
+                                </a>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <p class="text-muted text-center">Nenhum lançamento conferido</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Com Problemas -->
+                <div class="col-lg-6">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-header bg-danger text-white">
+                            <h6 class="mb-0"><i class="bi bi-exclamation-triangle me-2"></i>Com Problemas ({{ conferencias_por_status.PROBLEMA.count }})</h6>
+                        </div>
+                        <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                            {% if conferencias_por_status.PROBLEMA %}
+                            <div class="list-group list-group-flush">
+                                {% for conf in conferencias_por_status.PROBLEMA %}
+                                <a href="{% url 'conferencia-detail' conf.id %}" class="list-group-item list-group-item-action">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>{{ conf.lancamento.funcionario.nome }}</strong><br>
+                                            <small class="text-muted">
+                                                {{ conf.lancamento.competencia }} - R$ {{ conf.lancamento.valor_fgts|brl }}<br>
+                                                Por: {{ conf.conferido_por.username }} em {{ conf.data_conferencia|date:"d/m/Y" }}
+                                            </small>
+                                        </div>
+                                        <i class="bi bi-chevron-right"></i>
+                                    </div>
+                                </a>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <p class="text-muted text-center">Nenhum lançamento com problemas</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rejeitados -->
+                <div class="col-lg-6">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-header bg-dark text-white">
+                            <h6 class="mb-0"><i class="bi bi-x-circle me-2"></i>Rejeitados ({{ conferencias_por_status.REJEITADO.count }})</h6>
+                        </div>
+                        <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                            {% if conferencias_por_status.REJEITADO %}
+                            <div class="list-group list-group-flush">
+                                {% for conf in conferencias_por_status.REJEITADO %}
+                                <div class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <strong>{{ conf.lancamento.funcionario.nome }}</strong><br>
+                                            <small class="text-muted">{{ conf.lancamento.competencia }} - {{ conf.lancamento.valor_fgts|brl }}</small><br>
+                                            <small class="text-danger">
+                                                <strong>Motivo:</strong> {{ conf.observacoes|truncatechars:50 }}
+                                            </small>
+                                        </div>
+                                        <a href="{% url 'conferencia-detail' conf.id %}" class="btn btn-sm btn-outline-secondary">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <p class="text-muted text-center">Nenhum lançamento rejeitado</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%) !important;
+    }
+</style>
+{% endblock %}

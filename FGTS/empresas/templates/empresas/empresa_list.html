@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="card shadow-lg">
+    <div class="card-header bg-gradient text-white" style="background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);">
+      <div class="d-flex justify-content-between align-items-center">
+        <h4 class="mb-0"><i class="bi bi-building"></i> Empresas</h4>
+        <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#empresaModal">
+          <i class="bi bi-building-add"></i> Nova Empresa
+        </button>
+      </div>
+    </div>
+    <div class="card-body">
+      {% if empresas %}
+      <div class="table-responsive">
+        <table class="table table-hover table-striped">
+          <thead class="table-dark">
+            <tr>
+              <th>Código</th>
+              <th>Nome</th>
+              <th>CNPJ</th>
+              <th>Cidade</th>
+              <th>UF</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for empresa in empresas %}
+            <tr>
+              <td>{{ empresa.codigo_exibicao }}</td>
+              <td>{{ empresa.nome }}</td>
+              <td>{{ empresa.cnpj }}</td>
+              <td>{{ empresa.cidade }}</td>
+              <td>{{ empresa.uf }}</td>
+              <td>
+                {% if empresa.billing_customer %}
+                  {% if empresa.billing_customer.status == 'active' %}
+                    <span class="badge bg-success">Ativa</span>
+                  {% elif empresa.billing_customer.status == 'pending' %}
+                    <span class="badge bg-warning text-dark">Pendente</span>
+                  {% elif empresa.billing_customer.status == 'canceled' %}
+                    <span class="badge bg-secondary">Cancelada</span>
+                  {% else %}
+                    <span class="badge bg-light text-dark">Inativa</span>
+                  {% endif %}
+                {% else %}
+                  <span class="badge bg-light text-dark">Sem assinatura</span>
+                {% endif %}
+              </td>
+              <td>
+                <a href="{% url 'empresa-update' empresa.pk %}" class="btn btn-sm btn-outline-primary">
+                  <i class="bi bi-pencil"></i> Editar
+                </a>
+                <form method="post" action="{% url 'billing-checkout-empresa' empresa.pk %}" class="d-inline ms-1">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-sm btn-primary">
+                    <i class="bi bi-credit-card"></i> Assinar
+                  </button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="alert alert-info text-center">
+        <i class="bi bi-info-circle"></i> Nenhuma empresa cadastrada ainda.
+        <br>
+        <button type="button" class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#empresaModal">
+          Cadastrar Primeira Empresa
+        </button>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% include 'empresas/_empresa_modal.html' %}
+{% endblock %}

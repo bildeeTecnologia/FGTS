@@ -1,0 +1,343 @@
+{% extends "base.html" %}
+
+{% block title %}Novo Lançamento - FGTS Web{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            <!-- Card Principal -->
+            <div class="card border-0 shadow-lg">
+                <!-- Header -->
+                <div class="card-header bg-gradient-primary text-white py-4 border-0">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-pencil-square fs-4 me-3"></i>
+                        <div>
+                            <h4 class="mb-0 fw-bold">Novo Lançamento</h4>
+                            <small class="opacity-75">Registre um novo entrada mensal de FGTS</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Body -->
+                <div class="card-body p-5">
+                    {% if messages %}
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags|default:'success' }} alert-dismissible fade show border-0" role="alert">
+                            <i class="bi bi-check-circle me-2"></i>
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <!-- Info Box -->
+                    <div class="alert alert-info border-0 bg-light mb-4">
+                        <div class="d-flex">
+                            <i class="bi bi-info-circle-fill text-info me-3 mt-1"></i>
+                            <div>
+                                <strong>Herança Automática:</strong>
+                                <small class="d-block">Se você não informar a base FGTS, o sistema utilizará automaticamente o valor do mês anterior. Isso facilita o registro de múltiplos meses.</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form method="post" novalidate id="lancamentoForm">
+                        {% csrf_token %}
+
+                        <!-- Seção 1: Identificação -->
+                        <div class="mb-4">
+                            <h6 class="text-uppercase fw-bold text-muted mb-3">
+                                <i class="bi bi-search me-2"></i>Identificação
+                            </h6>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="{{ form.empresa.id_for_label }}" class="form-label fw-bold">
+                                        {{ form.empresa.label }} <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form.empresa }}
+                                    {% if form.empresa.errors %}
+                                        <div class="invalid-feedback d-block">{{ form.empresa.errors }}</div>
+                                    {% endif %}
+                                    <small class="form-text text-muted d-block mt-2">Selecione a empresa para filtrar funcionários</small>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="{{ form.competencia.id_for_label }}" class="form-label fw-bold">
+                                        {{ form.competencia.label }} <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form.competencia }}
+                                    {% if form.competencia.errors %}
+                                        <div class="invalid-feedback d-block">{{ form.competencia.errors }}</div>
+                                    {% endif %}
+                                    <small class="form-text text-muted d-block mt-2">Formato: MM/YYYY (ex: 01/2024)</small>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="{{ form.parcela_13.id_for_label }}" class="form-label fw-bold">
+                                        {{ form.parcela_13.label }}
+                                    </label>
+                                    {{ form.parcela_13 }}
+                                    {% if form.parcela_13.errors %}
+                                        <div class="invalid-feedback d-block">{{ form.parcela_13.errors }}</div>
+                                    {% endif %}
+                                    <small class="form-text text-muted d-block mt-2">Use para marcar 13º: deixe em branco para competências normais, escolha 1ª ou 2ª parcela quando for 13º.</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4 opacity-20">
+
+                        <!-- Seção 2: Dados Principais -->
+                        <div class="mb-4">
+                            <h6 class="text-uppercase fw-bold text-muted mb-3">
+                                <i class="bi bi-person-badge me-2"></i>Dados Principais
+                            </h6>
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label for="{{ form.vinculo.id_for_label }}" class="form-label fw-bold">
+                                        {{ form.vinculo.label }} <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form.vinculo }}
+                                    {% if form.vinculo.errors %}
+                                        <div class="invalid-feedback d-block">{{ form.vinculo.errors }}</div>
+                                    {% endif %}
+                                    <small class="form-text text-muted d-block mt-2">Selecione a cadeira (vínculo) do funcionário. Use a matrícula para evitar ambiguidade.</small>
+                                </div>
+                            </div>
+
+                            <div class="row g-3 mt-1">
+                                <div class="col-md-6">
+                                    <label for="{{ form.base_fgts.id_for_label }}" class="form-label fw-bold">
+                                        {{ form.base_fgts.label }}
+                                    </label>
+                                    {{ form.base_fgts }}
+                                    {% if form.base_fgts.errors %}
+                                        <div class="invalid-feedback d-block">{{ form.base_fgts.errors }}</div>
+                                    {% endif %}
+                                    <small class="form-text text-muted d-block mt-2">
+                                        <i class="bi bi-lightbulb me-1"></i>
+                                        Deixe em branco para usar o valor do mês anterior
+                                    </small>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="bg-light p-3 rounded" style="height: 100%; display: flex; align-items: center;">
+                                        <div class="w-100">
+                                            <small class="text-muted d-block mb-2">Base FGTS Anterior:</small>
+                                            <strong class="text-success fs-5" id="base-anterior">
+                                                R$ 0,00
+                                            </strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4 opacity-20">
+
+                        <!-- Seção 3: Informações de Pagamento -->
+                        <div class="mb-4">
+                            <h6 class="text-uppercase fw-bold text-muted mb-3">
+                                <i class="bi bi-cash-coin me-2"></i>Informações de Pagamento
+                            </h6>
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <div class="form-check">
+                                        {{ form.pago }}
+                                        <label class="form-check-label fw-bold" for="{{ form.pago.id_for_label }}">
+                                            {{ form.pago.label }}
+                                        </label>
+                                        <small class="form-text text-muted d-block mt-2">
+                                            <i class="bi bi-info-circle me-1"></i>
+                                            Marque esta opção se o FGTS deste mês já foi pago
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row g-3 mt-1" id="campos-pagamento" style="display: none;">
+                                <div class="col-md-6">
+                                    <label for="{{ form.data_pagto.id_for_label }}" class="form-label fw-bold">
+                                        {{ form.data_pagto.label }}
+                                    </label>
+                                    {{ form.data_pagto }}
+                                    {% if form.data_pagto.errors %}
+                                        <div class="invalid-feedback d-block">{{ form.data_pagto.errors }}</div>
+                                    {% endif %}
+                                    <small class="form-text text-muted d-block mt-2">Data em que o FGTS foi efetivamente pago</small>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="{{ form.valor_pago.id_for_label }}" class="form-label fw-bold">
+                                        {{ form.valor_pago.label }}
+                                    </label>
+                                    {{ form.valor_pago }}
+                                    {% if form.valor_pago.errors %}
+                                        <div class="invalid-feedback d-block">{{ form.valor_pago.errors }}</div>
+                                    {% endif %}
+                                    <small class="form-text text-muted d-block mt-2">Valor que foi efetivamente pago (pode incluir juros/correção)</small>
+                                </div>
+                                <div class="col-12 mt-2">
+                                    <div class="form-check">
+                                        {{ form.extrato_analitico }}
+                                        <label class="form-check-label fw-semibold text-success" for="{{ form.extrato_analitico.id_for_label }}">
+                                            {{ form.extrato_analitico.label }}
+                                        </label>
+                                        <small class="form-text text-muted d-block mt-1">
+                                            <i class="bi bi-shield-check me-1 text-success"></i>
+                                            {{ form.extrato_analitico.help_text }}
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Erros Gerais -->
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger border-0" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <strong>Erro ao salvar:</strong>
+                            {% for error in form.non_field_errors %}
+                                <div>{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </form>
+                </div>
+
+                <!-- Footer -->
+                <div class="card-footer bg-light border-top py-4">
+                    <div class="d-flex gap-3 justify-content-end">
+                        <a href="{% url 'lancamento-list' %}" class="btn btn-outline-secondary btn-lg rounded-3">
+                            <i class="bi bi-x-circle me-2"></i> Cancelar
+                        </a>
+                        <button type="submit" form="lancamentoForm" class="btn btn-primary btn-lg rounded-3">
+                            <i class="bi bi-check-circle me-2"></i> Registrar Lançamento
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info Card -->
+            <div class="card border-0 bg-light mt-4">
+                <div class="card-body py-3 px-4">
+                    <p class="mb-0">
+                        <i class="bi bi-lightbulb-fill text-warning me-2"></i>
+                        <strong>Campos obrigatórios:</strong> Empresa, Vínculo/Matrícula e Competência (MM/YYYY).
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #005CA9 0%, #003A78 100%);
+    }
+
+    .form-label {
+        color: #2c3e50;
+    }
+
+    .form-control, .form-select {
+        border-radius: 0.5rem;
+        border: 1px solid #e0e0e0;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #005CA9;
+        box-shadow: 0 0 0 0.2rem rgba(0, 92, 169, 0.25);
+    }
+
+    .form-select:disabled {
+        background-color: #e9ecef;
+        color: #6c757d;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var VINCULOS_JSON_URL = '{% url "vinculos-json" %}';
+        var empresaSelect      = document.getElementById('id_empresa');
+        var vinculoSelect      = document.getElementById('id_vinculo');
+        var baseAnteriorDisplay = document.getElementById('base-anterior');
+        var pagoCheckbox       = document.getElementById('id_pago');
+        var camposPagamento    = document.getElementById('campos-pagamento');
+
+        // Popular vínculos via AJAX quando empresa muda
+        function popularVinculos(empresaId, manter) {
+            if (!empresaId) {
+                vinculoSelect.disabled = true;
+                vinculoSelect.innerHTML = '<option value="">-- Selecione uma empresa primeiro --</option>';
+                if (baseAnteriorDisplay) baseAnteriorDisplay.textContent = 'R$ 0,00';
+                return;
+            }
+            vinculoSelect.disabled = false;
+            vinculoSelect.innerHTML = '<option value="">Carregando...</option>';
+            fetch(VINCULOS_JSON_URL + '?empresa_id=' + encodeURIComponent(empresaId))
+                .then(function (r) {
+                    if (!r.ok) throw new Error('Erro HTTP ' + r.status);
+                    return r.json();
+                })
+                .then(function (lista) {
+                    if (lista.length === 0) {
+                        vinculoSelect.innerHTML = '<option value="">Nenhum vínculo encontrado para esta empresa</option>';
+                    } else {
+                        vinculoSelect.innerHTML = '<option value="">---------</option>';
+                        lista.forEach(function (v) {
+                            var opt = document.createElement('option');
+                            opt.value = v.id;
+                            opt.textContent = v.nome;
+                            if (String(v.id) === String(manter)) opt.selected = true;
+                            vinculoSelect.appendChild(opt);
+                        });
+                    }
+                })
+                .catch(function (err) {
+                    console.error('Erro ao carregar vínculos:', err);
+                    vinculoSelect.innerHTML = '<option value="">Erro ao carregar. Recarregue a página.</option>';
+                });
+        }
+
+        // Mostrar/ocultar campos de pagamento
+        function toggleCamposPagamento() {
+            if (pagoCheckbox && pagoCheckbox.checked) {
+                camposPagamento.style.display = '';
+            } else {
+                camposPagamento.style.display = 'none';
+            }
+        }
+
+        empresaSelect.addEventListener('change', function () {
+            popularVinculos(this.value, '');
+        });
+
+        if (pagoCheckbox) {
+            pagoCheckbox.addEventListener('change', toggleCamposPagamento);
+            toggleCamposPagamento();
+        }
+
+        // Ao carregar (novo ou edição), popula vínculos respeitando seleção atual
+        var currentVinculo = vinculoSelect ? vinculoSelect.value : '';
+        popularVinculos(empresaSelect.value, currentVinculo);
+    });
+</script>
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
+<script>
+    flatpickr('#id_data_pagto', {
+        locale: 'pt',
+        dateFormat: 'Y-m-d',
+        altInput: true,
+        altFormat: 'd/m/Y',
+        allowInput: true,
+    });
+</script>
+{% endblock %}
+{% endblock %}

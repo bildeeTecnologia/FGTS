@@ -1,0 +1,211 @@
+{% extends 'base.html' %}
+{% block title %}Termos de Uso — FGTS Web{% endblock %}
+
+{% block extra_css %}
+<style>
+  .doc-sidebar { position: sticky; top: 24px; max-height: calc(100vh - 80px); overflow-y: auto; }
+  .doc-nav a { display:block; padding:.4rem .75rem; font-size:.87rem; color:#4a5568; text-decoration:none; border-left:2px solid transparent; transition:all .15s; border-radius:0 4px 4px 0; }
+  .doc-nav a:hover, .doc-nav a.active { color:#005CA9; background:#f0f5ff; border-left-color:#005CA9; }
+  .doc-nav .nav-section { font-size:.75rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:#9aa5b4; padding:.75rem .75rem .25rem; margin-top:.5rem; }
+  .doc-section { scroll-margin-top:32px; }
+  .doc-section h2 { font-size:1.25rem; font-weight:700; color:#005CA9; border-bottom:2px solid #e0e8f0; padding-bottom:.5rem; margin-bottom:1.1rem; }
+  .doc-section p, .doc-section li { font-size:.95rem; line-height:1.75; color:#374151; }
+  .last-updated { background:#f0f5ff; border-radius:8px; padding:.6rem 1rem; font-size:.83rem; color:#4a5568; margin-bottom:2rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="row">
+
+    <!-- Sidebar -->
+    <div class="col-lg-3 d-none d-lg-block">
+      <div class="doc-sidebar doc-nav">
+        <div class="nav-section">Termos de Uso</div>
+        <a href="#objeto">1. Objeto</a>
+        <a href="#cadastro">2. Cadastro e Conta</a>
+        <a href="#planos">3. Planos e Pagamento</a>
+        <a href="#trial">4. Período de Trial</a>
+        <a href="#bpo">5. Módulo BPO</a>
+        <a href="#uso-aceitavel">6. Uso Aceitável</a>
+        <a href="#propriedade">7. Propriedade Intelectual</a>
+        <a href="#suspensao">8. Suspensão e Cancelamento</a>
+        <a href="#responsabilidade">9. Limitação de Responsabilidade</a>
+        <a href="#privacidade">10. Privacidade e Dados</a>
+        <a href="#alteracoes">11. Alterações</a>
+        <a href="#lei">12. Lei Aplicável e Foro</a>
+        <a href="#contato">13. Contato</a>
+      </div>
+    </div>
+
+    <!-- Conteúdo -->
+    <div class="col-lg-9">
+
+      <div class="d-flex align-items-center gap-3 mb-4">
+        <div>
+          <h1 style="font-size:1.7rem; font-weight:700; color:#005CA9; margin:0;">
+            <i class="bi bi-file-text me-2"></i>Termos de Uso
+          </h1>
+          <span class="text-muted" style="font-size:.9rem;">FGTS Web — Plataforma de Gestão de FGTS</span>
+        </div>
+      </div>
+
+      <div class="last-updated">
+        <i class="bi bi-calendar-check me-2"></i>
+        Última atualização: <strong>[DATA_VIGÊNCIA]</strong> &nbsp;|&nbsp;
+        Versão 1.0
+      </div>
+
+      <p style="font-size:.95rem; color:#374151; line-height:1.75;">
+        Estes Termos de Uso regulam o acesso e uso da plataforma <strong>FGTS Web</strong>, operada por
+        <strong>[RAZÃO SOCIAL]</strong>, inscrita no CNPJ sob o n.º <strong>[CNPJ]</strong>
+        ("Empresa", "nós", "nos"). Ao criar uma conta ou utilizar a plataforma, o usuário
+        ("Usuário", "você") declara ter lido, compreendido e concordado integralmente com estes
+        termos. Caso não concorde, não utilize a plataforma.
+      </p>
+
+      <!-- 1. Objeto -->
+      <div class="doc-section mb-5" id="objeto">
+        <h2>1. Objeto</h2>
+        <p>A FGTS Web é uma plataforma SaaS (<em>Software as a Service</em>) para gestão, cálculo e conferência do Fundo de Garantia do Tempo de Serviço (FGTS), incluindo funcionalidades de geração de guias, relatórios, exportação SEFIP e gerenciamento de funcionários e empresas.</p>
+        <p>O acesso à plataforma é fornecido mediante assinatura de plano mensal, conforme condições definidas nestes termos e na página de preços vigente.</p>
+      </div>
+
+      <!-- 2. Cadastro -->
+      <div class="doc-section mb-5" id="cadastro">
+        <h2>2. Cadastro e Conta</h2>
+        <p>Para utilizar a plataforma, o Usuário deve criar uma conta com informações verdadeiras, completas e atualizadas. São obrigações do Usuário:</p>
+        <ul>
+          <li>Manter as credenciais de acesso em sigilo, sendo o único responsável por todas as atividades realizadas em sua conta.</li>
+          <li>Notificar imediatamente a FGTS Web em caso de acesso não autorizado ou suspeita de comprometimento da conta.</li>
+          <li>Não ceder, transferir ou compartilhar o acesso com terceiros não autorizados.</li>
+          <li>Manter o e-mail de cadastro atualizado para recebimento de comunicações sobre cobrança, segurança e alterações nos termos.</li>
+        </ul>
+        <p>A FGTS Web reserva-se o direito de recusar o cadastro ou encerrar contas que violem estes termos.</p>
+      </div>
+
+      <!-- 3. Planos -->
+      <div class="doc-section mb-5" id="planos">
+        <h2>3. Planos e Pagamento</h2>
+        <p>O acesso completo à plataforma requer a contratação de um plano pago. As condições vigentes estão disponíveis na página de preços. Ao contratar um plano:</p>
+        <ul>
+          <li>O pagamento é processado mensalmente por meio do parceiro de pagamento Asaas. A FGTS Web não armazena dados de cartão de crédito.</li>
+          <li>O Usuário autoriza a cobrança automática de acordo com o plano contratado.</li>
+          <li>Planos com valor incorreto gerado por erro técnico poderão ser corrigidos pela FGTS Web, com prévia comunicação ao Usuário.</li>
+          <li>Em caso de inadimplência, o acesso à plataforma poderá ser suspenso após o vencimento da cobrança, sem prejuízo da cobrança dos valores devidos.</li>
+          <li>Os preços estão sujeitos a reajuste anual ou a qualquer tempo, com aviso prévio de 30 dias.</li>
+        </ul>
+        <p>Para o <strong>Plano BPO</strong>, a cobrança é por CNPJ ativo, conforme política específica descrita na seção 5.</p>
+      </div>
+
+      <!-- 4. Trial -->
+      <div class="doc-section mb-5" id="trial">
+        <h2>4. Período de Trial</h2>
+        <p>Novos usuários podem ter acesso a um período de teste gratuito ("trial") conforme o plano selecionado:</p>
+        <ul>
+          <li>O trial tem duração definida no plano e começa na data de ativação da conta.</li>
+          <li>Durante o trial, o Usuário tem acesso às funcionalidades do plano sem cobrança.</li>
+          <li>Ao término do trial, o acesso é suspenso automaticamente caso o Usuário não configure o pagamento.</li>
+          <li>O trial é concedido uma única vez por empresa (CNPJ). Tentativas de obter novos períodos de trial por meio de múltiplos cadastros são consideradas violação destes termos.</li>
+        </ul>
+      </div>
+
+      <!-- 5. BPO -->
+      <div class="doc-section mb-5" id="bpo">
+        <h2>5. Módulo BPO</h2>
+        <p>O Módulo BPO destina-se a escritórios e bureaus de processamento de folha que gerenciam FGTS de múltiplas empresas clientes. Ao contratar o plano BPO, o Usuário concorda que:</p>
+        <ul>
+          <li>É responsável pelo uso da plataforma pelas empresas clientes cadastradas em sua conta BPO.</li>
+          <li>A cobrança mensal é calculada com base no número de CNPJs ativos no ciclo de cobrança, incluindo CNPJs suspensos durante o ciclo vigente (política de <em>high-water mark</em>). A suspensão de um CNPJ somente reduz a fatura no ciclo seguinte.</li>
+          <li>A concessão de acesso à plataforma para empresas clientes é de sua responsabilidade e deve respeitar as permissões configuradas no painel BPO.</li>
+          <li>O escritório BPO assume a condição de responsável pelo tratamento de dados das empresas clientes perante a legislação vigente.</li>
+        </ul>
+      </div>
+
+      <!-- 6. Uso Aceitável -->
+      <div class="doc-section mb-5" id="uso-aceitavel">
+        <h2>6. Uso Aceitável</h2>
+        <p>O Usuário compromete-se a utilizar a plataforma exclusivamente para fins lícitos e legítimos. São expressamente vedados:</p>
+        <ul>
+          <li>Inserir dados falsos, fraudulentos ou de terceiros sem autorização.</li>
+          <li>Realizar engenharia reversa, descompilar ou tentar obter o código-fonte da plataforma.</li>
+          <li>Utilizar robôs, scrapers ou qualquer método automatizado para extrair dados da plataforma sem autorização expressa.</li>
+          <li>Interferir na infraestrutura, segurança ou integridade da plataforma ou de outros usuários.</li>
+          <li>Revender, sublicenciar ou comercializar o acesso à plataforma sem autorização prévia e escrita.</li>
+          <li>Utilizar a plataforma para finalidades incompatíveis com a legislação trabalhista e previdenciária brasileira.</li>
+        </ul>
+        <p>A violação das regras de uso aceitável pode resultar na suspensão imediata da conta, sem direito a reembolso.</p>
+      </div>
+
+      <!-- 7. Propriedade Intelectual -->
+      <div class="doc-section mb-5" id="propriedade">
+        <h2>7. Propriedade Intelectual</h2>
+        <p>Todo o conteúdo da plataforma — incluindo código-fonte, design, logotipos, textos, algoritmos de cálculo e interfaces — é de propriedade exclusiva da <strong>[RAZÃO SOCIAL]</strong> ou de seus licenciantes, protegido pelas leis de direito autoral e propriedade intelectual do Brasil.</p>
+        <p>O Usuário recebe uma licença de uso não exclusiva, intransferível e revogável, limitada ao acesso e uso da plataforma conforme estes termos. Nenhuma licença adicional é concedida implicitamente.</p>
+        <p>Os dados inseridos pelo Usuário na plataforma (funcionários, lançamentos, documentos) permanecem de propriedade do Usuário. A FGTS Web não reivindica qualquer direito de propriedade sobre esses dados.</p>
+      </div>
+
+      <!-- 8. Suspensão -->
+      <div class="doc-section mb-5" id="suspensao">
+        <h2>8. Suspensão e Cancelamento</h2>
+        <p><strong>Pelo Usuário:</strong> pode solicitar o cancelamento a qualquer momento pelo suporte. O cancelamento encerra o acesso ao fim do ciclo de cobrança em curso. Não há reembolso proporcional pela fração não utilizada do mês.</p>
+        <p><strong>Pela FGTS Web:</strong> reservamo-nos o direito de suspender ou encerrar contas em caso de:</p>
+        <ul>
+          <li>Inadimplência por mais de [X] dias após o vencimento;</li>
+          <li>Violação destes termos de uso;</li>
+          <li>Uso que coloque em risco a segurança ou integridade da plataforma ou de outros usuários;</li>
+          <li>Determinação judicial ou regulatória.</li>
+        </ul>
+        <p>Após o cancelamento, os dados do Usuário ficam disponíveis para exportação por 30 dias, após o que serão excluídos definitivamente dos sistemas.</p>
+      </div>
+
+      <!-- 9. Responsabilidade -->
+      <div class="doc-section mb-5" id="responsabilidade">
+        <h2>9. Limitação de Responsabilidade</h2>
+        <p>A FGTS Web presta o serviço com diligência e boa-fé, mas não garante resultados específicos, disponibilidade ininterrupta ou ausência de erros. A plataforma é fornecida "como está" (<em>as is</em>).</p>
+        <p>A responsabilidade total da FGTS Web, por quaisquer danos diretos decorrentes do uso da plataforma, fica limitada ao valor pago pelo Usuário nos 3 (três) meses anteriores ao evento gerador do dano.</p>
+        <p>A FGTS Web não se responsabiliza por:</p>
+        <ul>
+          <li>Multas, autuações ou penalidades decorrentes de dados incorretos inseridos pelo Usuário;</li>
+          <li>Decisões e cálculos baseados em informações desatualizadas ou incorretas fornecidas pelo Usuário;</li>
+          <li>Danos causados por falhas de infraestrutura de terceiros (provedores de nuvem, operadoras de pagamento);</li>
+          <li>Lucros cessantes, danos indiretos ou consequentes.</li>
+        </ul>
+      </div>
+
+      <!-- 10. Privacidade -->
+      <div class="doc-section mb-5" id="privacidade">
+        <h2>10. Privacidade e Dados</h2>
+        <p>O tratamento de dados pessoais realizado pela FGTS Web é regido pela <strong>Lei Geral de Proteção de Dados (Lei 13.709/2018 — LGPD)</strong> e está detalhado em nossa
+          <a href="{% url 'legal-privacidade' %}">Política de Privacidade</a>.
+        </p>
+        <p>Ao utilizar a plataforma, o Usuário autoriza o tratamento dos dados pessoais inseridos para as finalidades descritas na Política de Privacidade.</p>
+      </div>
+
+      <!-- 11. Alterações -->
+      <div class="doc-section mb-5" id="alteracoes">
+        <h2>11. Alterações dos Termos</h2>
+        <p>A FGTS Web pode alterar estes termos a qualquer tempo. Alterações materiais serão comunicadas com antecedência mínima de 30 dias por e-mail ou aviso na plataforma. O uso continuado após a vigência das novas condições implica sua aceitação.</p>
+      </div>
+
+      <!-- 12. Lei e Foro -->
+      <div class="doc-section mb-5" id="lei">
+        <h2>12. Lei Aplicável e Foro</h2>
+        <p>Estes termos são regidos pelas leis da República Federativa do Brasil. Fica eleito o foro da comarca de <strong>[CIDADE/UF]</strong> para dirimir quaisquer litígios decorrentes destes termos, renunciando as partes a qualquer outro, por mais privilegiado que seja.</p>
+      </div>
+
+      <!-- 13. Contato -->
+      <div class="doc-section mb-5" id="contato">
+        <h2>13. Contato</h2>
+        <p>Para dúvidas sobre estes termos:</p>
+        <ul>
+          <li><strong>E-mail:</strong> <a href="mailto:[EMAIL_CONTATO]">[EMAIL_CONTATO]</a></li>
+          <li><strong>Empresa:</strong> [RAZÃO SOCIAL] — CNPJ [CNPJ]</li>
+          <li><strong>Endereço:</strong> [ENDEREÇO]</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

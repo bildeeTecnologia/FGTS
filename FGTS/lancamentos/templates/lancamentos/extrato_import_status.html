@@ -1,0 +1,260 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Confirmando Extrato CEF...{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="mb-3">
+                <h1 class="h4 fw-bold text-dark">
+                    <i class="bi bi-bank text-success me-2"></i>
+                    Importação Extrato Analítico — CEF
+                </h1>
+                <p class="text-muted mb-0 small">Arquivo: <strong>{{ importacao.nome_arquivo }}</strong></p>
+            </div>
+
+            <div class="card border-0 shadow-lg">
+                <div class="card-header text-white py-3 border-0" style="background: linear-gradient(135deg, #2E7D32 0%, #1B5E20 100%);">
+                    <h2 class="h6 mb-0"><i class="bi bi-hourglass-split me-2"></i> Status da Importação</h2>
+                </div>
+                <div class="card-body p-4">
+
+                    <!-- Processando -->
+                    <div id="state-processing" style="display:none;">
+                        <div class="d-flex align-items-center gap-3 mb-4">
+                            <div class="spinner-border flex-shrink-0" style="color:#2E7D32;" role="status"></div>
+                            <div>
+                                <div id="state-processing-title" class="fw-semibold">Aguardando processamento...</div>
+                                <div class="text-muted small">Não feche esta aba.</div>
+                            </div>
+                            <div class="ms-auto text-end">
+                                <div class="text-muted small">Tempo decorrido</div>
+                                <div id="elapsed-time" class="fw-bold font-monospace" style="color:#2E7D32;">0:00</div>
+                            </div>
+                        </div>
+                        <div class="mb-1 d-flex justify-content-between small">
+                            <span id="progress-label">Aguardando início...</span>
+                            <span id="progress-pct" class="fw-bold" style="color:#2E7D32;">—</span>
+                        </div>
+                        <div class="progress mb-1" style="height:18px;border-radius:9px;">
+                            <div id="progress-bar" class="progress-bar progress-bar-striped progress-bar-animated"
+                                 role="progressbar" style="width:0%;border-radius:9px;background:#2E7D32;"></div>
+                        </div>
+                        <div id="eta-label" class="text-muted small mb-0" style="min-height:1.2em;"></div>
+                    </div>
+
+                    <!-- Concluído -->
+                    <div id="state-done" style="display:none;">
+                        <div class="alert border-0 d-flex align-items-center mb-3" style="background:#E8F5E9;">
+                            <i class="bi bi-check-circle-fill fs-4 me-3 text-success"></i>
+                            <div>
+                                <strong>Confirmação concluída!</strong>
+                                <div class="small" id="done-tempo"></div>
+                            </div>
+                        </div>
+                        <div class="row g-3 mb-4">
+                            <div class="col-3 text-center">
+                                <div class="border rounded-3 p-3">
+                                    <div class="fs-3 fw-bold text-success" id="result-confirmados">-</div>
+                                    <div class="small text-muted">Confirmados</div>
+                                    <div id="result-com-13-note" class="small text-success" style="display:none;"></div>
+                                </div>
+                            </div>
+                            <div class="col-3 text-center">
+                                <div class="border rounded-3 p-3">
+                                    <div class="fs-3 fw-bold text-secondary" id="result-ja-confirmados">-</div>
+                                    <div class="small text-muted">Já confirmados</div>
+                                </div>
+                            </div>
+                            <div class="col-3 text-center">
+                                <div class="border rounded-3 p-3">
+                                    <div class="fs-3 fw-bold text-warning" id="result-nao-encontrados">-</div>
+                                    <div class="small text-muted">Não encontrados</div>
+                                </div>
+                            </div>
+                            <div class="col-3 text-center">
+                                <div class="border rounded-3 p-3">
+                                    <div class="fs-3 fw-bold text-danger" id="result-erros">-</div>
+                                    <div class="small text-muted">Erros</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Avisos -->
+                        <div id="aviso-container" style="display:none;">
+                            <p class="fw-semibold text-warning small mb-1">Avisos:</p>
+                            <ul id="aviso-list" class="small text-muted ps-3 mb-0"></ul>
+                            <p id="more-avisos" class="small text-muted mt-1 mb-0"></p>
+                        </div>
+
+                        <!-- Erros -->
+                        <div id="error-list-container" style="display:none;">
+                            <p class="fw-semibold text-danger small mb-1">Erros encontrados:</p>
+                            <ul id="error-list" class="small text-danger ps-3 mb-0"></ul>
+                            <p id="more-errors" class="small text-muted mt-1 mb-0"></p>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 pt-3 border-top mt-3">
+                            <a href="{% url 'extrato-import' %}" class="btn btn-outline-secondary rounded-3">
+                                <i class="bi bi-upload me-1"></i> Novo Extrato
+                            </a>
+                            <a id="btn-relatorio"
+                               href="{% url 'extrato-import-relatorio' pk=importacao.pk %}"
+                               class="btn btn-success rounded-3" style="display:none;">
+                                <i class="bi bi-file-earmark-spreadsheet me-1"></i>
+                                Baixar Relatório XLSX
+                            </a>
+                            <a href="{% url 'lancamento-list' %}" class="btn rounded-3 text-white" style="background:#2E7D32;">
+                                <i class="bi bi-list-ul me-1"></i> Ver Lançamentos
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Erro -->
+                    <div id="state-error" style="display:none;">
+                        <div class="alert alert-danger border-0 mb-3">
+                            <i class="bi bi-x-circle-fill me-2"></i>
+                            <strong>Erro na importação</strong>
+                            <p id="error-message" class="mb-0 mt-1 small"></p>
+                        </div>
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="{% url 'extrato-import' %}" class="btn rounded-3 text-white" style="background:#2E7D32;">
+                                <i class="bi bi-arrow-left me-1"></i> Tentar Novamente
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.font-monospace { font-family: var(--bs-font-monospace); }
+</style>
+
+<script>
+(function () {
+    var statusUrl = "{% url 'extrato-import-status-json' pk=importacao.pk %}";
+    var startTime = Date.now();
+    var pollingId = null;
+    var elapsedId = null;
+
+    var elProcessing = document.getElementById('state-processing');
+    var elDone       = document.getElementById('state-done');
+    var elError      = document.getElementById('state-error');
+
+    function fmtSeconds(s) {
+        s = Math.round(s);
+        return Math.floor(s/60) + ':' + ('0' + (s%60)).slice(-2);
+    }
+    function fmtNum(n) { return (n || 0).toLocaleString('pt-BR'); }
+
+    function tickElapsed() {
+        document.getElementById('elapsed-time').textContent = fmtSeconds((Date.now()-startTime)/1000);
+    }
+    function startElapsed() { if (!elapsedId) { tickElapsed(); elapsedId = setInterval(tickElapsed, 1000); } }
+    function stopElapsed()  { if (elapsedId) { clearInterval(elapsedId); elapsedId = null; } }
+
+    function updateProgress(proc, total) {
+        if (!total) { document.getElementById('progress-label').textContent = 'Calculando...'; return; }
+        var pct = Math.min(Math.round(proc/total*100), 100);
+        document.getElementById('progress-bar').style.width = pct + '%';
+        document.getElementById('progress-pct').textContent = pct + '%';
+        document.getElementById('progress-label').textContent = fmtNum(proc) + ' de ' + fmtNum(total) + ' registros';
+        var elapsed = (Date.now()-startTime)/1000;
+        if (proc > 0 && pct < 100 && elapsed > 2) {
+            var eta = (total-proc)/proc*elapsed;
+            document.getElementById('eta-label').textContent = 'Tempo estimado: ~' + fmtSeconds(eta);
+        }
+    }
+
+    function showProcessing(status, data) {
+        elProcessing.style.display = ''; elDone.style.display = 'none'; elError.style.display = 'none';
+        document.getElementById('state-processing-title').textContent =
+            status === 'pending' ? 'Aguardando processamento...' : 'Confirmando depósitos...';
+        startElapsed();
+        if (data) updateProgress(data.linhas_processadas||0, data.linhas_total);
+    }
+
+    function showDone(data) {
+        stopElapsed();
+        elProcessing.style.display = 'none'; elError.style.display = 'none'; elDone.style.display = '';
+        document.getElementById('done-tempo').textContent = 'Processado em ' + fmtSeconds((Date.now()-startTime)/1000);
+        var r = data.resultado || {};
+        document.getElementById('result-confirmados').textContent    = fmtNum(r.confirmados);
+        document.getElementById('result-ja-confirmados').textContent = fmtNum(r.ja_confirmados);
+        document.getElementById('result-nao-encontrados').textContent = fmtNum(r.nao_encontrados);
+        document.getElementById('result-erros').textContent          = fmtNum((r.erros||[]).length);
+
+        // Nota de 13º junto com mensal
+        var com13 = r.confirmados_com_13 || 0;
+        if (com13 > 0) {
+            var el13 = document.getElementById('result-com-13-note');
+            el13.textContent = '(' + fmtNum(com13) + ' incluem 13º)';
+            el13.style.display = '';
+        }
+
+        // Avisos
+        if (r.avisos && r.avisos.length) {
+            var al = document.getElementById('aviso-list');
+            r.avisos.slice(0, 5).forEach(function(a) {
+                var li = document.createElement('li'); li.textContent = a; al.appendChild(li);
+            });
+            if (r.avisos.length > 5) document.getElementById('more-avisos').textContent = 'E mais ' + (r.avisos.length-5) + ' aviso(s)...';
+            document.getElementById('aviso-container').style.display = '';
+        }
+
+        // Erros
+        if (r.erros && r.erros.length) {
+            var el = document.getElementById('error-list');
+            r.erros.slice(0, 5).forEach(function(e) {
+                var li = document.createElement('li'); li.textContent = e; el.appendChild(li);
+            });
+            if (r.erros.length > 5) document.getElementById('more-errors').textContent = 'E mais ' + (r.erros.length-5) + ' erro(s)...';
+            document.getElementById('error-list-container').style.display = '';
+        }
+
+        document.getElementById('btn-relatorio').style.display = '';
+    }
+
+    function showError(msg) {
+        stopElapsed();
+        elProcessing.style.display = 'none'; elDone.style.display = 'none'; elError.style.display = '';
+        document.getElementById('error-message').textContent = msg || 'Erro desconhecido.';
+    }
+
+    function applyStatus(data) {
+        if (data.status === 'pending' || data.status === 'processing') { showProcessing(data.status, data); return false; }
+        if (data.status === 'done')  { showDone(data);        return true; }
+        if (data.status === 'error') { showError(data.erro);  return true; }
+        return false;
+    }
+
+    function poll() {
+        if (pollingId) return;
+        pollingId = setInterval(function () {
+            fetch(statusUrl, {credentials:'same-origin'})
+                .then(function(r) { return r.json(); })
+                .then(function(data) { if (applyStatus(data)) { clearInterval(pollingId); pollingId = null; } })
+                .catch(function() {});
+        }, 3000);
+    }
+
+    var initialStatus = "{{ importacao.status }}";
+    if (initialStatus === 'done' || initialStatus === 'error') {
+        fetch(statusUrl, {credentials:'same-origin'}).then(r => r.json()).then(applyStatus);
+    } else {
+        showProcessing(initialStatus, null);
+        poll();
+    }
+
+    if (initialStatus === 'done') {
+        document.getElementById('btn-relatorio').style.display = '';
+    }
+})();
+</script>
+{% endblock %}

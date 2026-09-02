@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% block title %}Ativar Conta BPO — FGTS Web{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 0 auto;">
+
+  <div class="mb-4">
+    <h1 style="font-size: 1.8rem; font-weight: 700; color: #005CA9;">
+      <i class="bi bi-buildings me-2" style="color: #F7941D;"></i>Ativar Conta BPO
+    </h1>
+    <p class="text-muted">Configure a forma de pagamento para continuar usando a plataforma.</p>
+  </div>
+
+  {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags|default:'info' }} mb-3" role="alert">
+      {{ message }}
+    </div>
+    {% endfor %}
+  {% endif %}
+
+  <!-- Resumo da conta -->
+  <div class="card shadow-sm mb-4" style="border-radius: 14px; border: 1.5px solid #e0e8f0;">
+    <div class="card-header" style="background: linear-gradient(135deg, #005CA9, #003A78); border-radius: 12px 12px 0 0; color: #fff; padding: 1rem 1.5rem;">
+      <strong><i class="bi bi-receipt me-2"></i>Resumo da Cobrança</strong>
+    </div>
+    <div class="card-body p-4">
+      <div class="row g-3">
+        <div class="col-6">
+          <div class="text-muted" style="font-size: .82rem;">Plano</div>
+          <div class="fw-bold">{{ conta_bpo.plano.nome }}</div>
+        </div>
+        <div class="col-6">
+          <div class="text-muted" style="font-size: .82rem;">CNPJs ativos</div>
+          <div class="fw-bold">{{ cnpjs_ativos }}</div>
+        </div>
+        <div class="col-6">
+          <div class="text-muted" style="font-size: .82rem;">Preço por CNPJ/mês</div>
+          <div class="fw-bold">R$ {{ preco_por_cnpj }}</div>
+        </div>
+        <div class="col-6">
+          <div class="text-muted" style="font-size: .82rem;">Valor mensal estimado</div>
+          <div class="fw-bold text-primary" style="font-size: 1.15rem;">R$ {{ valor_mensal }}</div>
+        </div>
+      </div>
+      <hr style="border-color: #e0e8f0;">
+      <div class="d-flex align-items-center gap-2">
+        <i class="bi bi-calendar-check text-primary"></i>
+        <span class="text-muted" style="font-size: .9rem;">
+          Próxima cobrança: <strong>dia {{ conta_bpo.dia_cobranca }}</strong> de cada mês
+          (primeiro vencimento: <strong>{{ proximo_vencimento|date:"d/m/Y" }}</strong>)
+        </span>
+      </div>
+      <div class="alert alert-info border-0 mt-3 mb-0" style="border-radius: 10px; font-size: .88rem;">
+        <i class="bi bi-info-circle me-2"></i>
+        A cobrança é gerada automaticamente na data de vencimento com base nos CNPJs ativos naquele momento.
+        Ao adicionar ou suspender empresas, o valor é ajustado proporcionalmente.
+      </div>
+    </div>
+  </div>
+
+  <!-- Formulário -->
+  <form method="post" action="{% url 'billing:bpo-checkout' %}">
+    {% csrf_token %}
+
+    <div class="card shadow-sm mb-4" style="border-radius: 14px; border: 1.5px solid #e0e8f0;">
+      <div class="card-body p-4">
+        <h6 class="fw-bold mb-3">Forma de Pagamento</h6>
+        <div class="d-flex flex-column gap-2">
+
+          <label class="d-flex align-items-center gap-3 p-3 rounded" style="border: 1.5px solid #e0e8f0; cursor: pointer; transition: border-color .15s;" onmouseover="this.style.borderColor='#005CA9'" onmouseout="if(!this.querySelector('input').checked) this.style.borderColor='#e0e8f0'">
+            <input type="radio" name="billing_type" value="BOLETO" checked onchange="highlightSelected()">
+            <i class="bi bi-upc-scan" style="font-size: 1.3rem; color: #005CA9;"></i>
+            <div>
+              <div class="fw-bold" style="font-size: .95rem;">Boleto Bancário</div>
+              <div class="text-muted" style="font-size: .82rem;">Vence em até 3 dias úteis após geração</div>
+            </div>
+          </label>
+
+          <label class="d-flex align-items-center gap-3 p-3 rounded" style="border: 1.5px solid #e0e8f0; cursor: pointer; transition: border-color .15s;" onmouseover="this.style.borderColor='#005CA9'" onmouseout="if(!this.querySelector('input').checked) this.style.borderColor='#e0e8f0'">
+            <input type="radio" name="billing_type" value="PIX" onchange="highlightSelected()">
+            <i class="bi bi-qr-code-scan" style="font-size: 1.3rem; color: #32bcad;"></i>
+            <div>
+              <div class="fw-bold" style="font-size: .95rem;">PIX</div>
+              <div class="text-muted" style="font-size: .82rem;">Pagamento instantâneo, disponível 24h</div>
+            </div>
+          </label>
+
+        </div>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary w-100 py-3 fw-bold" style="border-radius: 10px; font-size: 1.05rem; background: linear-gradient(135deg, #005CA9, #003A78); border: none;">
+      <i class="bi bi-check-circle me-2"></i>Ativar Plano BPO
+    </button>
+    <p class="text-center text-muted mt-3" style="font-size: .83rem;">
+      Ao ativar, você concorda com os termos de uso da plataforma.<br>
+      A cobrança é gerada mensalmente e pode ser cancelada a qualquer momento.
+    </p>
+  </form>
+
+</div>
+
+<script>
+function highlightSelected() {
+  document.querySelectorAll('label').forEach(function(label) {
+    const radio = label.querySelector('input[type=radio]');
+    if (radio) {
+      label.style.borderColor = radio.checked ? '#005CA9' : '#e0e8f0';
+    }
+  });
+}
+highlightSelected();
+</script>
+{% endblock %}

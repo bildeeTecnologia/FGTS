@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% block title %}Ajuda — FGTS Web{% endblock %}
+
+{% block content %}
+<div style="max-width: 860px; margin: 0 auto;">
+
+  <!-- Cabeçalho -->
+  <div class="mb-5">
+    <h1 style="font-size: 1.9rem; font-weight: 700; color: #005CA9;">
+      <i class="bi bi-question-circle me-2" style="color: #F7941D;"></i>Central de Ajuda
+    </h1>
+    <p class="text-muted" style="font-size: 1.05rem;">
+      Documentação técnica da plataforma FGTS Web — objetiva, organizada por módulo.
+    </p>
+    <hr style="border-color: #e0e8f0;">
+  </div>
+
+  <!-- Cards das 4 seções -->
+  <div class="row g-4 mb-5">
+
+    <div class="col-md-6">
+      <a href="{% url 'ajuda-primeiros-passos' %}" class="text-decoration-none">
+        <div class="card h-100 shadow-sm" style="border-radius: 14px; border: 1.5px solid #e0e8f0; transition: box-shadow .2s;">
+          <div class="card-body p-4">
+            <div class="mb-3" style="width: 48px; height: 48px; border-radius: 10px; background: linear-gradient(135deg, #005CA9 0%, #003A78 100%); display: flex; align-items: center; justify-content: center;">
+              <i class="bi bi-rocket-takeoff" style="font-size: 1.4rem; color: #fff;"></i>
+            </div>
+            <h5 style="font-weight: 700; color: #1a2a3a;">Primeiros Passos</h5>
+            <p class="text-muted mb-0" style="font-size: 0.93rem; line-height: 1.6;">
+              Do cadastro à geração do primeiro relatório: passo a passo para configurar a plataforma do zero.
+            </p>
+          </div>
+          <div class="card-footer bg-transparent border-0 pb-3 ps-4">
+            <span style="font-size: 0.85rem; color: #005CA9; font-weight: 600;">Acessar guia <i class="bi bi-arrow-right"></i></span>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <div class="col-md-6">
+      <a href="{% url 'ajuda-manual' %}" class="text-decoration-none">
+        <div class="card h-100 shadow-sm" style="border-radius: 14px; border: 1.5px solid #e0e8f0; transition: box-shadow .2s;">
+          <div class="card-body p-4">
+            <div class="mb-3" style="width: 48px; height: 48px; border-radius: 10px; background: linear-gradient(135deg, #005CA9 0%, #003A78 100%); display: flex; align-items: center; justify-content: center;">
+              <i class="bi bi-book" style="font-size: 1.4rem; color: #fff;"></i>
+            </div>
+            <h5 style="font-weight: 700; color: #1a2a3a;">Manual do Usuário</h5>
+            <p class="text-muted mb-0" style="font-size: 0.93rem; line-height: 1.6;">
+              Documentação completa de cada módulo: empresas, funcionários, lançamentos, relatórios e SEFIP.
+            </p>
+          </div>
+          <div class="card-footer bg-transparent border-0 pb-3 ps-4">
+            <span style="font-size: 0.85rem; color: #005CA9; font-weight: 600;">Acessar manual <i class="bi bi-arrow-right"></i></span>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <div class="col-md-6">
+      <a href="{% url 'ajuda-faq' %}" class="text-decoration-none">
+        <div class="card h-100 shadow-sm" style="border-radius: 14px; border: 1.5px solid #e0e8f0; transition: box-shadow .2s;">
+          <div class="card-body p-4">
+            <div class="mb-3" style="width: 48px; height: 48px; border-radius: 10px; background: linear-gradient(135deg, #F7941D 0%, #e07b10 100%); display: flex; align-items: center; justify-content: center;">
+              <i class="bi bi-patch-question" style="font-size: 1.4rem; color: #fff;"></i>
+            </div>
+            <h5 style="font-weight: 700; color: #1a2a3a;">Perguntas Frequentes</h5>
+            <p class="text-muted mb-0" style="font-size: 0.93rem; line-height: 1.6;">
+              Base FGTS, JAM, competência, SEFIP, planos — as dúvidas mais comuns respondidas de forma direta.
+            </p>
+          </div>
+          <div class="card-footer bg-transparent border-0 pb-3 ps-4">
+            <span style="font-size: 0.85rem; color: #F7941D; font-weight: 600;">Ver respostas <i class="bi bi-arrow-right"></i></span>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <div class="col-md-6">
+      <a href="{% url 'ajuda-glossario' %}" class="text-decoration-none">
+        <div class="card h-100 shadow-sm" style="border-radius: 14px; border: 1.5px solid #e0e8f0; transition: box-shadow .2s;">
+          <div class="card-body p-4">
+            <div class="mb-3" style="width: 48px; height: 48px; border-radius: 10px; background: linear-gradient(135deg, #F7941D 0%, #e07b10 100%); display: flex; align-items: center; justify-content: center;">
+              <i class="bi bi-alphabet" style="font-size: 1.4rem; color: #fff;"></i>
+            </div>
+            <h5 style="font-weight: 700; color: #1a2a3a;">Glossário Técnico</h5>
+            <p class="text-muted mb-0" style="font-size: 0.93rem; line-height: 1.6;">
+              Definições objetivas dos termos trabalhistas e previdenciários usados na plataforma.
+            </p>
+          </div>
+          <div class="card-footer bg-transparent border-0 pb-3 ps-4">
+            <span style="font-size: 0.85rem; color: #F7941D; font-weight: 600;">Ver glossário <i class="bi bi-arrow-right"></i></span>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <div class="col-md-6">
+      <a href="{% url 'ajuda-bpo' %}" class="text-decoration-none">
+        <div class="card h-100 shadow-sm" style="border-radius: 14px; border: 1.5px solid #e0e8f0; transition: box-shadow .2s;">
+          <div class="card-body p-4">
+            <div class="mb-3" style="width: 48px; height: 48px; border-radius: 10px; background: linear-gradient(135deg, #0d6efd 0%, #0a3faa 100%); display: flex; align-items: center; justify-content: center;">
+              <i class="bi bi-buildings" style="font-size: 1.4rem; color: #fff;"></i>
+            </div>
+            <h5 style="font-weight: 700; color: #1a2a3a;">Guia para Escritórios BPO</h5>
+            <p class="text-muted mb-0" style="font-size: 0.93rem; line-height: 1.6;">
+              Como gerenciar múltiplas empresas clientes, cobrança por CNPJ, rateio proporcional e controle de acesso.
+            </p>
+          </div>
+          <div class="card-footer bg-transparent border-0 pb-3 ps-4">
+            <span style="font-size: 0.85rem; color: #0d6efd; font-weight: 600;">Acessar guia BPO <i class="bi bi-arrow-right"></i></span>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <div class="col-md-6">
+      <a href="{% url 'ajuda-manual' %}#tipo-vinculo" class="text-decoration-none">
+        <div class="card h-100 shadow-sm" style="border-radius: 14px; border: 1.5px solid #fff3cd; transition: box-shadow .2s;">
+          <div class="card-body p-4">
+            <div class="mb-3" style="width: 48px; height: 48px; border-radius: 10px; background: linear-gradient(135deg, #ffc107 0%, #e0a000 100%); display: flex; align-items: center; justify-content: center;">
+              <i class="bi bi-mortarboard" style="font-size: 1.4rem; color: #fff;"></i>
+            </div>
+            <h5 style="font-weight: 700; color: #1a2a3a;">Tipo de Vínculo (CLT / Aprendiz)</h5>
+            <p class="text-muted mb-0" style="font-size: 0.93rem; line-height: 1.6;">
+              Entenda como o tipo de vínculo define a alíquota de FGTS (8% CLT, 2% Aprendiz), a indicação visual e as regras de alteração.
+            </p>
+          </div>
+          <div class="card-footer bg-transparent border-0 pb-3 ps-4">
+            <span style="font-size: 0.85rem; color: #b08000; font-weight: 600;">Ver documentação <i class="bi bi-arrow-right"></i></span>
+          </div>
+        </div>
+      </a>
+    </div>
+
+  </div>
+
+  <!-- Rodapé de suporte -->
+  <div class="card p-4" style="border-radius: 12px; background: linear-gradient(135deg, #005CA9 0%, #003A78 100%); border: none;">
+    <div class="row align-items-center">
+      <div class="col-md-8">
+        <h6 class="text-white fw-bold mb-1"><i class="bi bi-chat-left-dots me-2"></i>Não encontrou o que precisava?</h6>
+        <p class="text-white-50 mb-0" style="font-size: 0.9rem;">
+          Envie seu feedback — nossa equipe usa para melhorar a plataforma continuamente.
+        </p>
+      </div>
+      <div class="col-md-4 text-md-end mt-3 mt-md-0">
+        <a href="{% url 'billing:feedback-criar' %}" class="btn btn-light fw-bold" style="color: #005CA9; border-radius: 8px;">
+          Enviar Feedback
+        </a>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

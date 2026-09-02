@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Pré-visualização — Extrato Analítico CEF{% endblock %}
+
+{% block content %}
+{% with pr=importacao.preview_resultado %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-xl-11">
+
+            <!-- Header -->
+            <div class="mb-3">
+                <h1 class="h4 fw-bold text-dark mb-0">
+                    <i class="bi bi-eye text-success me-2"></i>
+                    Pré-visualização — Extrato Analítico CEF
+                </h1>
+                <p class="text-muted small mt-1">
+                    Arquivo: <strong>{{ importacao.nome_arquivo }}</strong>
+                    &nbsp;·&nbsp;
+                    Mostrando <strong>{{ pr.linhas_amostradas }}</strong> de <strong>{{ pr.total_registros }}</strong> depósitos
+                </p>
+            </div>
+
+            <!-- Cards resumo -->
+            <div class="row g-3 mb-4">
+                <div class="col-sm-3">
+                    <div class="card border-0 shadow-sm text-center py-3">
+                        <div class="text-muted small mb-1">Total no extrato</div>
+                        <div class="fs-4 fw-bold text-dark">{{ pr.total_registros }}</div>
+                        <div class="text-muted small">depósitos</div>
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <div class="card border-0 shadow-sm text-center py-3">
+                        <div class="text-muted small mb-1">Confirmáveis</div>
+                        <div class="fs-4 fw-bold text-success">{{ pr.linhas_ok }}</div>
+                        <div class="text-muted small">lançamentos encontrados</div>
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <div class="card border-0 shadow-sm text-center py-3 {% if pr.linhas_erro > 0 %}border-warning{% endif %}">
+                        <div class="text-muted small mb-1">Não encontrados</div>
+                        <div class="fs-4 fw-bold text-warning">{{ pr.linhas_erro }}</div>
+                        <div class="text-muted small">na plataforma</div>
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <div class="card border-0 shadow-sm text-center py-3">
+                        <div class="text-muted small mb-1">Amostra analisada</div>
+                        <div class="fs-4 fw-bold text-muted">{{ pr.linhas_amostradas }}</div>
+                        <div class="text-muted small">registros</div>
+                    </div>
+                </div>
+            </div>
+
+            {% if pr.linhas_erro > 0 %}
+            <div class="alert alert-warning d-flex gap-2 py-2 mb-3">
+                <i class="bi bi-exclamation-triangle-fill flex-shrink-0 mt-1"></i>
+                <div class="small">
+                    <strong>{{ pr.linhas_erro }} depósito{{ pr.linhas_erro|pluralize }} sem lançamento correspondente na plataforma.</strong>
+                    Esses registros serão ignorados (o depósito existiu na CEF, mas não há lançamento para confirmar).
+                    Os demais serão marcados como <strong>Pago — confirmado pela CEF</strong>.
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Tabela -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-bottom py-2 px-3">
+                    <span class="fw-semibold small text-muted">
+                        <i class="bi bi-table me-1"></i>
+                        Amostra das primeiras {{ pr.linhas_amostradas }} linhas
+                    </span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover align-middle mb-0" style="font-size:.82rem;">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-3">Status</th>
+                                <th>Nome</th>
+                                <th>PIS / Matrícula</th>
+                                <th>Empresa</th>
+                                <th>Competência</th>
+                                <th>Data Pagamento</th>
+                                <th class="text-end">Valor (CEF)</th>
+                                <th>Lançamento</th>
+                                <th>Observação</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in pr.rows %}
+                            <tr class="{% if row.status == 'ok' %}table-success{% else %}table-warning{% endif %}" style="--bs-table-bg-type: transparent;">
+                                <td class="ps-3">
+                                    {% if row.status == 'ok' %}
+                                        {% if row.ja_confirmado_cef %}
+                                            <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle">Já confirmado</span>
+                                        {% else %}
+                                            <span class="badge bg-success-subtle text-success border border-success-subtle">✓ Confirmável</span>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle">⚠ Não encontrado</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ row.nome|default:"—" }}</td>
+                                <td class="font-monospace text-nowrap small">
+                                    {% if row.pis %}PIS: {{ row.pis }}{% endif %}
+                                    {% if row.matricula %}<br>Mat: {{ row.matricula }}{% endif %}
+                                </td>
+                                <td class="text-nowrap">{{ row.empresa_nome|default:"—" }}</td>
+                                <td class="text-nowrap fw-semibold">{{ row.competencia }}</td>
+                                <td class="text-nowrap">{{ row.data_pagamento }}</td>
+                                <td class="text-end text-nowrap">R$ {{ row.valor }}</td>
+                                <td>
+                                    {% if row.lancamento_id %}
+                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle">#{{ row.lancamento_id }}</span>
+                                    {% else %}—{% endif %}
+                                </td>
+                                <td class="small text-muted">{{ row.erro }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="9" class="text-center text-muted py-4">Nenhum registro na amostra.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Confirmação -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <p class="small fw-semibold mb-2">
+                        <i class="bi bi-check-circle me-1 text-success"></i>
+                        Confirmar a importação irá marcar <strong>{{ pr.linhas_ok }}</strong> lançamento{{ pr.linhas_ok|pluralize }}
+                        como <strong>Pago — confirmado pela CEF</strong>.
+                    </p>
+                    <p class="small text-muted mb-3">
+                        Lançamentos já confirmados pela CEF serão ignorados. Apenas depósitos com lançamento correspondente na plataforma serão atualizados.
+                    </p>
+                    <form method="post" action="{% url 'extrato-import-confirm' importacao.pk %}">
+                        {% csrf_token %}
+                        <div class="d-flex flex-wrap gap-3 align-items-center">
+                            <button type="submit" class="btn px-4 text-white" style="background:#2E7D32;">
+                                <i class="bi bi-check-circle me-2"></i>
+                                Confirmar e aplicar {{ pr.total_registros }} depósito{{ pr.total_registros|pluralize }}
+                            </button>
+                            <a href="{% url 'extrato-import' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-counterclockwise me-1"></i>
+                                Cancelar e enviar outro arquivo
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endwith %}
+{% endblock %}

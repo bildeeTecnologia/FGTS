@@ -1,0 +1,264 @@
+{% extends 'base.html' %}
+
+{% block title %}Cadastrar Nova Empresa — FGTS Web{% endblock %}
+
+{% block extra_css %}
+<style>
+  .onboarding-hero {
+    background: linear-gradient(135deg, #005CA9 0%, #003A78 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .onboarding-hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 500px;
+    height: 500px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    z-index: 0;
+  }
+
+  .onboarding-hero::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    left: -5%;
+    width: 400px;
+    height: 400px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+    z-index: 0;
+  }
+
+  .onboarding-content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    color: white;
+  }
+
+  .onboarding-content h1 {
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  .onboarding-content p {
+    font-size: 1.5rem;
+    margin-bottom: 3rem;
+    opacity: 0.95;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+  }
+
+  .btn-lg-custom {
+    padding: 0.75rem 2.5rem;
+    font-size: 1.1rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  }
+
+  .btn-lg-custom:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  }
+
+  .btn-light-custom {
+    background: white;
+    color: #005CA9;
+    font-weight: 600;
+  }
+
+  .btn-light-custom:hover {
+    background: #f8f9fa;
+    color: #003A78;
+  }
+
+  .modal-header {
+    background: linear-gradient(135deg, #005CA9 0%, #003A78 100%);
+    color: white;
+    border: none;
+  }
+
+  .modal-header .modal-title {
+    font-weight: 600;
+  }
+
+  .form-label {
+    font-weight: 500;
+    color: #333;
+  }
+
+  .form-control, .form-select {
+    border: 1px solid #ddd;
+    padding: 0.625rem 0.75rem;
+  }
+
+  .form-control:focus, .form-select:focus {
+    border-color: #005CA9;
+    box-shadow: 0 0 0 0.2rem rgba(0, 92, 169, 0.25);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="onboarding-hero">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="onboarding-content">
+          <h1>Bem-vindo ao FGTS Web</h1>
+          <p>Sistema de Gestão de FGTS em Atraso</p>
+          <button type="button" class="btn btn-light-custom btn-lg-custom" data-bs-toggle="modal" data-bs-target="#empresaModal">
+            <i class="bi bi-building-add"></i> Cadastrar Nova Empresa
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Cadastro de Empresa -->
+<div class="modal fade" id="empresaModal" tabindex="-1" aria-labelledby="empresaModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="empresaModalLabel">
+          <i class="bi bi-building-add"></i> Cadastro de Empresa
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+      <form method="post" action="{% url 'empresa-create' %}" id="empresaForm">
+        <div class="modal-body">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="id_nome" class="form-label">Nome da Empresa *</label>
+              {{ form.nome }}
+            </div>
+            <div class="col-md-3">
+              <label for="id_cnpj" class="form-label">CNPJ *</label>
+              {{ form.cnpj }}
+            </div>
+            <div class="col-md-3">
+              <label for="id_codigo_folha" class="form-label">Codigo Folha</label>
+              {{ form.codigo_folha }}
+            </div>
+          </div>
+
+          <div class="row g-3 mt-2">
+            <div class="col-md-8">
+              <label for="id_endereco" class="form-label">Endereço</label>
+              {{ form.endereco }}
+            </div>
+            <div class="col-md-4">
+              <label for="id_numero" class="form-label">Número</label>
+              {{ form.numero }}
+            </div>
+          </div>
+
+          <div class="row g-3 mt-2">
+            <div class="col-md-4">
+              <label for="id_bairro" class="form-label">Bairro</label>
+              {{ form.bairro }}
+            </div>
+            <div class="col-md-3">
+              <label for="id_cep" class="form-label">CEP</label>
+              {{ form.cep }}
+            </div>
+            <div class="col-md-4">
+              <label for="id_cidade" class="form-label">Cidade</label>
+              {{ form.cidade }}
+            </div>
+            <div class="col-md-1">
+              <label for="id_uf" class="form-label">UF</label>
+              {{ form.uf }}
+            </div>
+          </div>
+
+          <div class="row g-3 mt-2">
+            <div class="col-md-6">
+              <label for="id_nome_contato" class="form-label">Nome do Contato</label>
+              {{ form.nome_contato }}
+            </div>
+            <div class="col-md-6">
+              <label for="id_fone_contato" class="form-label">Telefone de Contato</label>
+              {{ form.fone_contato }}
+            </div>
+          </div>
+
+          <div class="row g-3 mt-2">
+            <div class="col-md-3">
+              <label for="id_cnae" class="form-label">CNAE</label>
+              {{ form.cnae }}
+            </div>
+            <div class="col-md-3">
+              <label for="id_percentual_rat" class="form-label">% RAT</label>
+              {{ form.percentual_rat }}
+            </div>
+            <div class="col-md-3">
+              <label for="id_optante_simples" class="form-label">Optante Simples</label>
+              {{ form.optante_simples }}
+            </div>
+            <div class="col-md-3">
+              <label for="id_fpas" class="form-label">FPAS</label>
+              {{ form.fpas }}
+            </div>
+          </div>
+
+          <div class="row g-3 mt-2">
+            <div class="col-md-4">
+              <label for="id_outras_entidades" class="form-label">Outras Entidades</label>
+              {{ form.outras_entidades }}
+            </div>
+            <div class="col-md-8">
+              <label for="id_email" class="form-label">E-mail</label>
+              {{ form.email }}
+            </div>
+          </div>
+
+          <div class="row g-3 mt-2">
+            <div class="col-md-6">
+              <label for="id_grupo" class="form-label">Grupo Econômico</label>
+              {{ form.grupo }}
+              <small class="text-muted">(Opcional. Selecione se a empresa faz parte de um grupo.)</small>
+            </div>
+          </div>
+
+          {% if form.errors %}
+          <div class="alert alert-danger mt-3">
+            <strong>Erro!</strong> Corrija os campos destacados.
+            {{ form.errors }}
+          </div>
+          {% endif %}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <i class="bi bi-x-circle"></i> Cancelar
+          </button>
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-circle"></i> Salvar Empresa
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Auto-abrir o modal se houver erros de validação
+  {% if form.errors %}
+    var empresaModal = new bootstrap.Modal(document.getElementById('empresaModal'));
+    empresaModal.show();
+  {% endif %}
+</script>
+{% endblock %}

@@ -1,0 +1,239 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Importar Lançamentos FGTS{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Header -->
+            <div class="mb-3">
+                <h1 class="h4 fw-bold text-dark">
+                    <i class="bi bi-upload text-primary me-2"></i>
+                    Importar Lançamentos
+                </h1>
+                <p class="text-muted mb-0 small">
+                    Importe lançamentos em massa a partir de um arquivo XLSX padronizado pelo sistema.
+                </p>
+            </div>
+
+            <!-- Quick Info -->
+            <div class="alert alert-info border-0 small py-2">
+                <p class="mb-1">
+                    <strong>Como usar:</strong>
+                    1) Baixe o modelo; 2) Preencha os dados; 3) (Opcional) Selecione a empresa; 4) Faça o upload.
+                </p>
+                <p class="mb-0">
+                    <strong>Importante:</strong>
+                    Competência em MM/YYYY - Valores com ponto decimal - COD_EMPRESA = Codigo Folha - Para evitar "vínculo ambíguo", use COD_EMPRESA + MATRICULA (recomendado). CPF pode ficar em branco quando MATRICULA estiver preenchida.
+                </p>
+            </div>
+
+            <!-- Botão Download Template -->
+            <div class="mb-4 text-center">
+                <a href="{% url 'lancamento-download-template' %}"
+                   class="btn btn-success btn-lg rounded-3 shadow-sm d-inline-flex align-items-center justify-content-center">
+                    <i class="bi bi-download me-2"></i>
+                    Baixar modelo XLSX
+                </a>
+            </div>
+
+            <!-- Formulário de Upload -->
+            <div class="card border-0 shadow-lg">
+                <div class="card-header bg-gradient-primary text-white py-3 border-0">
+                    <h2 class="h6 mb-0">
+                        <i class="bi bi-file-earmark-spreadsheet me-2"></i>
+                        Upload de lançamentos
+                    </h2>
+                </div>
+
+                <form method="post" enctype="multipart/form-data" class="card-body p-3">
+                    {% csrf_token %}
+
+                    <!-- Seleção de Empresa -->
+                    <div class="mb-3">
+                        <label for="empresa" class="form-label small fw-bold">Empresa (opcional)</label>
+                        <select name="empresa" id="empresa" class="form-select form-select-sm">
+                            <option value="">(Opcional) Usar a coluna EMPRESA do XLSX</option>
+                            {% for empresa in empresas %}
+                                <option value="{{ empresa.codigo }}">{{ empresa.codigo_exibicao }} - {{ empresa.nome }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Upload de Arquivo -->
+                    <div class="mb-3">
+                        <label for="file" class="form-label small fw-bold">Arquivo XLSX *</label>
+                        <div class="border border-2 border-dashed rounded-3 p-4 text-center bg-light">
+                            <div class="text-center small">
+                                <i class="bi bi-cloud-upload fs-3 text-muted d-block mb-2"></i>
+                                <div class="text-muted">
+                                    <label for="file" class="fw-semibold text-primary cursor-pointer">
+                                        Selecione um arquivo
+                                        <input id="file" name="file" type="file" accept=".xlsx" required class="d-none" onchange="updateFileName(this)">
+                                    </label>
+                                    <span class="text-secondary"> ou arraste para esta área</span>
+                                </div>
+                                <p class="text-secondary mt-1 mb-0">Apenas arquivos .xlsx gerados a partir do modelo.</p>
+                                <p id="file-name" class="text-primary fw-semibold mt-1 mb-0"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Opções de Cálculo -->
+                    <div class="card border border-warning-subtle bg-warning-subtle rounded-3 mb-3">
+                        <div class="card-body py-3 px-3">
+                            <h3 class="h6 fw-bold mb-3">
+                                <i class="bi bi-sliders me-1 text-warning-emphasis"></i>
+                                Opções de cálculo
+                            </h3>
+
+                            <!-- Valor FGTS -->
+                            <div class="mb-3">
+                                <p class="small fw-semibold mb-1">Valor FGTS</p>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="recalcular_fgts" id="opt_recalcular" value="recalcular" checked>
+                                    <label class="form-check-label small" for="opt_recalcular">
+                                        <strong>RECALCULAR</strong> — Forçar 8% da base
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle ms-1">Recomendado</span>
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="recalcular_fgts" id="opt_manter" value="manter">
+                                    <label class="form-check-label small" for="opt_manter">
+                                        <strong>MANTER</strong> — Usar o valor <code>VALOR_FGTS</code> exatamente como está no arquivo
+                                    </label>
+                                </div>
+                                <p class="text-muted small mt-1 mb-0">
+                                    Use "MANTER" apenas se o arquivo já contém valores calculados com alíquota personalizada (ex.: 2% aprendiz) ou ajustes manuais.
+                                </p>
+                            </div>
+
+                            <!-- JAM -->
+                            <div>
+                                <div class="form-check mb-1">
+                                    <input class="form-check-input" type="checkbox" name="aplicar_jam" id="opt_jam" onchange="toggleJamDate(this)">
+                                    <label class="form-check-label small fw-semibold" for="opt_jam">
+                                        Aplicar correção JAM / índices acumulados
+                                    </label>
+                                </div>
+                                <p class="text-muted small mb-2">
+                                    Aplica os coeficientes de juros (JAM) sobre o valor FGTS de cada competência até a data de referência.
+                                    Útil para calcular o saldo atualizado de débito em aberto.
+                                </p>
+                                <div id="jam-date-container" class="d-none">
+                                    <label for="data_referencia_jam" class="form-label small mb-1">Data de referência (para JAM)</label>
+                                    <input type="date" name="data_referencia_jam" id="data_referencia_jam" class="form-control form-control-sm" style="max-width:200px;">
+                                    <p class="text-muted small mt-1 mb-0">Deixe em branco para usar a data de hoje.</p>
+                                </div>
+                            </div>
+
+                            <!-- Extrato Analítico -->
+                            <div class="mt-3 pt-3 border-top border-warning-subtle">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="extrato_analitico" id="opt_extrato_analitico">
+                                    <label class="form-check-label small fw-semibold text-success" for="opt_extrato_analitico">
+                                        <i class="bi bi-shield-check me-1"></i>
+                                        Lançamentos pagos confirmados pelo Extrato Analítico CEF (fonte da verdade)
+                                    </label>
+                                </div>
+                                <p class="text-muted small mt-1 mb-0 ms-4">
+                                    Marque se os pagamentos desta importação foram verificados via Extrato Analítico da CEF.
+                                    Lançamentos não pagos não são afetados por esta opção.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botões -->
+                    <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                        <a href="{% url 'lancamento-list' %}" class="btn btn-outline-secondary btn-lg rounded-3">
+                            <i class="bi bi-x-circle me-1"></i>
+                            Cancelar
+                        </a>
+                        <button type="submit" id="btn-submit" class="btn btn-primary btn-lg rounded-3 d-inline-flex align-items-center">
+                            <i class="bi bi-upload me-2"></i>
+                            <span id="btn-text">Importar</span>
+                        </button>
+                    </div>
+
+                    <!-- Progress indicator (hidden by default) -->
+                    <div id="progress-container" class="mt-3 d-none">
+                        <div class="alert alert-info border-0 d-flex align-items-center">
+                            <div class="spinner-border spinner-border-sm text-primary me-3" role="status">
+                                <span class="visually-hidden">Processando...</span>
+                            </div>
+                            <div>
+                                <strong>Processando importação...</strong>
+                                <p class="mb-0 small text-muted">Isso pode levar alguns segundos. Aguarde...</p>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #005CA9 0%, #003A78 100%);
+    }
+
+    .border-dashed {
+        border-style: dashed !important;
+    }
+</style>
+
+<script>
+function updateFileName(input) {
+    const fileName = input.files && input.files[0] ? input.files[0].name : "";
+    const fileNameDisplay = document.getElementById('file-name');
+    if (fileNameDisplay) {
+        fileNameDisplay.textContent = fileName ? `Arquivo selecionado: ${fileName}` : "";
+    }
+}
+
+function toggleJamDate(checkbox) {
+    const container = document.getElementById('jam-date-container');
+    if (container) {
+        container.classList.toggle('d-none', !checkbox.checked);
+    }
+}
+
+// Mostrar indicador de progresso ao submeter o formulário
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form[enctype="multipart/form-data"]');
+    const btnSubmit = document.getElementById('btn-submit');
+    const btnText = document.getElementById('btn-text');
+    const progressContainer = document.getElementById('progress-container');
+    
+    if (form && btnSubmit) {
+        form.addEventListener('submit', function(e) {
+            // Validar se arquivo foi selecionado
+            const fileInput = document.getElementById('file');
+            const empresaSelect = document.getElementById('empresa');
+            
+            if (!fileInput.files || fileInput.files.length === 0) {
+                e.preventDefault();
+                alert('Por favor, selecione um arquivo XLSX para importar.');
+                return false;
+            }
+            
+            // Mostrar indicador de progresso
+            btnSubmit.disabled = true;
+            btnText.textContent = 'Processando...';
+            btnSubmit.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span><span>Processando...</span>';
+            
+            if (progressContainer) {
+                progressContainer.classList.remove('d-none');
+            }
+            
+            // Scroll para o indicador de progresso
+            progressContainer?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        });
+    }
+});
+</script>
+{% endblock %}

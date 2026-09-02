@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% load lancamento_extras %}
+
+{% block title %}Rejeitar Lançamento - FGTS Web{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Card Principal -->
+            <div class="card border-0 shadow-lg">
+                <!-- Header -->
+                <div class="card-header bg-gradient-danger text-white py-4">
+                    <h4 class="mb-0 fw-bold">
+                        <i class="bi bi-x-circle me-2"></i>Rejeitar Lançamento #{{ conferencia.id }}
+                    </h4>
+                </div>
+
+                <!-- Body -->
+                <div class="card-body p-5">
+                    <!-- Informações do Lançamento -->
+                    <div class="card border-danger bg-light mb-4">
+                        <div class="card-body">
+                            <h6 class="text-danger text-uppercase fw-bold mb-3">Dados do Lançamento</h6>
+                            <div class="row">
+                                <div class="col-md-12 mb-2">
+                                    <strong>Funcionário:</strong> {{ lancamento.funcionario.nome }}<br>
+                                    <small class="text-muted">PIS: {{ lancamento.funcionario.pis }}</small>
+                                </div>
+                                <div class="col-md-4 mb-2">
+                                    <strong>Competência:</strong> {{ lancamento.competencia }}
+                                </div>
+                                <div class="col-md-4 mb-2">
+                                    <strong>Base FGTS:</strong> R$ {{ lancamento.base_fgts|brl }}
+                                </div>
+                                <div class="col-md-4 mb-2">
+                                    <strong>Valor FGTS:</strong> R$ {{ lancamento.valor_fgts|brl }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Aviso -->
+                    <div class="alert alert-warning border-0 mb-4">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        <strong>Atenção:</strong> Ao rejeitar este lançamento, ele não poderá ser consolidado ou pago até que seja corrigido e conferido novamente.
+                    </div>
+
+                    <!-- Formulário de Rejeição -->
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+
+                        <!-- Motivo Padrão -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">{{ form.motivo_padrao.label }} *</label>
+                            <div class="row">
+                                {% for value, label in form.motivo_padrao.field.choices %}
+                                <div class="col-md-6 mb-2">
+                                    <div class="form-check">
+                                        <input class="form-check-input" 
+                                               type="radio" 
+                                               name="motivo_padrao" 
+                                               id="motivo_{{ value }}" 
+                                               value="{{ value }}" 
+                                               required>
+                                        <label class="form-check-label" for="motivo_{{ value }}">
+                                            {{ label }}
+                                        </label>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% if form.motivo_padrao.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.motivo_padrao.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Motivo Detalhado -->
+                        <div class="mb-4">
+                            <label for="{{ form.motivo_detalhado.id_for_label }}" class="form-label fw-bold">
+                                {{ form.motivo_detalhado.label }} *
+                            </label>
+                            {{ form.motivo_detalhado }}
+                            <small class="form-text text-muted d-block mt-2">
+                                {{ form.motivo_detalhado.help_text }}
+                            </small>
+                            {% if form.motivo_detalhado.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.motivo_detalhado.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Botões de Ação -->
+                        <div class="d-flex justify-content-between pt-4">
+                            <a href="{% url 'conferencia-list' lancamento.empresa.pk %}" 
+                               class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-danger btn-lg">
+                                <i class="bi bi-x-circle me-2"></i>Confirmar Rejeição
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-gradient-danger {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;
+    }
+</style>
+{% endblock %}

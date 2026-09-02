@@ -1,0 +1,310 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load lancamento_extras %}
+
+{% block title %}Recolhimento por Funcionário{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+
+  {# ── Cabeçalho da página ─────────────────────────────────────────── #}
+  <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+    <div>
+      <h4 class="mb-0 fw-semibold">
+        <i class="bi bi-person-lines-fill text-primary me-2"></i>Listagem do Recolhimento por Funcionário
+      </h4>
+      <small class="text-muted">Resumo do FGTS a recolher e recolhido por funcionário no período</small>
+    </div>
+    {% if gerou_relatorio %}
+    <div class="d-flex gap-2">
+      <a href="{% url 'recolhimento-funcionario-pdf' %}?competencia_inicio={{ comp_inicio }}&competencia_fim={{ comp_fim }}{% if form.empresa.value %}&empresa={{ form.empresa.value }}{% endif %}{% if form.funcionario.value %}&funcionario={{ form.funcionario.value }}{% endif %}"
+         class="btn btn-danger btn-sm" target="_blank">
+        <i class="bi bi-file-earmark-pdf me-1"></i>Exportar PDF
+      </a>
+      <a href="{% url 'recolhimento-funcionario-xlsx' %}?competencia_inicio={{ comp_inicio }}&competencia_fim={{ comp_fim }}{% if form.empresa.value %}&empresa={{ form.empresa.value }}{% endif %}{% if form.funcionario.value %}&funcionario={{ form.funcionario.value }}{% endif %}"
+         class="btn btn-success btn-sm" target="_blank">
+        <i class="bi bi-file-earmark-excel me-1"></i>Exportar XLSX
+      </a>
+    </div>
+    {% endif %}
+  </div>
+
+  {# ── Formulário de filtros ───────────────────────────────────────── #}
+  <div class="card shadow-sm mb-4" style="position:relative; z-index:5;">
+    <div class="card-header bg-dark text-white fw-semibold">
+      <i class="bi bi-funnel me-1"></i>Filtros
+    </div>
+    <div class="card-body">
+      <form method="post" autocomplete="off" class="row g-3" id="form-relatorio">
+        {% csrf_token %}
+
+        <div class="col-12 col-md-4 col-lg-3">
+          <label class="form-label fw-semibold">Empresa</label>
+          {{ form.empresa }}
+          {% if form.empresa.errors %}
+            <div class="text-danger small">{{ form.empresa.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="col-12 col-md-4 col-lg-3">
+          <label class="form-label fw-semibold">Funcionário</label>
+          <div class="autocomplete-wrapper position-relative">
+            <input type="text" id="funcionario_display_rec" class="form-control"
+                   placeholder="Digite para buscar..." autocomplete="off">
+            {{ form.funcionario }}
+            <div id="funcionario_dropdown_rec" class="autocomplete-dropdown list-group position-absolute d-none"
+                 style="z-index:1050;max-height:220px;overflow-y:auto;width:100%;top:100%;left:0;"></div>
+          </div>
+          {% if form.funcionario.errors %}
+            <div class="text-danger small">{{ form.funcionario.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="col-12 col-md-4 col-lg-2">
+          <label class="form-label fw-semibold">Competência Inicial <span class="text-danger">*</span></label>
+          {{ form.competencia_inicio }}
+          {% if form.competencia_inicio.errors %}
+            <div class="text-danger small">{{ form.competencia_inicio.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="col-12 col-md-4 col-lg-2">
+          <label class="form-label fw-semibold">Competência Final <span class="text-danger">*</span></label>
+          {{ form.competencia_fim }}
+          {% if form.competencia_fim.errors %}
+            <div class="text-danger small">{{ form.competencia_fim.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="col-12 col-lg-2 d-flex align-items-end gap-2">
+          <button type="submit" class="btn btn-primary w-100" id="btn-gerar">
+            <i class="bi bi-search me-1"></i>Gerar
+          </button>
+        </div>
+
+        {% if form.non_field_errors %}
+        <div class="col-12">
+          <div class="alert alert-danger py-2">{{ form.non_field_errors }}</div>
+        </div>
+        {% endif %}
+      </form>
+    </div>
+  </div>
+
+  {# ── Resultado ───────────────────────────────────────────────────── #}
+  {% if gerou_relatorio %}
+
+    {% if empresas_resultado %}
+
+      {# ── Totais globais ────────────────────────────────────────────── #}
+      <div class="row g-3 mb-4">
+        <div class="col-sm-4">
+          <div class="card border-0 shadow-sm text-center py-3">
+            <div class="text-muted small mb-1"><i class="bi bi-exclamation-circle text-warning me-1"></i>Valor a Recolher (em aberto)</div>
+            <div class="fs-5 fw-bold text-warning">{{ total_geral_recolher|brl }}</div>
+          </div>
+        </div>
+        <div class="col-sm-4">
+          <div class="card border-0 shadow-sm text-center py-3">
+            <div class="text-muted small mb-1"><i class="bi bi-check-circle text-success me-1"></i>Total Recolhido</div>
+            <div class="fs-5 fw-bold text-success">{{ total_geral_recolhido|brl }}</div>
+          </div>
+        </div>
+        <div class="col-sm-4">
+          <div class="card border-0 shadow-sm text-center py-3">
+            <div class="text-muted small mb-1"><i class="bi bi-sigma text-primary me-1"></i>Valor Atualizado</div>
+            <div class="fs-5 fw-bold text-primary">{{ total_geral|brl }}</div>
+          </div>
+        </div>
+      </div>
+
+      {# ── Tabela por empresa ──────────────────────────────────────────── #}
+      {% for emp in empresas_resultado %}
+      <div class="card shadow-sm mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-1"
+             style="background: linear-gradient(90deg,#005CA9,#003A78); color:#fff;">
+          <div>
+            <i class="bi bi-building me-1"></i>
+            <strong>{{ emp.empresa.nome }}</strong>
+            {% if emp.empresa.cnpj %}<span class="ms-2 opacity-75 small">CNPJ: {{ emp.empresa.cnpj }}</span>{% endif %}
+          </div>
+          <small class="opacity-75">Período: {{ comp_inicio }} a {{ comp_fim }}</small>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-sm table-hover align-middle mb-0"
+                   style="font-size:.85rem; table-layout:fixed; width:100%;">
+              <colgroup>
+                <col style="width:5%">    {# Cod. #}
+                <col style="width:27%">   {# Nome #}
+                <col style="width:10%">   {# Admissão #}
+                <col style="width:10%">   {# Demissão #}
+                <col style="width:14%">   {# PIS #}
+                <col style="width:11%">   {# Valor a Recolher #}
+                <col style="width:11%">   {# Total Recolhido #}
+                <col style="width:12%">   {# Total Geral #}
+              </colgroup>
+              <thead class="table-secondary">
+                <tr>
+                  <th class="ps-3">Cod.</th>
+                  <th>Nome do Funcionário</th>
+                  <th class="text-center">Admissão</th>
+                  <th class="text-center">Demissão</th>
+                  <th class="text-center">P I S</th>
+                  <th class="text-end pe-2">Valor a Recolher</th>
+                  <th class="text-end pe-2">Total Recolhido</th>
+                  <th class="text-end pe-3">Valor Atualizado</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for item in emp.funcionarios %}
+                <tr class="{% cycle '' 'table-light' %}">
+                  <td class="ps-3 text-muted" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ item.matricula|default:"—" }}</td>
+                  <td class="fw-semibold" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="{{ item.funcionario.nome }}">{{ item.funcionario.nome }}</td>
+                  <td class="text-center" style="white-space:nowrap;">
+                    {% if item.data_admissao %}{{ item.data_admissao|date:"d/m/Y" }}{% else %}—{% endif %}
+                  </td>
+                  <td class="text-center" style="white-space:nowrap;">
+                    {% if item.data_demissao %}
+                      <span class="text-danger">{{ item.data_demissao|date:"d/m/Y" }}</span>
+                    {% else %}
+                      <span class="text-success">—</span>
+                    {% endif %}
+                  </td>
+                  <td class="text-center font-monospace" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ item.pis|default:"—" }}</td>
+                  <td class="text-end pe-2 {% if item.valor_a_recolher > 0 %}text-warning fw-semibold{% endif %}" style="white-space:nowrap;">
+                    {{ item.valor_a_recolher|brl }}
+                  </td>
+                  <td class="text-end pe-2 {% if item.total_recolhido > 0 %}text-success{% endif %}" style="white-space:nowrap;">
+                    {{ item.total_recolhido|brl }}
+                  </td>
+                  <td class="text-end pe-3 fw-bold" style="white-space:nowrap;">
+                    {{ item.total_geral|brl }}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+              <tfoot>
+                <tr style="background:#D0DFF0; font-size:.84rem;">
+                  <td colspan="5" class="ps-3 fw-bold text-primary">EMPRESA: Totais:</td>
+                  <td class="text-end pe-2 fw-bold text-warning">{{ emp.total_a_recolher|brl }}</td>
+                  <td class="text-end pe-2 fw-bold text-success">{{ emp.total_recolhido|brl }}</td>
+                  <td class="text-end pe-3 fw-bold text-primary">{{ emp.total_geral|brl }}</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+
+      {# Rodapé com totais gerais — sempre visível #}
+      <div class="card border-0 shadow-sm mb-4" style="background:linear-gradient(90deg,#005CA9,#003A78);">
+        <div class="card-body py-3 text-white">
+          <div class="row text-center">
+            <div class="col-md-4">
+              <div class="opacity-75 small">Valor a Recolher — Total Geral</div>
+              <div class="fs-5 fw-bold">{{ total_geral_recolher|brl }}</div>
+            </div>
+            <div class="col-md-4">
+              <div class="opacity-75 small">Total Recolhido — Total Geral</div>
+              <div class="fs-5 fw-bold">{{ total_geral_recolhido|brl }}</div>
+            </div>
+            <div class="col-md-4">
+              <div class="opacity-75 small">Valor Atualizado do Relatório</div>
+              <div class="fs-5 fw-bold">{{ total_geral|brl }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    {% else %}
+      <div class="alert alert-info">
+        <i class="bi bi-info-circle me-1"></i>
+        Nenhum lançamento encontrado para o período <strong>{{ comp_inicio }}</strong> a <strong>{{ comp_fim }}</strong>
+        com os filtros selecionados.
+      </div>
+    {% endif %}
+
+  {% endif %}
+
+</div>
+
+<script>
+document.getElementById('form-relatorio').addEventListener('submit', function() {
+  document.getElementById('btn-gerar').disabled = true;
+  document.getElementById('btn-gerar').innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Processando...';
+});
+
+// Autocomplete empresa → funcionário (recolhimento)
+(function () {
+  var AUTOCOMPLETE_URL = '{% url "funcionarios-autocomplete" %}';
+  var empresaEl = document.getElementById('id_empresa');
+  var funcEl    = document.getElementById('id_funcionario');
+  var displayEl = document.getElementById('funcionario_display_rec');
+  var dropEl    = document.getElementById('funcionario_dropdown_rec');
+  if (!empresaEl || !funcEl || !displayEl || !dropEl) return;
+
+  funcEl.style.display = 'none';
+  var debounce = null;
+
+  function setPlaceholder() {
+    displayEl.placeholder = 'Digite para buscar...';
+  }
+
+  function hide() { dropEl.classList.add('d-none'); dropEl.innerHTML = ''; }
+
+  function show(results) {
+    dropEl.innerHTML = '';
+    if (!results || !results.length) {
+      var el = document.createElement('div');
+      el.className = 'list-group-item text-muted small';
+      el.textContent = 'Nenhum funcionário encontrado';
+      dropEl.appendChild(el);
+    } else {
+      results.forEach(function (r) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'list-group-item list-group-item-action small py-2';
+        btn.textContent = r.label;
+        btn.addEventListener('mousedown', function (e) {
+          e.preventDefault();
+          displayEl.value = r.label;
+          funcEl.value = r.id;
+          hide();
+        });
+        dropEl.appendChild(btn);
+      });
+    }
+    dropEl.classList.remove('d-none');
+  }
+
+  displayEl.addEventListener('input', function () {
+    funcEl.value = '';
+    var q = this.value.trim();
+    clearTimeout(debounce);
+    if (q.length < 2) { hide(); return; }
+    debounce = setTimeout(function () {
+      var url = AUTOCOMPLETE_URL + '?q=' + encodeURIComponent(q) + '&agrupar_cpf=1';
+      if (empresaEl.value) url += '&empresa_id=' + encodeURIComponent(empresaEl.value);
+      fetch(url)
+        .then(function (r) { if (!r.ok) { show([]); return null; } return r.json(); })
+        .then(function (d) { if (d !== null) show(d); })
+        .catch(function (err) { console.error('[Autocomplete]', err); show([]); });
+    }, 150);
+  });
+
+  displayEl.addEventListener('blur', function () { setTimeout(hide, 300); });
+
+  empresaEl.addEventListener('change', function () {
+    displayEl.value = '';
+    funcEl.value = '';
+    hide();
+    setPlaceholder();
+  });
+
+  setPlaceholder();
+})();
+</script>
+
+{% endblock %}

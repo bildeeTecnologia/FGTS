@@ -1,0 +1,334 @@
+{% extends 'base.html' %}
+
+{% block title %}Criar Conta — FGTS Web{% endblock %}
+
+{% block extra_css %}
+<style>
+  .register-container {
+    min-height: 85vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #005CA9 0%, #003A78 100%);
+    padding: 20px;
+  }
+  
+  .register-card {
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    width: 100%;
+    max-width: 450px;
+    padding: 40px;
+  }
+  
+  .register-card h2 {
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  
+  .register-card .subtitle {
+    text-align: center;
+    color: #95a5a6;
+    margin-bottom: 30px;
+    font-size: 0.95rem;
+  }
+  
+  .form-group {
+    margin-bottom: 16px;
+  }
+  
+  .form-group label {
+    display: block;
+    font-weight: 500;
+    color: #2c3e50;
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+  }
+  
+  .form-group input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    transition: border-color 0.3s;
+  }
+  
+  .form-group input:focus {
+    outline: none;
+    border-color: #005CA9;
+    box-shadow: 0 0 0 3px rgba(0, 92, 169, 0.1);
+  }
+  
+  .form-group small {
+    display: block;
+    color: #95a5a6;
+    margin-top: 4px;
+    font-size: 0.8rem;
+  }
+  
+  .errorlist {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 15px 0;
+    background: #fee;
+    border: 1px solid #fcc;
+    border-radius: 6px;
+    padding: 12px;
+    color: #c33;
+    font-size: 0.9rem;
+  }
+  
+  .errorlist li {
+    margin: 4px 0;
+  }
+  
+  .errorlist li:first-child {
+    margin-top: 0;
+  }
+  
+  .errorlist li:last-child {
+    margin-bottom: 0;
+  }
+  
+  .form-group.error input {
+    border-color: #e74c3c;
+    background: #fef5f5;
+  }
+  
+  .btn-register {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #005CA9 0%, #003A78 100%);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  
+  .btn-register:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 92, 169, 0.3);
+  }
+  
+  .register-footer {
+    text-align: center;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #f0f0f0;
+  }
+  
+  .register-footer p {
+    color: #555;
+    font-size: 0.95rem;
+    margin: 0;
+  }
+  
+  .register-footer a {
+    color: #005CA9;
+    text-decoration: none;
+    font-weight: 600;
+  }
+  
+  .register-footer a:hover {
+    text-decoration: underline;
+  }
+  
+  .register-back {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .register-back a {
+    color: #005CA9;
+    text-decoration: none;
+    font-size: 0.9rem;
+  }
+  
+  .password-wrapper {
+    position: relative;
+  }
+  .password-wrapper input {
+    padding-right: 42px !important;
+  }
+  .toggle-pw {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #95a5a6;
+    padding: 0;
+    line-height: 1;
+    font-size: 1rem;
+  }
+  .toggle-pw:hover { color: #005CA9; }
+
+  .info-box {
+    background: #e8f4f8;
+    border-left: 4px solid #3498db;
+    padding: 12px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    color: #2c3e50;
+  }
+
+  .info-box strong {
+    display: block;
+    margin-bottom: 4px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="register-container">
+  <div class="register-card">
+    <div class="register-back">
+      <a href="{% url 'home' %}">← Voltar para home</a>
+    </div>
+    
+    <h2>Criar Conta</h2>
+    <p class="subtitle">Junte-se ao FGTS Web e comece a regularizar seu FGTS</p>
+    
+    {% if selected_plan %}
+    <div class="info-box">
+      <strong>📋 Plano Selecionado:</strong>
+      {{ selected_plan.get_plan_type_display }} - R$ {{ selected_plan.price_monthly }}/mês
+    </div>
+    {% endif %}
+    
+    <form method="post" novalidate>
+      {% csrf_token %}
+      
+      {% if form.non_field_errors %}
+        <div class="errorlist">
+          {% for error in form.non_field_errors %}
+            <li>{{ error }}</li>
+          {% endfor %}
+        </div>
+      {% endif %}
+      
+      <!-- Nome de Usuário -->
+      <div class="form-group {% if form.username.errors %}error{% endif %}">
+        {{ form.username.label_tag }}
+        {{ form.username }}
+        {% if form.username.errors %}
+          <div class="errorlist">
+            {% for error in form.username.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </div>
+        {% endif %}
+        <small>Será usado para fazer login</small>
+      </div>
+      
+      <!-- E-mail -->
+      <div class="form-group {% if form.email.errors %}error{% endif %}">
+        {{ form.email.label_tag }}
+        {{ form.email }}
+        {% if form.email.errors %}
+          <div class="errorlist">
+            {% for error in form.email.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+      
+      <!-- Nome -->
+      <div class="form-group {% if form.first_name.errors %}error{% endif %}">
+        {{ form.first_name.label_tag }}
+        {{ form.first_name }}
+        {% if form.first_name.errors %}
+          <div class="errorlist">
+            {% for error in form.first_name.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+      
+      <!-- Sobrenome -->
+      <div class="form-group {% if form.last_name.errors %}error{% endif %}">
+        {{ form.last_name.label_tag }}
+        {{ form.last_name }}
+        {% if form.last_name.errors %}
+          <div class="errorlist">
+            {% for error in form.last_name.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+      
+      <!-- Senha -->
+      <div class="form-group {% if form.password1.errors %}error{% endif %}">
+        {{ form.password1.label_tag }}
+        <div class="password-wrapper">
+          {{ form.password1 }}
+          <button type="button" class="toggle-pw" onclick="togglePw('{{ form.password1.id_for_label }}', this)" tabindex="-1" aria-label="Mostrar/ocultar senha">
+            <i class="bi bi-eye"></i>
+          </button>
+        </div>
+        {% if form.password1.errors %}
+          <div class="errorlist">
+            {% for error in form.password1.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </div>
+        {% endif %}
+        <small>{{ form.password1.help_text|safe }}</small>
+      </div>
+
+      <!-- Confirmar Senha -->
+      <div class="form-group {% if form.password2.errors %}error{% endif %}">
+        {{ form.password2.label_tag }}
+        <div class="password-wrapper">
+          {{ form.password2 }}
+          <button type="button" class="toggle-pw" onclick="togglePw('{{ form.password2.id_for_label }}', this)" tabindex="-1" aria-label="Mostrar/ocultar senha">
+            <i class="bi bi-eye"></i>
+          </button>
+        </div>
+        {% if form.password2.errors %}
+          <div class="errorlist">
+            {% for error in form.password2.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+      
+      <button type="submit" class="btn-register">Criar Conta</button>
+    </form>
+    
+    <div class="register-footer">
+      <p>Já tem uma conta? <a href="{% url 'login' %}">Faça login aqui</a></p>
+    </div>
+  </div>
+</div>
+
+<script>
+function togglePw(fieldId, btn) {
+  var input = document.getElementById(fieldId);
+  var icon = btn.querySelector('i');
+  if (input.type === 'password') {
+    input.type = 'text';
+    icon.className = 'bi bi-eye-slash';
+  } else {
+    input.type = 'password';
+    icon.className = 'bi bi-eye';
+  }
+}
+</script>
+
+{% endblock %}

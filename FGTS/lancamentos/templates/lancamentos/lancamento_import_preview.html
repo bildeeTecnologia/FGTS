@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+{% load static %}
+{% load lancamento_extras %}
+
+{% block title %}Pré-visualização da Importação{% endblock %}
+
+{% block content %}
+{% with pr=importacao.preview_resultado %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-xl-11">
+
+            <!-- Header -->
+            <div class="mb-3 d-flex align-items-start gap-3">
+                <div class="flex-grow-1">
+                    <h1 class="h4 fw-bold text-dark mb-0">
+                        <i class="bi bi-eye text-primary me-2"></i>
+                        Pré-visualização da Importação
+                    </h1>
+                    <p class="text-muted mb-0 small mt-1">
+                        Arquivo: <strong>{{ importacao.nome_arquivo }}</strong>
+                        &nbsp;·&nbsp;
+                        Mostrando as primeiras <strong>{{ pr.linhas_amostradas }}</strong>
+                        de aprox. <strong>{{ pr.total_linhas_arquivo }}</strong> linhas de dados
+                    </p>
+                </div>
+            </div>
+
+            <!-- Resumo -->
+            <div class="row g-3 mb-4">
+                <div class="col-sm-4">
+                    <div class="card border-0 shadow-sm text-center py-3">
+                        <div class="text-muted small mb-1">Total no arquivo</div>
+                        <div class="fs-4 fw-bold text-dark">{{ pr.total_linhas_arquivo }}</div>
+                        <div class="text-muted small">linhas de dados</div>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="card border-0 shadow-sm text-center py-3 {% if pr.linhas_ok > 0 %}border-success{% endif %}">
+                        <div class="text-muted small mb-1">Na amostra — OK</div>
+                        <div class="fs-4 fw-bold text-success">{{ pr.linhas_ok }}</div>
+                        <div class="text-muted small">de {{ pr.linhas_amostradas }} verificadas</div>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="card border-0 shadow-sm text-center py-3 {% if pr.linhas_erro > 0 %}border-danger{% endif %}">
+                        <div class="text-muted small mb-1">Na amostra — Erros</div>
+                        <div class="fs-4 fw-bold {% if pr.linhas_erro > 0 %}text-danger{% else %}text-muted{% endif %}">{{ pr.linhas_erro }}</div>
+                        <div class="text-muted small">de {{ pr.linhas_amostradas }} verificadas</div>
+                    </div>
+                </div>
+            </div>
+
+            {% if pr.linhas_erro > 0 %}
+            <div class="alert alert-warning d-flex gap-2 py-2 mb-3">
+                <i class="bi bi-exclamation-triangle-fill flex-shrink-0 mt-1"></i>
+                <div class="small">
+                    <strong>{{ pr.linhas_erro }} linha{{ pr.linhas_erro|pluralize }} com erro na amostra.</strong>
+                    Essas linhas serão registradas como erros no resultado final — as demais serão importadas normalmente.
+                    Você pode corrigir o arquivo e fazer um novo upload, ou confirmar mesmo assim.
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Resumo das opções selecionadas -->
+            <div class="card border-0 shadow-sm mb-4 bg-light">
+                <div class="card-body py-3 px-3 small">
+                    <p class="fw-semibold mb-2">
+                        <i class="bi bi-sliders me-1"></i>
+                        Opções selecionadas para esta importação:
+                    </p>
+                    <div class="d-flex flex-wrap gap-3">
+                        <div>
+                            <span class="text-muted">Valor FGTS:</span>
+                            {% if importacao.recalcular_fgts %}
+                                <span class="badge bg-success-subtle text-success border border-success-subtle">RECALCULADO — 8% da base</span>
+                            {% else %}
+                                <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle">MANTIDO conforme arquivo</span>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <span class="text-muted">Correção JAM:</span>
+                            {% if importacao.aplicar_jam %}
+                                <span class="badge bg-info-subtle text-info border border-info-subtle">
+                                    APLICADA até {{ importacao.data_referencia_jam|default:"hoje" }}
+                                </span>
+                            {% else %}
+                                <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle">NÃO APLICADA</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabela -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-bottom py-2 px-3">
+                    <span class="fw-semibold small text-muted">
+                        <i class="bi bi-table me-1"></i>
+                        Amostra das primeiras {{ pr.linhas_amostradas }} linhas
+                    </span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover align-middle mb-0" style="font-size:.82rem;">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-3">#</th>
+                                <th>Status</th>
+                                <th>CPF</th>
+                                <th>Nome (planilha)</th>
+                                <th>Funcionário (sistema)</th>
+                                <th>Empresa</th>
+                                <th>Competência</th>
+                                <th>Base FGTS</th>
+                                <th>Valor FGTS</th>
+                                <th>Observação</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in pr.rows %}
+                            <tr class="{% if row.status == 'ok' %}table-success{% else %}table-danger{% endif %}" style="--bs-table-bg-type: transparent;">
+                                <td class="ps-3 text-muted">{{ row.row_idx }}</td>
+                                <td>
+                                    {% if row.status == 'ok' %}
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle">✅ OK</span>
+                                    {% else %}
+                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle">❌ Erro</span>
+                                    {% endif %}
+                                </td>
+                                <td class="font-monospace text-nowrap">{{ row.raw_cpf|default:"—" }}</td>
+                                <td>{{ row.raw_nome|default:"—" }}</td>
+                                <td>
+                                    {% if row.status == 'ok' %}
+                                        {{ row.funcionario_nome|default:"—" }}
+                                    {% else %}
+                                        <span class="text-muted">—</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if row.status == 'ok' %}
+                                        <span class="text-nowrap">{{ row.empresa_nome|default:"—" }}</span>
+                                    {% else %}
+                                        <span class="text-muted">{{ row.raw_empresa|default:"—" }}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-nowrap">{{ row.competencia|default:"—" }}</td>
+                                <td class="text-end text-nowrap">
+                                    {% if row.base_fgts %}R$ {{ row.base_fgts|brl }}{% else %}—{% endif %}
+                                </td>
+                                <td class="text-end text-nowrap">
+                                    {% if row.valor_fgts %}R$ {{ row.valor_fgts|brl }}{% else %}—{% endif %}
+                                </td>
+                                <td class="text-danger small">
+                                    {% if row.status == 'error' %}{{ row.error }}{% endif %}
+                                    {% if row.parcela_13 %}
+                                        <span class="badge bg-info-subtle text-info ms-1">13º {{ row.parcela_13 }}ª</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="10" class="text-center text-muted py-4">Nenhuma linha encontrada na amostra.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Aceite de Responsabilidade + Confirmação -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <p class="small fw-semibold mb-2">
+                        <i class="bi bi-shield-check me-1 text-danger"></i>
+                        Termo de responsabilidade
+                    </p>
+                    <form method="POST" action="{% url 'lancamento-import-confirm' importacao.pk %}" id="confirm-form">
+                        {% csrf_token %}
+
+                        {% if confirm_form.aceite_responsabilidade.errors %}
+                        <div class="alert alert-danger py-2 small mb-2">
+                            {{ confirm_form.aceite_responsabilidade.errors }}
+                        </div>
+                        {% endif %}
+
+                        <div class="form-check mb-3 p-3 border rounded bg-light">
+                            {{ confirm_form.aceite_responsabilidade }}
+                            <label class="form-check-label small ms-2" for="id_aceite_responsabilidade">
+                                {{ confirm_form.aceite_responsabilidade.label }}
+                            </label>
+                        </div>
+
+                        <div class="d-flex flex-wrap gap-3 align-items-center">
+                            <button type="submit" id="btn-confirm" class="btn btn-primary px-4" disabled>
+                                <i class="bi bi-check-circle me-2"></i>
+                                Confirmar e importar {{ pr.total_linhas_arquivo }} linha{{ pr.total_linhas_arquivo|pluralize }}
+                            </button>
+                            <a href="{% url 'lancamento-import' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-counterclockwise me-1"></i>
+                                Cancelar e enviar outro arquivo
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endwith %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const checkbox = document.getElementById('id_aceite_responsabilidade');
+    const btnConfirm = document.getElementById('btn-confirm');
+    if (checkbox && btnConfirm) {
+        checkbox.addEventListener('change', function () {
+            btnConfirm.disabled = !this.checked;
+        });
+    }
+});
+</script>
+{% endblock %}

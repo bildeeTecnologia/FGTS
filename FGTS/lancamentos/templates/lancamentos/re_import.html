@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Importar Arquivo RE / SEFIP{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+
+            <!-- Header -->
+            <div class="mb-3">
+                <h1 class="h4 fw-bold text-dark">
+                    <i class="bi bi-file-earmark-text text-primary me-2"></i>
+                    Importar Arquivo RE / SEFIP
+                </h1>
+                <p class="text-muted mb-0 small">
+                    Crie lançamentos automaticamente a partir do arquivo gerado pelo SEFIP da Caixa.
+                </p>
+            </div>
+
+            <!-- Info -->
+            <div class="alert alert-info border-0 small py-2 mb-4">
+                <strong>Formatos aceitos:</strong>
+                <ul class="mb-0 mt-1">
+                    <li><strong>.RE ou .TXT</strong> — arquivo texto no formato SEFIP legado (360 chars/linha, ISO-8859-1)</li>
+                    <li><strong>.PDF</strong> — relatório visual GFIP/SEFIP emitido pelo Ministério do Trabalho</li>
+                </ul>
+                <p class="mb-0 mt-2">
+                    O sistema criará os lançamentos correspondentes, identificando cada trabalhador pelo PIS e a empresa pelo CNPJ.
+                </p>
+            </div>
+
+            {% if erro %}
+            <div class="alert alert-danger d-flex gap-2">
+                <i class="bi bi-x-circle-fill flex-shrink-0 mt-1"></i>
+                <div>{{ erro }}</div>
+            </div>
+            {% endif %}
+
+            <!-- Formulário -->
+            <div class="card border-0 shadow-lg">
+                <div class="card-header text-white py-3 border-0" style="background: linear-gradient(135deg, #005CA9 0%, #003A78 100%);">
+                    <h2 class="h6 mb-0">
+                        <i class="bi bi-upload me-2"></i>
+                        Upload do arquivo
+                    </h2>
+                </div>
+
+                <form method="post" enctype="multipart/form-data" class="card-body p-4" id="re-upload-form">
+                    {% csrf_token %}
+
+                    <!-- Empresa -->
+                    <div class="mb-3">
+                        <label for="empresa" class="form-label small fw-bold">
+                            Empresa <span class="text-muted fw-normal">(obrigatório se o arquivo não identificar a empresa pelo CNPJ)</span>
+                        </label>
+                        <select name="empresa" id="empresa" class="form-select form-select-sm">
+                            <option value="">(Usar o CNPJ do próprio arquivo)</option>
+                            {% for emp in empresas %}
+                                <option value="{{ emp.codigo }}">{{ emp.nome }} — CNPJ: {{ emp.cnpj }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Upload -->
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold">Arquivo RE, TXT ou PDF *</label>
+                        <div class="border border-2 border-dashed rounded-3 p-4 text-center bg-light" id="drop-zone">
+                            <i class="bi bi-cloud-upload fs-2 text-muted d-block mb-2"></i>
+                            <div class="text-muted small">
+                                <label for="file" class="fw-semibold text-primary" style="cursor:pointer;">
+                                    Selecione um arquivo
+                                    <input id="file" name="file" type="file"
+                                           accept=".re,.txt,.pdf,.RE,.TXT,.PDF"
+                                           required class="d-none"
+                                           onchange="updateFileName(this)">
+                                </label>
+                                <span> ou arraste para esta área</span>
+                            </div>
+                            <p class="text-secondary mt-1 mb-0 small">Aceita: .RE, .TXT (SEFIP texto) ou .PDF (relatório visual)</p>
+                            <p id="file-name" class="text-primary fw-semibold mt-1 mb-0"></p>
+                        </div>
+                    </div>
+
+                    <!-- Botões -->
+                    <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                        <a href="{% url 'lancamento-list' %}" class="btn btn-outline-secondary rounded-3">
+                            <i class="bi bi-x-circle me-1"></i> Cancelar
+                        </a>
+                        <button type="submit" id="btn-submit" class="btn btn-primary rounded-3 d-inline-flex align-items-center">
+                            <i class="bi bi-upload me-2"></i>
+                            <span id="btn-text">Carregar e verificar</span>
+                        </button>
+                    </div>
+
+                    <!-- Progresso -->
+                    <div id="progress-container" class="mt-3 d-none">
+                        <div class="alert alert-info border-0 d-flex align-items-center">
+                            <div class="spinner-border spinner-border-sm text-primary me-3" role="status"></div>
+                            <div>
+                                <strong>Processando arquivo...</strong>
+                                <p class="mb-0 small text-muted">Aguarde enquanto verificamos os dados.</p>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<style>.border-dashed { border-style: dashed !important; }</style>
+
+<script>
+function updateFileName(input) {
+    const name = input.files && input.files[0] ? input.files[0].name : '';
+    document.getElementById('file-name').textContent = name ? 'Arquivo: ' + name : '';
+}
+
+document.getElementById('re-upload-form').addEventListener('submit', function () {
+    const btn = document.getElementById('btn-submit');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processando...';
+    document.getElementById('progress-container').classList.remove('d-none');
+});
+
+// Drag & drop
+const zone = document.getElementById('drop-zone');
+const input = document.getElementById('file');
+zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('border-primary'); });
+zone.addEventListener('dragleave', () => zone.classList.remove('border-primary'));
+zone.addEventListener('drop', e => {
+    e.preventDefault();
+    zone.classList.remove('border-primary');
+    if (e.dataTransfer.files.length) {
+        input.files = e.dataTransfer.files;
+        updateFileName(input);
+    }
+});
+</script>
+{% endblock %}

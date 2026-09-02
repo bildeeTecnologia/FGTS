@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+{% block title %}Importar SEFIP.RE — FGTS Web{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4" style="max-width: 860px;">
+
+  <!-- Cabeçalho -->
+  <div class="d-flex align-items-center mb-4">
+    <a href="{% url 'sefip-export' %}" class="btn btn-sm btn-outline-secondary me-3">
+      <i class="bi bi-arrow-left"></i>
+    </a>
+    <div>
+      <h4 class="mb-0 fw-bold" style="color: #005CA9;">
+        <i class="bi bi-file-earmark-arrow-up me-2"></i>Importar SEFIP.RE
+      </h4>
+      <small class="text-muted">
+        Lê os registros 301 do arquivo e cria lançamentos na empresa selecionada.
+      </small>
+    </div>
+  </div>
+
+  <!-- Resultado da última importação -->
+  {% if resultado %}
+  <div class="card mb-4 border-0 shadow-sm">
+    <div class="card-header border-0 py-3"
+         style="background: {% if resultado.total_erros == 0 %}rgba(39,174,96,0.1){% else %}rgba(243,156,18,0.1){% endif %};">
+      <div class="d-flex align-items-center gap-2">
+        {% if resultado.total_erros == 0 %}
+          <i class="bi bi-check-circle-fill text-success fs-5"></i>
+          <strong class="text-success">Importação concluída</strong>
+        {% else %}
+          <i class="bi bi-exclamation-triangle-fill text-warning fs-5"></i>
+          <strong style="color: #7a4a00;">Importação concluída com avisos</strong>
+        {% endif %}
+        <small class="text-muted ms-auto">Empresa: {{ resultado.empresa_nome }}</small>
+      </div>
+    </div>
+    <div class="card-body">
+      <!-- Contadores -->
+      <div class="row g-3 mb-3">
+        <div class="col-4">
+          <div class="text-center p-3 rounded" style="background: rgba(39,174,96,0.08);">
+            <div class="h3 mb-0 text-success fw-bold">{{ resultado.criados }}</div>
+            <div class="small text-muted">criados</div>
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="text-center p-3 rounded" style="background: rgba(0,92,169,0.06);">
+            <div class="h3 mb-0 fw-bold" style="color: #005CA9;">{{ resultado.ignorados }}</div>
+            <div class="small text-muted">ignorados</div>
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="text-center p-3 rounded" style="background: rgba(231,76,60,0.07);">
+            <div class="h3 mb-0 text-danger fw-bold">{{ resultado.total_erros }}</div>
+            <div class="small text-muted">erros</div>
+          </div>
+        </div>
+      </div>
+
+      {% if resultado.competencias %}
+      <div class="mb-3">
+        <span class="text-muted small">Competência(s) identificada(s):</span>
+        {% for comp in resultado.competencias %}
+          <span class="badge ms-1" style="background: #005CA9;">{{ comp }}</span>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <!-- Erros -->
+      {% if resultado.erros %}
+      <div class="mb-3">
+        <div class="fw-bold text-danger small mb-1">
+          <i class="bi bi-x-circle me-1"></i>Erros ({{ resultado.total_erros }}{% if resultado.total_erros > 30 %}, exibindo primeiros 30{% endif %}):
+        </div>
+        <ul class="list-unstyled mb-0" style="font-size: 0.84rem; color: #c0392b;">
+          {% for erro in resultado.erros %}
+          <li><i class="bi bi-dot"></i>{{ erro }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+
+      <!-- Avisos -->
+      {% if resultado.avisos %}
+      <div>
+        <div class="fw-bold small mb-1" style="color: #7a4a00;">
+          <i class="bi bi-exclamation-circle me-1"></i>Avisos ({{ resultado.total_avisos }}{% if resultado.total_avisos > 30 %}, exibindo primeiros 30{% endif %}):
+        </div>
+        <ul class="list-unstyled mb-0" style="font-size: 0.84rem; color: #7a4a00;">
+          {% for aviso in resultado.avisos %}
+          <li><i class="bi bi-dot"></i>{{ aviso }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Formulário de importação -->
+  <div class="card border-0 shadow-sm">
+    <div class="card-header border-0 py-3" style="background: rgba(0,92,169,0.06);">
+      <strong style="color: #005CA9; font-size: 0.95rem;">
+        <i class="bi bi-upload me-2"></i>Novo arquivo
+      </strong>
+    </div>
+    <div class="card-body p-4">
+
+      <!-- Informações sobre o formato -->
+      <div class="alert border-0 mb-4" style="background: #fff8e8; border-left: 4px solid #F7941D !important; border-radius: 0 8px 8px 0;">
+        <div class="fw-bold small mb-2" style="color: #7a4a00;">
+          <i class="bi bi-info-circle me-1"></i>Requisitos do arquivo
+        </div>
+        <ul class="mb-0 small" style="color: #7a4a00;">
+          <li>Formato <strong>SEFIP.RE</strong> — gerado pelo aplicativo SEFIP da Caixa Econômica Federal</li>
+          <li>Extensão <code>.RE</code> ou <code>.TXT</code></li>
+          <li>Codificação <strong>ISO-8859-1</strong> (Latin-1), linhas de <strong>360 caracteres</strong></li>
+          <li>Funcionários identificados pelo <strong>PIS/NIS</strong> — devem estar cadastrados no sistema</li>
+          <li>Lançamentos já existentes para a mesma competência e funcionário são <strong>ignorados</strong></li>
+        </ul>
+      </div>
+
+      <!-- Campos extraídos -->
+      <div class="mb-4">
+        <div class="small fw-bold text-muted text-uppercase mb-2" style="letter-spacing: 0.06em;">
+          Campos lidos do registro 301
+        </div>
+        <div class="table-responsive">
+          <table class="table table-sm table-bordered mb-0" style="font-size: 0.85rem;">
+            <thead style="background: #f0f5ff;">
+              <tr>
+                <th>Campo</th>
+                <th>Posição no arquivo</th>
+                <th>Descrição</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Competência</td><td>Reg. 00 / pos. 291–296</td><td>YYYYMM ou YYYY13 → convertido para MM/AAAA</td></tr>
+              <tr><td>PIS / NIS</td><td>Reg. 301 / pos. 32–42</td><td>11 dígitos — chave para localizar o funcionário</td></tr>
+              <tr><td>Nome</td><td>Reg. 301 / pos. 53–122</td><td>Usado apenas nos avisos (não gravado)</td></tr>
+              <tr><td>Base FGTS</td><td>Reg. 301 / pos. 167–181</td><td>15 chars (13 inteiros + 2 decimais)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Form -->
+      <form method="post" enctype="multipart/form-data" id="sefipImportForm" novalidate>
+        {% csrf_token %}
+
+        <!-- Empresa -->
+        <div class="mb-4">
+          <label class="form-label fw-semibold">
+            {{ form.empresa.label }} <span class="text-danger">*</span>
+          </label>
+          {{ form.empresa }}
+          {% if form.empresa.errors %}
+          <div class="invalid-feedback d-block">{{ form.empresa.errors }}</div>
+          {% endif %}
+          <small class="text-muted">{{ form.empresa.help_text }}</small>
+        </div>
+
+        <!-- Arquivo -->
+        <div class="mb-4">
+          <label class="form-label fw-semibold">
+            {{ form.arquivo_re.label }} <span class="text-danger">*</span>
+          </label>
+          <div class="input-group">
+            {{ form.arquivo_re }}
+            <label class="input-group-text" for="{{ form.arquivo_re.id_for_label }}">
+              <i class="bi bi-folder2-open"></i>
+            </label>
+          </div>
+          {% if form.arquivo_re.errors %}
+          <div class="invalid-feedback d-block">{{ form.arquivo_re.errors }}</div>
+          {% endif %}
+          <small class="text-muted">{{ form.arquivo_re.help_text }}</small>
+        </div>
+
+        <!-- Botões -->
+        <div class="d-flex justify-content-between pt-2">
+          <a href="{% url 'lancamento-list' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i>Cancelar
+          </a>
+          <button type="submit" class="btn btn-primary" id="btnImportar">
+            <i class="bi bi-upload me-1"></i>Importar lançamentos
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</div>
+
+<script>
+document.getElementById('sefipImportForm').addEventListener('submit', function () {
+  const btn = document.getElementById('btnImportar');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>Processando...';
+});
+</script>
+{% endblock %}

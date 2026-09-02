@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Coeficientes JAM{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2>📈 Coeficientes JAM</h2>
+            <p class="text-muted">Listagem de coeficientes JAM para cálculo de FGTS</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'coefjam-upload' %}" class="btn btn-primary">+ Importar Coeficientes</a>
+        </div>
+    </div>
+
+    {% if coeficientes %}
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>Data Pagamento</th>
+                    <th>Competência</th>
+                    <th>Valor</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for coef in coeficientes %}
+                <tr>
+                    <td>{{ coef.data_pagamento|date:"d/m/Y" }}</td>
+                    <td>{{ coef.competencia }}</td>
+                    <td><code>{{ coef.valor }}</code></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Paginação -->
+    {% if is_paginated %}
+    <nav aria-label="Paginação">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1">Primeira</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+            </li>
+            {% endif %}
+            <li class="page-item active">
+                <span class="page-link">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+            </li>
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Próxima</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Última</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+
+    {% else %}
+    <div class="alert alert-info">
+        <strong>Nenhum coeficiente encontrado.</strong> Importe dados para começar.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

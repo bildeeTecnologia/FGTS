@@ -1,0 +1,208 @@
+{% extends 'base.html' %}
+{% load lancamento_extras %}
+
+{% block title %}Calculadora FGTS Online — Calcule FGTS em Atraso com Correção{% endblock %}
+
+{% block seo %}
+<meta name="description" content="Calcule o FGTS em atraso gratuitamente. Informe a base de cálculo, competência e data de pagamento — a calculadora aplica os índices oficiais (TR, JAM, SELIC) automaticamente.">
+<meta name="keywords" content="calculadora FGTS, calcular FGTS atrasado, FGTS em atraso online, correção FGTS, índice FGTS, JAM FGTS">
+<meta name="robots" content="index, follow">
+<meta name="author" content="FGTS Web">
+{% endblock %}
+
+{% block canonical %}
+<link rel="canonical" href="https://fgts.bildee.com.br/calculadora-fgts/">
+{% endblock %}
+
+{% block og_title %}Calculadora FGTS Online — Calcule FGTS em Atraso com Correção{% endblock %}
+{% block og_description %}Calcule o FGTS em atraso gratuitamente com índices oficiais (TR, JAM, SELIC). Informe competência e data de pagamento e obtenha o valor corrigido.{% endblock %}
+{% block og_url %}https://fgts.bildee.com.br/calculadora-fgts/{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Calculadora FGTS Online",
+  "url": "https://fgts.bildee.com.br/calculadora-fgts/",
+  "description": "Calcule o FGTS em atraso com índices oficiais. Informe a base de cálculo, competência e data de pagamento para obter o valor corrigido.",
+  "applicationCategory": "FinanceApplication",
+  "operatingSystem": "Web",
+  "inLanguage": "pt-BR",
+  "isAccessibleForFree": true,
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "BRL"
+  }
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center min-vh-100" style="background: #f4f8fb;">
+  <div class="w-100" style="max-width: 420px;">
+    <div class="card shadow-lg p-4 mb-4" style="border-radius: 18px; background: linear-gradient(135deg, #005CA9 0%, #003A78 100%);">
+      <h2 class="mb-4 text-center text-white" style="font-weight: 700; letter-spacing: 1px;">Calculadora FGTS <span style="font-size: 0.7em; font-weight: 400;">(Degustação)</span></h2>
+      <form method="post" autocomplete="off">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label for="id_base_fgts" class="form-label text-white" style="font-weight: 600;">Base FGTS:</label>
+          {{ form.base_fgts }}
+          {% if form.base_fgts.errors %}
+            {% for erro in form.base_fgts.errors %}
+              <div class="campo-erro mt-1">{{ erro }}</div>
+            {% endfor %}
+          {% endif %}
+        </div>
+        <div class="mb-3">
+          <label for="id_competencia" class="form-label text-white" style="font-weight: 600;">Competência:</label>
+          {{ form.competencia }}
+          <small class="form-text text-light">MM/AAAA</small>
+          {% if form.competencia.errors %}
+            {% for erro in form.competencia.errors %}
+              <div class="campo-erro mt-1">{{ erro }}</div>
+            {% endfor %}
+          {% endif %}
+        </div>
+        <div class="mb-3">
+          <label for="id_data_pagamento" class="form-label text-white" style="font-weight: 600;">Data de Pagamento:</label>
+          {{ form.data_pagamento }}
+          <small class="form-text text-light">
+            Mínimo: hoje ({{ hoje|date:"d/m/Y" }}){% if data_maxima %} &nbsp;•&nbsp; Máximo: {{ data_maxima|date:"d/m/Y" }}{% endif %}
+          </small>
+          {% if form.data_pagamento.errors %}
+            {% for erro in form.data_pagamento.errors %}
+              <div class="campo-erro mt-1">{{ erro }}</div>
+            {% endfor %}
+          {% endif %}
+        </div>
+        <button type="submit" class="btn btn-lg w-100" style="background: linear-gradient(90deg, #F7941D 0%, #e07b10 100%); color: #fff; font-weight: 700; border: none; border-radius: 8px;">Calcular</button>
+      </form>
+    </div>
+
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-success mt-2" role="alert" style="font-size:1.05em; border-radius:10px;">
+      ✔ {{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    {% if mensagem and not memoria %}
+    <div class="alert alert-warning mt-2" role="alert" style="font-size:1.1em;">
+      {{ mensagem }}
+    </div>
+    {% endif %}
+
+    {% if memoria %}
+    <div class="card shadow-sm p-4 mb-4" style="border-radius: 18px; background: #fff;">
+      <h4 class="mb-3 text-primary" style="font-weight: 700;">Resultado da Correção FGTS</h4>
+      <div class="mb-2"><b>Valor da Correção:</b> <span style="font-size:1.4em;color:#1a7f3c;font-weight:700;">R$ {{ memoria.correcao|brl }}</span></div>
+      <hr>
+      {% if mensagem %}
+        <div class="alert {% if premium_liberado %}alert-success{% else %}alert-warning{% endif %} mt-2" role="alert" style="font-size:1.1em;">
+          {{ mensagem }}
+        </div>
+      {% endif %}
+      <div class="mb-3 text-secondary" style="font-size:1em;">Veja o que você recebe no relatório premium:</div>
+      <ul class="mb-3" style="list-style:none;padding-left:0;">
+        <li style="margin-bottom:8px;"><span style="color:#F7941D;font-weight:700;">✔</span> Memória detalhada do cálculo</li>
+        <li style="margin-bottom:8px;"><span style="color:#F7941D;font-weight:700;">✔</span> Exportar PDF completo</li>
+        <li style="margin-bottom:8px;"><span style="color:#F7941D;font-weight:700;">✔</span> Histórico de cálculos</li>
+        <li style="margin-bottom:8px;"><span style="color:#F7941D;font-weight:700;">✔</span> Tabela de índices JAM</li>
+        <li style="margin-bottom:8px;"><span style="color:#F7941D;font-weight:700;">✔</span> Simulação avançada</li>
+      </ul>
+      <form method="post" action="" class="mt-3">
+        {% csrf_token %}
+        <input type="hidden" name="_apenas_email" value="1">
+        <div class="mb-3">
+          <label for="email" class="form-label">Informe seu melhor e-mail para receber o relatório premium:</label>
+          <input type="email" name="email" id="email" class="form-control form-control-lg" placeholder="seu@email.com" required>
+        </div>
+        <button type="submit" class="btn btn-lg w-100" style="background: linear-gradient(90deg, #005CA9 0%, #F7941D 100%); color: #fff; font-weight: 700; border: none; border-radius: 8px;">Receber Relatório Premium</button>
+      </form>
+      {% if steps_email %}
+      <div class="card mt-3 p-3" style="border-radius:12px; border: 1px solid #dee2e6; background:#f8f9fa;">
+        <h6 class="mb-3" style="font-weight:700; color:#495057;">Diagnóstico de envio</h6>
+        <ul class="list-unstyled mb-0">
+          {% for step in steps_email %}
+          <li class="d-flex align-items-start mb-2">
+            {% if step.status == 'ok' %}
+              <span class="me-2" style="color:#1a7f3c; font-size:1.1em;">✔</span>
+              <span style="color:#1a7f3c; font-weight:600;">{{ step.descricao }}</span>
+            {% elif step.status == 'erro' %}
+              <span class="me-2" style="color:#dc3545; font-size:1.1em;">✘</span>
+              <div>
+                <span style="color:#dc3545; font-weight:600;">{{ step.descricao }}</span>
+                {% if step.detalhe %}
+                  <br><small class="text-danger" style="font-family:monospace;">{{ step.detalhe }}</small>
+                {% endif %}
+              </div>
+            {% else %}
+              <span class="me-2" style="color:#fd7e14; font-size:1.1em;">⚠</span>
+              <div>
+                <span style="color:#fd7e14; font-weight:600;">{{ step.descricao }}</span>
+                {% if step.detalhe %}
+                  <br><small class="text-warning" style="font-family:monospace;">{{ step.detalhe }}</small>
+                {% endif %}
+              </div>
+            {% endif %}
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+<style>
+  .campo-erro {
+    font-size: 0.83rem;
+    font-weight: 600;
+    color: #ffe066;
+    background: rgba(0,0,0,0.18);
+    border-radius: 6px;
+    padding: 4px 10px;
+  }
+  @media (max-width: 600px) {
+    .container.d-flex {
+      min-height: unset !important;
+      padding: 0 !important;
+    }
+    .card {
+      padding: 1.2rem !important;
+      margin-bottom: 1.2rem !important;
+    }
+    .w-100[style] {
+      max-width: 100% !important;
+    }
+    h2, h4 {
+      font-size: 1.2em !important;
+    }
+    .form-control-lg {
+      font-size: 1em !important;
+      padding: 0.7em 1em !important;
+    }
+    .mt-3, .mb-4, .mt-4, .mb-3, .mb-2, .mt-2, .p-4, .p-3 {
+      margin: 0.5rem 0 !important;
+      padding: 0.7rem !important;
+    }
+    .table-responsive {
+      font-size: 0.9em;
+    }
+  }
+</style>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('form').forEach(function(form) {
+      form.addEventListener('submit', function() {
+        let spinner = document.createElement('div');
+        spinner.innerHTML = '<div class="d-flex justify-content-center mt-3"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Processando...</span></div></div>';
+        form.parentNode.appendChild(spinner);
+      });
+    });
+  });
+</script>
+{% endblock %}
