@@ -367,8 +367,10 @@ class VinculoUpdateService:
     """Serviço para atualização em lote de vínculos existentes via XLSX."""
 
     MOTIVOS_VALIDOS = {
-        'transferencia', 'pedido_demissao',
+        'transferencia', 'pedido_demissao', 'rescisao_indireta',
         'demissao_sem_justa_causa', 'demissao_justa_causa', 'outro',
+        'rescisao_experiencia_antecipado_empregador', 'rescisao_experiencia_antecipado_trabalhador',
+        'rescisao_termino_contrato_experiencia', 'rescisao_acordo', 'termino_contrato',
     }
 
     UPDATE_COLUMNS = [
@@ -425,7 +427,7 @@ class VinculoUpdateService:
             "• EMPRESA (obrigatório): código folha da empresa (ex: CF001ABC)",
             "• MATRICULA ou CPF (pelo menos um obrigatório): identifica o vínculo a atualizar",
             "• Campos em branco são IGNORADOS — apenas campos preenchidos serão atualizados",
-            "• MOTIVO_SAIDA valores válidos: transferencia | pedido_demissao | demissao_sem_justa_causa | demissao_justa_causa | outro",
+            "• MOTIVO_SAIDA valores válidos: transferencia | pedido_demissao | rescisao_indireta | rescisao_experiencia_antecipado_empregador | rescisao_experiencia_antecipado_trabalhador | rescisao_termino_contrato_experiencia | rescisao_acordo | termino_contrato | demissao_sem_justa_causa | demissao_justa_causa | outro",
             "• DATA_DEMISSAO formato: YYYY-MM-DD (ex: 2024-12-31) ou DD/MM/YYYY",
             "• SALARIO formato: número com ponto decimal (ex: 4500.00)",
             "• Apague a linha de exemplo antes de importar seus dados",

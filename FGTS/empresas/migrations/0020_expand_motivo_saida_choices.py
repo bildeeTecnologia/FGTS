@@ -13,6 +13,11 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='funcionariovinculo',
             name='motivo_saida',
-            field=models.CharField(blank=True, choices=[('transferencia', 'Transferência'), ('pedido_demissao', 'Pedido de demissão'), ('demissao_sem_justa_causa', 'Demissão sem justa causa'), ('demissao_justa_causa', 'Demissão por justa causa'), ('outro', 'Outro')], max_length=30, null=True),
+            field=models.CharField(blank=True, choices=[('transferencia', 'Transferência'), ("rescisao_indireta","Rescisão indireta"),
+                    ("rescisao_experiencia_antecipado_empregador", "Rescisão experiencia antecipado empregador"),
+                    ("rescisao_experiencia_antecipado_trabalhador", "Rescisão experiencia antecipado trabalhador"),
+                    ("rescisao_termino_contrato_experiencia", "Rescisão termino contrato experiencia"),
+                    ("rescisao_acordo", "Rescisão acordo"),
+                    ("termino_contrato", "Término de contrato"), ('pedido_demissao', 'Pedido de demissão'), ('demissao_sem_justa_causa', 'Demissão sem justa causa'), ('demissao_justa_causa', 'Demissão por justa causa'), ('outro', 'Outro')], max_length=30, null=True),
         ),
     ]

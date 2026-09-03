@@ -4263,7 +4263,7 @@ def export_relatorio_posicao_xlsx(request, pk):
             l.get('fonte_confirmacao_pagamento', ''),
             _decimal(l.get('valor_atualizado')),
             l.get('status_vinculo', ''),
-            l.get('observacoes', ''),
+            l.get('motivo_saida', ''),
         ])
 
     col_widths = [10, 12, 30, 18, 14, 30, 14, 12, 20, 10, 10,

@@ -54,6 +54,12 @@ class FuncionarioVinculo(models.Model):
     ]
     MOTIVO_SAIDA_CHOICES = [
         ("transferencia", "Transferência"),
+        ("rescisao_indireta","Rescisão indireta"),
+        ("rescisao_experiencia_antecipado_empregador", "Rescisão experiencia antecipado empregador"),
+        ("rescisao_experiencia_antecipado_trabalhador", "Rescisão experiencia antecipado trabalhador"),
+        ("rescisao_termino_contrato_experiencia", "Rescisão termino contrato experiencia"),
+        ("rescisao_acordo", "Rescisão acordo"),
+        ("termino_contrato", "Término de contrato"),
         ("pedido_demissao", "Pedido de demissão"),
         ("demissao_sem_justa_causa", "Demissão sem justa causa"),
         ("demissao_justa_causa", "Demissão por justa causa"),
@@ -65,7 +71,7 @@ class FuncionarioVinculo(models.Model):
     data_admissao = models.DateField()
     data_demissao = models.DateField(blank=True, null=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='ativo', verbose_name='Status do vínculo')
-    motivo_saida = models.CharField(max_length=30, choices=MOTIVO_SAIDA_CHOICES, blank=True, null=True)
+    motivo_saida = models.CharField(max_length=50, choices=MOTIVO_SAIDA_CHOICES, blank=True, null=True)
     observacoes = models.TextField(blank=True, null=True)
     cargo = models.CharField(max_length=100, blank=True, null=True)
     salario = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
