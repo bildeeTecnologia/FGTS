@@ -154,6 +154,16 @@ class LancamentoForm(forms.ModelForm):
             except Exception:
                 pass
 
+        # Se marcado como pago, data e valor do pagamento passam a ser obrigatórios
+        pago = cleaned_data.get('pago')
+        if pago:
+            data_pagto = cleaned_data.get('data_pagto')
+            valor_pago = cleaned_data.get('valor_pago')
+            if not data_pagto:
+                self.add_error('data_pagto', 'Informe a data de pagamento quando o FGTS estiver marcado como pago.')
+            if valor_pago is None:
+                self.add_error('valor_pago', 'Informe o valor pago quando o FGTS estiver marcado como pago.')
+
         # Garantir que o model instance tenha empresa/funcionário antes do full_clean do ModelForm
         self.instance.vinculo = vinculo
         self.instance.empresa = vinculo.empresa

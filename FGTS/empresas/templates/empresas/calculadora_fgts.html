@@ -98,19 +98,33 @@
     {% if memoria %}
     <div class="card shadow-sm p-4 mb-4" style="border-radius: 18px; background: #fff;">
       <h4 class="mb-3 text-primary" style="font-weight: 700;">Resultado da Correção FGTS</h4>
+      <div class="mb-1 text-secondary" style="font-size:0.95em;">
+        Depósito do mês (8% de R$ {{ memoria.base_fgts|brl }}): <b>R$ {{ memoria.fgts_mes|brl }}</b>
+      </div>
       <div class="mb-2"><b>Valor da Correção:</b> <span style="font-size:1.4em;color:#1a7f3c;font-weight:700;">R$ {{ memoria.correcao|brl }}</span></div>
+
+      <div class="alert mt-3 mb-2" style="border-left:4px solid #F7941D; background:#fff8ef; font-size:0.97em;">
+        <b>⚠ Atenção:</b> esse valor corrige apenas o depósito pelo índice oficial (TR). Se o FGTS não foi
+        depositado na época correta, o <b>JAM (Juros e Atualização Monetária)</b> também não foi aplicado — e ele é
+        obrigatório para apurar corretamente o <b>FGTS rescisório</b> deste colaborador.
+        <br><br>
+        Calcular o JAM manualmente exige aplicar o coeficiente correto mês a mês, desde a competência até a data de
+        pagamento. Sem esse cálculo, o valor que você paga (ou cobra) na rescisão pode sair errado — e um erro aqui
+        vira passivo trabalhista.
+      </div>
+
       <hr>
       {% if mensagem %}
         <div class="alert {% if premium_liberado %}alert-success{% else %}alert-warning{% endif %} mt-2" role="alert" style="font-size:1.1em;">
           {{ mensagem }}
         </div>
       {% endif %}
-      <div class="mb-3 text-secondary" style="font-size:1em;">Veja o que você recebe no relatório premium:</div>
+      <div class="mb-3 text-secondary" style="font-size:1em;">O relatório premium entrega o cálculo completo, incluindo o JAM:</div>
       <ul class="mb-3" style="list-style:none;padding-left:0;">
+        <li style="margin-bottom:8px;"><span style="color:#F7941D;font-weight:700;">✔</span> Cálculo do JAM mês a mês (obrigatório na rescisão)</li>
         <li style="margin-bottom:8px;"><span style="color:#F7941D;font-weight:700;">✔</span> Memória detalhada do cálculo</li>
         <li style="margin-bottom:8px;"><span style="color:#F7941D;font-weight:700;">✔</span> Exportar PDF completo</li>
         <li style="margin-bottom:8px;"><span style="color:#F7941D;font-weight:700;">✔</span> Histórico de cálculos</li>
-        <li style="margin-bottom:8px;"><span style="color:#F7941D;font-weight:700;">✔</span> Tabela de índices JAM</li>
         <li style="margin-bottom:8px;"><span style="color:#F7941D;font-weight:700;">✔</span> Simulação avançada</li>
       </ul>
       <form method="post" action="" class="mt-3">

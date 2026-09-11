@@ -65,9 +65,9 @@ class Lancamento(models.Model):
 	
 	def save(self, *args, **kwargs):
 		"""
-		Sobrescreve o save para:
-		1. Registrar automaticamente quando marcar como pago
-		2. Atualizar lançamentos posteriores quando houver mudança na base_fgts (cascata de reajuste)
+		Sobrescreve o save para registrar automaticamente quando marcar como pago.
+		Apenas a competência sendo salva é afetada: não há propagação de base_fgts
+		para outros lançamentos (import e edição manual são sempre mandatórios).
 		"""
 		# Garantir consistência do vínculo (quando informado)
 		if self.vinculo_id:
@@ -111,10 +111,6 @@ class Lancamento(models.Model):
 		
 		# Salvar o lançamento atual
 		super().save(*args, **kwargs)
-		
-		# Se houve mudança na base_fgts, atualizar todos os lançamentos posteriores
-		if base_fgts_mudou:
-			self.atualizar_lancamentos_posteriores()
 
 	def clean(self):
 		super().clean()
@@ -199,49 +195,6 @@ class Lancamento(models.Model):
 				raise ValidationError({
 					'competencia': f"Já existe lançamento para este vínculo na competência {self.competencia}{parcela_label}."
 				})
-	
-	def atualizar_lancamentos_posteriores(self):
-		"""
-		Atualiza todos os lançamentos posteriores do mesmo funcionário com a nova base_fgts.
-		Isso implementa a cascata de reajuste salarial.
-		"""
-		try:
-			# Converter competência atual para data
-			mes, ano = map(int, self.competencia.split('/'))
-			data_atual = datetime(ano, mes, 1)
-			
-			# Buscar todos os lançamentos posteriores do mesmo funcionário (ou do mesmo vínculo, quando aplicável)
-			filtro = {'funcionario': self.funcionario}
-			if self.vinculo_id:
-				filtro = {'vinculo_id': self.vinculo_id}
-
-			lancamentos_posteriores = Lancamento.objects.filter(
-			**filtro,
-			parcela_13__isnull=True,  # Não propagar para parcelas de 13° salário
-		).select_related('vinculo__tipo_vinculo').order_by('competencia')
-
-			# Filtrar apenas os meses posteriores ao atual
-			for lancamento in lancamentos_posteriores:
-				try:
-					mes_l, ano_l = map(int, lancamento.competencia.split('/'))
-					data_lancamento = datetime(ano_l, mes_l, 1)
-
-					# Se for posterior, atualizar
-					if data_lancamento > data_atual:
-						aliquota = get_aliquota_fgts(lancamento.vinculo)
-						lancamento.base_fgts = self.base_fgts
-						lancamento.valor_fgts = (self.base_fgts * aliquota).quantize(Decimal('0.01'))
-						# Usar update direto para evitar recursão infinita
-						Lancamento.objects.filter(pk=lancamento.pk).update(
-							base_fgts=lancamento.base_fgts,
-							valor_fgts=lancamento.valor_fgts
-						)
-				except:
-					continue
-					
-		except Exception as e:
-			# Não interromper o fluxo em caso de erro na cascata
-			pass
 	
 	@staticmethod
 	def obter_base_fgts_anterior(funcionario, competencia_str, vinculo=None):

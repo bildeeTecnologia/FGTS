@@ -303,13 +303,14 @@
                 });
         }
 
-        // Mostrar/ocultar campos de pagamento
+        // Mostrar/ocultar campos de pagamento e alternar obrigatoriedade
         function toggleCamposPagamento() {
-            if (pagoCheckbox && pagoCheckbox.checked) {
-                camposPagamento.style.display = '';
-            } else {
-                camposPagamento.style.display = 'none';
-            }
+            var dataPagtoInput = document.getElementById('id_data_pagto');
+            var valorPagoInput = document.getElementById('id_valor_pago');
+            var marcado = !!(pagoCheckbox && pagoCheckbox.checked);
+            if (camposPagamento) camposPagamento.style.display = marcado ? '' : 'none';
+            if (dataPagtoInput) dataPagtoInput.required = marcado;
+            if (valorPagoInput) valorPagoInput.required = marcado;
         }
 
         empresaSelect.addEventListener('change', function () {
