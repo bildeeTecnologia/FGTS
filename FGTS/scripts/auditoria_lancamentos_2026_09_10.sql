@@ -173,7 +173,24 @@ ORDER BY empresa_nome, funcionario_nome, data_admissao;
 -- ========================================================
 -- SEÇÃO 3: DIVERGÊNCIAS EM LANÇAMENTOS (pagos e não pagos)
 -- ========================================================
-WITH achados AS (
+WITH grupos_guia AS (
+  -- Em competências de novembro/dezembro é comum existir o lançamento normal +
+  -- a parcela do 13º (parcela_13 1 ou 2) pagos juntos na MESMA guia: o valor_pago
+  -- acaba repetido (igual) nos dois lançamentos, enquanto o valor_fgts fica
+  -- dividido entre eles. Por isso agrupamos por vínculo (ou funcionário, para
+  -- lançamentos legados sem vínculo) + competência e comparamos o valor_pago
+  -- com a SOMA do valor_fgts do grupo, evitando falso positivo de divergência.
+  SELECT
+    COALESCE(vinculo_id::text, 'func:' || funcionario_id::text) AS chave_grupo,
+    competencia,
+    SUM(valor_fgts) AS valor_fgts_grupo,
+    MAX(valor_pago) AS valor_pago_grupo,
+    COUNT(*) AS qtd_lancamentos_grupo
+  FROM lancamentos_lancamento
+  WHERE pago = true AND valor_pago IS NOT NULL AND valor_fgts IS NOT NULL
+  GROUP BY 1, 2
+),
+achados AS (
   SELECT l.id AS lancamento_id, l.empresa_id, l.vinculo_id, l.competencia,
     'PAGO_SEM_DATA_PAGAMENTO' AS tipo_divergencia,
     'Lançamento marcado como pago mas sem data_pagto preenchida' AS detalhe
@@ -206,10 +223,21 @@ WITH achados AS (
   UNION ALL
   SELECT l.id, l.empresa_id, l.vinculo_id, l.competencia,
     'PAGO_VALOR_PAGO_DIVERGENTE_DO_CALCULADO',
-    format('valor_pago (%s) difere de valor_fgts (%s) em mais de R$5 ou 20%%', l.valor_pago, l.valor_fgts)
+    CASE
+      WHEN g.qtd_lancamentos_grupo > 1 THEN
+        format(
+          'valor_pago (%s) difere da SOMA de valor_fgts do vínculo na competência (%s, considerando %s lançamentos: normal + 13º pagos juntos) em mais de R$5 ou 20%%',
+          l.valor_pago, g.valor_fgts_grupo, g.qtd_lancamentos_grupo
+        )
+      ELSE
+        format('valor_pago (%s) difere de valor_fgts (%s) em mais de R$5 ou 20%%', l.valor_pago, l.valor_fgts)
+    END
   FROM lancamentos_lancamento l
+  JOIN grupos_guia g
+    ON g.chave_grupo = COALESCE(l.vinculo_id::text, 'func:' || l.funcionario_id::text)
+   AND g.competencia = l.competencia
   WHERE l.pago = true AND l.valor_pago IS NOT NULL AND l.valor_fgts IS NOT NULL
-    AND ABS(l.valor_pago - l.valor_fgts) > GREATEST(5, l.valor_fgts * 0.20)
+    AND ABS(l.valor_pago - g.valor_fgts_grupo) > GREATEST(5, g.valor_fgts_grupo * 0.20)
 
   UNION ALL
   SELECT l.id, l.empresa_id, l.vinculo_id, l.competencia,

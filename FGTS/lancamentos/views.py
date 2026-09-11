@@ -3495,24 +3495,54 @@ def _filtrar_qs_por_funcionario(qs, funcionario_filtro):
     return qs.filter(funcionario_id=funcionario_filtro['funcionario_id'])
 
 
+def _somar_valor_pago_sem_duplicar(lancamentos_pagos):
+    """
+    Soma valor_pago de um grupo de lançamentos pagos (normal + parcelas do 13º) sem
+    contar duas vezes o mesmo valor: quando normal+13º são pagos juntos na mesma guia,
+    o valor_pago costuma vir repetido (igual) em todos os lançamentos do grupo, com o
+    valor_fgts é que fica dividido entre eles. Nesse caso conta o valor uma única vez.
+    Agrupa por vínculo (ou funcionário, para lançamentos legados sem vínculo) + competência.
+    """
+    from collections import defaultdict
+    grupos = defaultdict(list)
+    for lanc in lancamentos_pagos:
+        chave = (lanc.vinculo_id or f'func:{lanc.funcionario_id}', lanc.competencia)
+        grupos[chave].append(lanc)
+
+    total = Decimal('0')
+    for lancs in grupos.values():
+        valores_pagos = [(l.valor_pago or l.valor_fgts or Decimal('0')) for l in lancs]
+        if len(lancs) > 1:
+            soma_fgts = sum((l.valor_fgts or Decimal('0')) for l in lancs)
+            valores_iguais = len(set(valores_pagos)) == 1
+            tolerancia = max(Decimal('5'), soma_fgts * Decimal('0.20'))
+            if valores_iguais and soma_fgts > 0 and abs(valores_pagos[0] - soma_fgts) <= tolerancia:
+                total += valores_pagos[0]
+                continue
+        total += sum(valores_pagos)
+    return total
+
+
 def _calcular_dados_recolhimento(lancamentos_qs, data_ref=None, indice_cache=None):
     """
     Dado um queryset de Lancamento, retorna dict com:
     - valor_a_recolher: soma de valor_fgts dos não pagos
-    - total_recolhido:  soma de valor_pago dos pagos (ou valor_fgts se valor_pago nulo)
+    - total_recolhido:  soma de valor_pago dos pagos (ou valor_fgts se valor_pago nulo),
+      sem duplicar quando normal+13º foram pagos juntos na mesma guia (valor_pago repetido)
     - valor_atualizado: soma do valor atualizado (na data_ref) de cada lançamento
     """
     valor_a_recolher = Decimal('0')
-    total_recolhido = Decimal('0')
     valor_atualizado = Decimal('0')
+    lancamentos_pagos = []
     if indice_cache is None:
         indice_cache = {}
     for lanc in lancamentos_qs:
         if lanc.pago:
-            total_recolhido += (lanc.valor_pago or lanc.valor_fgts or Decimal('0'))
+            lancamentos_pagos.append(lanc)
         else:
             valor_a_recolher += (lanc.valor_fgts or Decimal('0'))
             valor_atualizado += _valor_atualizado_lancamento(lanc, data_ref, indice_cache)
+    total_recolhido = _somar_valor_pago_sem_duplicar(lancamentos_pagos)
     return {
         'valor_a_recolher': valor_a_recolher,
         'total_recolhido': total_recolhido,

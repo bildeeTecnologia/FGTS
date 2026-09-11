@@ -540,6 +540,7 @@ class LancamentoImportService:
                 if lancamento_data:
                     # Extrair flags internas antes de criar o objeto
                     _jam_aplicado = lancamento_data.pop('_jam_aplicado', False)
+                    _colunas_pagamento_presentes = lancamento_data.pop('_colunas_pagamento_presentes', {})
                     desired_valor_fgts = lancamento_data['valor_fgts']
                     _vinculo = lancamento_data.get('vinculo')
                     _aliquota = get_aliquota_fgts(_vinculo)
@@ -572,8 +573,13 @@ class LancamentoImportService:
                     if existing:
                         # Atualizar
                         for key, value in lancamento_data.items():
-                            if key not in ['funcionario', 'vinculo']:
-                                setattr(existing, key, value)
+                            if key in ['funcionario', 'vinculo']:
+                                continue
+                            # Coluna opcional ausente no arquivo: preserva o valor já gravado em vez
+                            # de sobrescrever com o padrão (pago=False/data_pagto=None/valor_pago=None).
+                            if not _colunas_pagamento_presentes.get(key, True):
+                                continue
+                            setattr(existing, key, value)
                         existing.save()
                         if needs_restore:
                             Lancamento.objects.filter(pk=existing.pk).update(
@@ -906,7 +912,17 @@ class LancamentoImportService:
                 # Caso contrário deixa None (competência normal)
             except Exception:
                 pass  # Ignorar valor inválido
-        
+
+        # Registra quais colunas de pagamento existem no arquivo (não apenas na linha), para que
+        # o update de um lançamento existente não apague pago/data_pagto/valor_pago/parcela_13
+        # quando o arquivo reimportado simplesmente não trouxer essas colunas opcionais.
+        lancamento_data['_colunas_pagamento_presentes'] = {
+            'pago': pago_idx is not None,
+            'data_pagto': data_pagto_idx is not None,
+            'valor_pago': valor_pago_idx is not None,
+            'parcela_13': parcela_13_idx is not None,
+        }
+
         return lancamento_data
 
     @staticmethod
