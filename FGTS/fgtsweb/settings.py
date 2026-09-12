@@ -178,6 +178,17 @@ else:
 # Modelo de usuário customizado
 AUTH_USER_MODEL = 'usuarios.Usuario'
 
+# Cache compartilhado entre processos/workers (usa o banco já configurado acima).
+# Usado, por ex., pela Auditoria de Lançamentos para não recalcular o comparativo
+# esperado x realizado x justificado por vínculo a cada clique em "Filtrar"
+# (lancamentos/services/auditoria_vinculo.py). Requer `manage.py createcachetable`.
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'django_cache',
+    }
+}
+
 # Redirecionamentos de autenticação
 LOGIN_REDIRECT_URL = 'dashboard'
 LOGIN_URL = 'login'

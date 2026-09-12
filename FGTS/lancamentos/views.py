@@ -135,6 +135,24 @@ class LancamentoCreateView(LoginRequiredMixin, EmpresaScopeMixin, CreateView):
     template_name = 'lancamentos/lancamento_form.html'
     success_url = reverse_lazy('lancamento-list')
 
+    def get_initial(self):
+        # Permite pré-preencher a partir da tela de Auditoria de Lançamentos (link "Lançar agora")
+        initial = super().get_initial()
+        vinculo_id = self.request.GET.get('vinculo')
+        if vinculo_id:
+            initial['vinculo'] = vinculo_id
+            from empresas.models_grupo import FuncionarioVinculo
+            vinculo = FuncionarioVinculo.objects.filter(pk=vinculo_id).first()
+            if vinculo:
+                initial['empresa'] = vinculo.empresa_id
+        competencia = self.request.GET.get('competencia')
+        if competencia:
+            initial['competencia'] = competencia
+        parcela_13 = self.request.GET.get('parcela_13')
+        if parcela_13:
+            initial['parcela_13'] = parcela_13
+        return initial
+
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['user'] = self.request.user

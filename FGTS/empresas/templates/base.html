@@ -387,6 +387,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'relatorio-competencia' %}"><i class="bi bi-bar-chart"></i> Relatório</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'auditoria-lancamentos-list' %}"><i class="bi bi-search"></i> Auditoria de Lançamentos</a>
+                    </li>
                     {% if request.user.is_staff or request.user.is_superuser or request.user.empresa.features.relatorio_posicao_fgts %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'relatorio-posicao' %}"><i class="bi bi-file-earmark-spreadsheet"></i> Posição FGTS</a>

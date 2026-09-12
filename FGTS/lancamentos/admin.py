@@ -4,6 +4,7 @@ from django.utils.html import format_html
 
 from lancamentos.models import Lancamento
 from lancamentos.models_relatorio import RelatorioTask
+from lancamentos.models_lacuna import LacunaJustificativa
 
 
 @admin.register(RelatorioTask)
@@ -12,6 +13,15 @@ class RelatorioTaskAdmin(admin.ModelAdmin):
     list_filter = ('status',)
     readonly_fields = ('criado_em', 'atualizado_em', 'resultado_json', 'parametros_json', 'avisos_json')
     search_fields = ('empresa__nome', 'usuario__email')
+    ordering = ('-criado_em',)
+
+
+@admin.register(LacunaJustificativa)
+class LacunaJustificativaAdmin(admin.ModelAdmin):
+    list_display = ('vinculo', 'competencia', 'parcela_13', 'motivo', 'usuario', 'criado_em')
+    list_filter = ('motivo',)
+    search_fields = ('vinculo__funcionario__nome', 'vinculo__matricula', 'competencia')
+    readonly_fields = ('criado_em', 'atualizado_em')
     ordering = ('-criado_em',)
 
 

@@ -400,3 +400,4 @@ class ImportacaoExtratoAnalitico(models.Model):
 		return f"ImportacaoExtrato #{self.pk} — {self.nome_arquivo}"
 
 from lancamentos.models_relatorio import RelatorioTask  # noqa: E402,F401
+from lancamentos.models_lacuna import LacunaJustificativa  # noqa: E402,F401

@@ -1,0 +1,220 @@
+{% extends "base.html" %}
+
+{% block title %}Auditoria de Lançamentos - FGTS Web{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-gradient-primary text-white py-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-0 fw-bold">
+                                <i class="bi bi-search me-2"></i>Auditoria de Lançamentos
+                            </h4>
+                            <small class="opacity-75">
+                                Compara os lançamentos esperados (com base na admissão/demissão de cada vínculo) com os
+                                lançamentos realmente registrados.
+                                <a href="{% url 'ajuda' %}#auditoria-lancamentos" class="text-white text-decoration-underline">Saiba mais</a>
+                            </small>
+                        </div>
+                        {% if empresa %}
+                        <a href="{% url 'auditoria-lancamentos-export-xlsx' %}?empresa={{ empresa.pk }}{% if status_filtro %}&status={{ status_filtro }}{% endif %}{% if apenas_pendentes %}&apenas_pendentes=1{% endif %}"
+                           class="btn btn-light btn-sm">
+                            <i class="bi bi-file-earmark-excel me-1"></i>Exportar XLSX
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="get" class="row g-3 mb-4" id="filtroAuditoriaForm">
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold">Empresa</label>
+                            <select class="form-select" name="empresa">
+                                <option value="">-- Selecione --</option>
+                                {% for e in empresas %}
+                                <option value="{{ e.pk }}" {% if empresa_filtro == e.pk|stringformat:"s" %}selected{% endif %}>{{ e.nome }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold">Status do vínculo</label>
+                            <select class="form-select" name="status">
+                                <option value="">-- Todos --</option>
+                                {% for valor, label in status_choices %}
+                                <option value="{{ valor }}" {% if status_filtro == valor %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3 d-flex align-items-end">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="apenas_pendentes" value="1" id="apenasPendentes" {% if apenas_pendentes %}checked{% endif %}>
+                                <label class="form-check-label" for="apenasPendentes">Somente com pendências</label>
+                            </div>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary w-100" id="btnFiltrarAuditoria">
+                                <i class="bi bi-funnel me-1"></i><span class="btn-label">Filtrar</span>
+                            </button>
+                        </div>
+                    </form>
+
+                    {% if empresa %}
+                    {% if data_minima_historico %}
+                    <div class="alert alert-secondary" role="alert">
+                        <i class="bi bi-info-circle me-1"></i>
+                        O plano contratado desta empresa aceita histórico a partir de
+                        <strong>{{ data_minima_historico|date:"m/Y" }}</strong>. Competências anteriores a essa data são
+                        exibidas apenas informativamente como "Fora do plano" — não é possível lançar nem é necessário
+                        justificá-las.
+                        <a href="{% url 'ajuda' %}#auditoria-lancamentos" class="alert-link">Saiba mais</a>
+                    </div>
+                    {% endif %}
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body text-center">
+                                    <div class="fs-3 fw-bold text-primary">{{ total_vinculos }}</div>
+                                    <div class="text-muted small">Vínculos analisados</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body text-center">
+                                    <div class="fs-3 fw-bold text-danger">{{ total_pendencias }}</div>
+                                    <div class="text-muted small">Competências pendentes (sem lançamento e sem justificativa)</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body text-center">
+                                    <div class="fs-3 fw-bold text-secondary">{{ total_fora_do_plano }}</div>
+                                    <div class="text-muted small">Fora do período de histórico contratado (informativo)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if page_obj %}
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Funcionário</th>
+                                    <th>Matrícula</th>
+                                    <th>Admissão</th>
+                                    <th>Demissão / Status</th>
+                                    <th class="text-center">Esperados</th>
+                                    <th class="text-center">Realizados</th>
+                                    <th class="text-center">Justificados</th>
+                                    <th class="text-center">Fora do plano</th>
+                                    <th class="text-center">Pendentes</th>
+                                    <th class="text-end">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for resumo in page_obj %}
+                                <tr>
+                                    <td>{{ resumo.vinculo.funcionario.nome }}</td>
+                                    <td>{{ resumo.vinculo.matricula|default:"—" }}</td>
+                                    <td>{{ resumo.vinculo.data_admissao|date:"d/m/Y" }}</td>
+                                    <td>
+                                        {% if resumo.vinculo.data_demissao %}
+                                            {{ resumo.vinculo.data_demissao|date:"d/m/Y" }}
+                                            <span class="badge bg-secondary">{{ resumo.vinculo.get_status_display }}</span>
+                                        {% else %}
+                                            <span class="badge bg-success">Ativo</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">{{ resumo.qtd_esperados }}</td>
+                                    <td class="text-center text-success">{{ resumo.qtd_realizados }}</td>
+                                    <td class="text-center text-info">{{ resumo.qtd_justificados }}</td>
+                                    <td class="text-center text-secondary">{{ resumo.qtd_fora_do_plano }}</td>
+                                    <td class="text-center">
+                                        {% if resumo.qtd_pendentes > 0 %}
+                                        <span class="badge bg-danger">{{ resumo.qtd_pendentes }}</span>
+                                        {% else %}
+                                        <span class="badge bg-success">0</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end">
+                                        <a href="{% url 'auditoria-vinculo-detail' resumo.vinculo.pk %}" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-eye me-1"></i>Ver detalhe
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {% if page_obj.paginator.num_pages > 1 %}
+                    <nav aria-label="Paginação">
+                        <ul class="pagination justify-content-center">
+                            {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}">Anterior</a>
+                            </li>
+                            {% endif %}
+                            <li class="page-item active">
+                                <span class="page-link">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+                            </li>
+                            {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}">Próxima</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+                    {% else %}
+                    <div class="alert alert-info text-center">
+                        <i class="bi bi-info-circle fs-3 d-block mb-2"></i>
+                        <p class="mb-0">Nenhum vínculo encontrado com os filtros selecionados.</p>
+                    </div>
+                    {% endif %}
+                    {% else %}
+                    <div class="alert alert-info text-center">
+                        <i class="bi bi-building fs-3 d-block mb-2"></i>
+                        <p class="mb-0">Selecione uma empresa para iniciar a auditoria.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%) !important;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('filtroAuditoriaForm');
+    const btn = document.getElementById('btnFiltrarAuditoria');
+    if (form && btn) {
+        form.addEventListener('submit', function () {
+            btn.disabled = true;
+            btn.querySelector('.btn-label').textContent = 'Carregando...';
+            btn.insertAdjacentHTML('afterbegin', '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>');
+        });
+    }
+});
+</script>
+{% endblock %}

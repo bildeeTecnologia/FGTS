@@ -21,6 +21,11 @@ from .views_re_extrato import (
     ExtratoImportDownloadRelatorioView,
 )
 from .bulk_delete import LancamentoBulkDeleteView
+from .views_auditoria import (
+    AuditoriaLancamentosListView, AuditoriaVinculoDetailView,
+    AuditoriaExportListXlsxView, AuditoriaExportVinculoXlsxView,
+    LacunaJustificarView, LacunaRemoverView,
+)
 
 urlpatterns = [
     path('', LancamentoListView.as_view(), name='lancamento-list'),
@@ -45,6 +50,14 @@ urlpatterns = [
     path('relatorio/recolhimento-funcionario/pdf', export_recolhimento_funcionario_pdf, name='recolhimento-funcionario-pdf'),
     path('relatorio/recolhimento-funcionario/xlsx', export_recolhimento_funcionario_xlsx, name='recolhimento-funcionario-xlsx'),
     path('bulk-delete/', LancamentoBulkDeleteView.as_view(), name='lancamento-bulk-delete'),
+
+    # Auditoria de Lançamentos (lacunas esperado x realizado x justificado)
+    path('auditoria/', AuditoriaLancamentosListView.as_view(), name='auditoria-lancamentos-list'),
+    path('auditoria/export/xlsx/', AuditoriaExportListXlsxView.as_view(), name='auditoria-lancamentos-export-xlsx'),
+    path('auditoria/vinculo/<int:vinculo_id>/', AuditoriaVinculoDetailView.as_view(), name='auditoria-vinculo-detail'),
+    path('auditoria/vinculo/<int:vinculo_id>/export/xlsx/', AuditoriaExportVinculoXlsxView.as_view(), name='auditoria-vinculo-export-xlsx'),
+    path('auditoria/vinculo/<int:vinculo_id>/justificar/', LacunaJustificarView.as_view(), name='auditoria-lacuna-justificar'),
+    path('auditoria/lacuna/<int:pk>/remover/', LacunaRemoverView.as_view(), name='auditoria-lacuna-remover'),
 
     # Relatório assíncrono (grandes volumes)
     path('relatorio/task/<int:pk>/status/', RelatorioTaskStatusView.as_view(), name='relatorio-task-status'),

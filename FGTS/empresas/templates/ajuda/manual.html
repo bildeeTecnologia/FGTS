@@ -107,6 +107,7 @@
         <a href="#geracao-auto">Geração Automática</a>
         <a href="#importacao-txt">Importação TXT (SEFIP)</a>
         <a href="#conferencia">Conferência de Lançamentos</a>
+        <a href="#auditoria-lancamentos">Auditoria de Lançamentos</a>
         <div class="nav-section">Saídas</div>
         <a href="#relatorios">Relatórios</a>
         <a href="#exportacao">Exportações (CSV / PDF)</a>
@@ -380,6 +381,77 @@
           <li>Clique em <strong>Conferir</strong> para aprovar ou <strong>Rejeitar</strong> para devolver com observação.</li>
           <li>Lançamentos rejeitados ficam sinalizados para o responsável corrigir.</li>
         </ol>
+      </section>
+
+      <!-- ===================== AUDITORIA DE LANÇAMENTOS ===================== -->
+      <section id="auditoria-lancamentos" class="doc-section mb-5">
+        <h2><i class="bi bi-search me-2"></i>Auditoria de Lançamentos</h2>
+
+        <p>
+          Cada vínculo empregatício tem um período conhecido (admissão até demissão, ou até o mês passado, se ainda ativo). Nesse período, o sistema sabe exatamente quantos lançamentos mensais — e quantas parcelas de 13º — deveriam existir. A tela <strong>Auditoria de Lançamentos</strong> compara o que é <em>esperado</em> com o que está de fato <em>lançado</em> e aponta os meses sem registro (lacunas), para que o usuário decida se deve lançar o mês faltante ou justificar por que ele não existe.
+        </p>
+
+        <h3>Onde acessar</h3>
+        <p>
+          Menu lateral → <strong>Auditoria de Lançamentos</strong>. Selecione a empresa para carregar a lista de vínculos.
+          O botão <strong>Exportar XLSX</strong> no topo da tela (tanto na listagem quanto no detalhe de um vínculo)
+          baixa a mesma informação em planilha, respeitando os filtros aplicados.
+        </p>
+
+        <h3>Como interpretar os contadores</h3>
+        <table class="table table-sm table-bordered field-table" style="font-size: 0.88rem;">
+          <thead style="background: #f0f5ff;"><tr><th>Contador</th><th>Significado</th></tr></thead>
+          <tbody>
+            <tr><td>Esperados</td><td>Total de competências (normais + parcelas de 13º) que o vínculo deveria ter, do mês de admissão até a demissão (ou até o mês anterior ao atual, se ainda ativo).</td></tr>
+            <tr><td>Realizados</td><td>Competências esperadas que já possuem um lançamento cadastrado (pago ou não pago).</td></tr>
+            <tr><td>Justificados</td><td>Competências sem lançamento, mas com uma justificativa registrada pelo usuário (ex.: afastamento).</td></tr>
+            <tr><td>Pendentes</td><td>Competências sem lançamento e sem justificativa — precisam de ação do usuário.</td></tr>
+            <tr><td>Fora do plano</td><td>Competências anteriores ao início do histórico aceito pelo plano contratado da empresa — apenas informativas, não exigem ação (veja «Histórico limitado pelo plano contratado» abaixo).</td></tr>
+          </tbody>
+        </table>
+
+        <h3>Histórico limitado pelo plano contratado</h3>
+        <p>
+          Toda empresa contrata um plano com um limite de <strong>meses de histórico aceito</strong> para lançamentos (ex.: um plano de 60 meses só aceita lançamentos dos últimos 5 anos), mesmo a plataforma sendo tecnicamente capaz de calcular competências muito mais antigas. Colaboradores admitidos antes do início desse período contratado sempre vão ter competências «faltando» no início do vínculo — isso é esperado e não representa um problema a corrigir.
+        </p>
+        <ul>
+          <li>Essas competências aparecem na auditoria com o status <strong>«Fora do plano»</strong> (não «Pendente»).</li>
+          <li>Não é possível criar lançamento manual para elas — o sistema bloqueia a competência com a mensagem «Competência fora do limite do seu plano».</li>
+          <li>Não é necessário (nem possível) justificá-las — elas não entram na contagem de «Pendentes».</li>
+          <li>O início exato do histórico aceito é exibido no topo da lista de vínculos e no detalhe de cada vínculo, calculado como «mês atual − meses contratados no plano».</li>
+        </ul>
+        <div class="tip-box">
+          <i class="bi bi-lightbulb me-1"></i> Se um cliente precisar de mais histórico, a solução é fazer upgrade do plano (ou o administrador da plataforma configurar uma exceção de «Limite especial de histórico» para aquela empresa em <strong>Django Admin → Billing → Clientes</strong>) — não adianta tentar lançar ou justificar essas competências.
+        </div>
+
+        <h3>Lançar ou justificar uma competência</h3>
+        <p>
+          Clique em <strong>Ver detalhe</strong> na lista para abrir a linha do tempo completa do vínculo, mês a mês. Para cada competência pendente, há duas opções:
+        </p>
+        <ul>
+          <li><strong>Lançar</strong>: abre a tela de novo lançamento já com o vínculo e a competência pré-preenchidos.</li>
+          <li><strong>Justificar</strong>: marque a caixa de seleção das competências pendentes (é possível selecionar várias de uma vez, ex.: um período inteiro de afastamento), escolha o motivo e, se necessário, escreva uma observação, depois clique em <strong>Confirmar</strong>.</li>
+        </ul>
+
+        <h3>Motivos disponíveis</h3>
+        <ul>
+          <li>Afastamento (INSS)</li>
+          <li>Licença não remunerada</li>
+          <li>Auxílio-doença</li>
+          <li>Licença maternidade/paternidade</li>
+          <li>Suspensão contratual</li>
+          <li>Erro de importação / dado histórico ausente</li>
+          <li>Outro — <strong>a observação é obrigatória</strong> nesse caso, para documentar o motivo real.</li>
+        </ul>
+
+        <div class="warn-box">
+          <i class="bi bi-exclamation-triangle me-1"></i>
+          A justificativa é <strong>autodeclarada</strong>: assim que registrada, a lacuna já é considerada resolvida (não existe um segundo aprovador). Cada justificativa fica registrada com o usuário e a data de criação, podendo ser removida (a lacuna volta a "Pendente") por qualquer usuário com acesso à empresa.
+        </div>
+
+        <div class="tip-box">
+          <i class="bi bi-lightbulb me-1"></i> Essa tela não substitui a Conferência de Lançamentos — a Conferência valida se os <em>valores</em> de um lançamento existente estão corretos; a Auditoria de Lançamentos identifica <em>meses inteiros sem lançamento</em> no histórico do vínculo.
+        </div>
       </section>
 
       <!-- ===================== RELATÓRIOS ===================== -->
