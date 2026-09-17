@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 from dateutil.relativedelta import relativedelta
 from io import BytesIO
 import re
@@ -16,6 +16,19 @@ from funcionarios.models import Funcionario
 from billing.models import BillingCustomer
 from fgtsweb.mixins import is_empresa_allowed, get_allowed_empresa_ids
 from empresas.models_grupo import FuncionarioVinculo, get_aliquota_fgts
+
+
+class VinculoAdmissaoPosteriorError(ValueError):
+    """A competência da linha é anterior à data_admissao do único vínculo candidato.
+
+    Usado na pré-visualização para sugerir o ajuste de data_admissao ao usuário,
+    em vez de simplesmente reportar "vínculo não ativo" como um erro genérico.
+    """
+
+    def __init__(self, vinculo, competencia_date, message):
+        super().__init__(message)
+        self.vinculo = vinculo
+        self.competencia_date = competencia_date
 
 
 class LancamentoImportService:
@@ -285,6 +298,20 @@ class LancamentoImportService:
         linhas_amostradas = 0
         linhas_ok = 0
         linhas_erro = 0
+        sugestoes_por_vinculo = {}
+
+        def _registrar_sugestao_admissao(exc):
+            atual = sugestoes_por_vinculo.get(exc.vinculo.pk)
+            if atual is None:
+                sugestoes_por_vinculo[exc.vinculo.pk] = {
+                    'vinculo': exc.vinculo,
+                    'data_sugerida': exc.competencia_date,
+                    'qtd_linhas': 1,
+                }
+            else:
+                atual['qtd_linhas'] += 1
+                if exc.competencia_date < atual['data_sugerida']:
+                    atual['data_sugerida'] = exc.competencia_date
 
         for row_idx, row in enumerate(rows_iter, start=2):
             if not any(row):
@@ -331,6 +358,13 @@ class LancamentoImportService:
                     'valor_fgts_modo': 'arquivo' if not recalcular_fgts else 'calculado',
                 })
                 linhas_ok += 1
+            except VinculoAdmissaoPosteriorError as exc:
+                _registrar_sugestao_admissao(exc)
+                entry.update({
+                    'status': 'aviso_admissao',
+                    'error': str(exc),
+                })
+                linhas_erro += 1
             except Exception as exc:
                 entry.update({
                     'status': 'error',
@@ -340,10 +374,41 @@ class LancamentoImportService:
 
             rows_preview.append(entry)
 
+        # Pré-scan do restante do arquivo (fora da amostra exibida) só para detectar,
+        # em todo o arquivo, vínculos cuja data_admissao precisaria ser ajustada.
+        for row in rows_iter:
+            if not any(row):
+                continue
+            try:
+                LancamentoImportService._process_row(
+                    row, column_indices, empresa, user, 0,
+                    billing_cache, empresa_cache, allowed_empresa_ids, vinculo_cache,
+                    recalcular_fgts=recalcular_fgts,
+                    aplicar_jam=aplicar_jam,
+                    data_referencia_jam=data_referencia_jam,
+                    jam_coef_lookup=_jam_coef_lookup,
+                )
+            except VinculoAdmissaoPosteriorError as exc:
+                _registrar_sugestao_admissao(exc)
+            except Exception:
+                continue
+
         try:
             wb.close()
         except Exception:
             pass
+
+        sugestoes_data_admissao = [
+            {
+                'vinculo_id': info['vinculo'].pk,
+                'funcionario_nome': info['vinculo'].funcionario.nome,
+                'empresa_nome': info['vinculo'].empresa.nome,
+                'data_admissao_atual': info['vinculo'].data_admissao.isoformat(),
+                'data_admissao_sugerida': info['data_sugerida'].isoformat(),
+                'qtd_linhas': info['qtd_linhas'],
+            }
+            for info in sugestoes_por_vinculo.values()
+        ]
 
         return {
             'total_linhas_arquivo': total_linhas_arquivo,
@@ -351,6 +416,7 @@ class LancamentoImportService:
             'linhas_ok': linhas_ok,
             'linhas_erro': linhas_erro,
             'rows': rows_preview,
+            'sugestoes_data_admissao': sugestoes_data_admissao,
         }
 
     @staticmethod
@@ -965,6 +1031,24 @@ class LancamentoImportService:
         return billing_customer
 
     @staticmethod
+    def _competencia_str_to_date(competencia: str):
+        """Converte 'MM/YYYY' em date(ano, mes, 1); retorna None se ilegível."""
+        try:
+            mes_str, ano_str = competencia.split('/')
+            return date(int(ano_str), int(mes_str), 1)
+        except Exception:
+            return None
+
+    @staticmethod
+    def _checar_admissao_posterior(vinculo, competencia: str, message: str):
+        """Levanta VinculoAdmissaoPosteriorError quando a única causa de inatividade é a
+        competência ser anterior à data_admissao do vínculo; senão levanta ValueError comum."""
+        competencia_date = LancamentoImportService._competencia_str_to_date(competencia)
+        if competencia_date and competencia_date < vinculo.data_admissao.replace(day=1):
+            raise VinculoAdmissaoPosteriorError(vinculo, competencia_date, message)
+        raise ValueError(message)
+
+    @staticmethod
     def _resolve_vinculo_for_empresa_competencia(*, cpf: str, empresa: Empresa, competencia: str, raw_vinculo, raw_matricula, vinculo_cache: dict = None) -> FuncionarioVinculo:
         """Resolve qual vínculo (cadeira) usar, considerando empresa e competência.
 
@@ -1006,7 +1090,8 @@ class LancamentoImportService:
                 )
 
             if not vinculo.is_ativo_em_competencia(competencia):
-                raise ValueError(
+                LancamentoImportService._checar_admissao_posterior(
+                    vinculo, competencia,
                     f"Vínculo (VINCULO={vinculo_id}) não está ativo na competência {competencia}."
                 )
 
@@ -1041,7 +1126,8 @@ class LancamentoImportService:
                 )
 
             if not vinculo.is_ativo_em_competencia(competencia):
-                raise ValueError(
+                LancamentoImportService._checar_admissao_posterior(
+                    vinculo, competencia,
                     f"Vínculo da MATRÍCULA {matricula} não está ativo na competência {competencia}."
                 )
 
@@ -1078,10 +1164,15 @@ class LancamentoImportService:
             return ativos[0]
 
         if len(ativos) == 0:
-            raise ValueError(
+            mensagem = (
                 f"Nenhum vínculo ativo encontrado para o CPF {cpf_fmt} na empresa '{empresa.nome}' "
                 f"na competência {competencia}. Verifique a competência, a empresa (coluna EMPRESA) e as datas de admissão/demissão do vínculo."
             )
+            # Só sugere ajuste de data_admissao quando há exatamente 1 vínculo candidato
+            # (evita adivinhar em casos ambíguos com múltiplos vínculos do mesmo CPF).
+            if len(vinculos_list) == 1:
+                LancamentoImportService._checar_admissao_posterior(vinculos_list[0], competencia, mensagem)
+            raise ValueError(mensagem)
 
         raise ValueError(
             f"Vínculo ambíguo: existem múltiplos vínculos ativos para o CPF {cpf_fmt} na empresa '{empresa.nome}' "
@@ -1103,3 +1194,23 @@ class LancamentoImportService:
             raw_matricula=None,
         )
         return vinculo.funcionario
+
+    @staticmethod
+    def aplicar_sugestoes_data_admissao(ajustes: dict) -> int:
+        """Aplica a data_admissao ajustada para os vínculos confirmados pelo usuário na
+        pré-visualização do import. `ajustes` é um dict {vinculo_id: date}. Retorna a
+        quantidade de vínculos efetivamente atualizados.
+        """
+        from django.db import transaction
+        aplicados = 0
+        with transaction.atomic():
+            for vinculo_id, nova_data in ajustes.items():
+                try:
+                    vinculo = FuncionarioVinculo.objects.get(pk=vinculo_id)
+                except FuncionarioVinculo.DoesNotExist:
+                    continue
+                vinculo.data_admissao = nova_data
+                vinculo.save(update_fields=['data_admissao'])
+                aplicados += 1
+        return aplicados
+

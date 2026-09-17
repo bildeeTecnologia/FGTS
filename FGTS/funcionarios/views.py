@@ -579,6 +579,15 @@ class FuncionarioTransferenciaView(LoginRequiredMixin, EmpresaScopeMixin, View):
                 usuario_responsavel=request.user,
                 observacoes=observacoes
             )
+            if data_transferencia.day != 1:
+                messages.warning(
+                    request,
+                    '⚠ A data da transferência não é o dia 1º do mês. Recomendamos que '
+                    'transferências sejam sempre efetivadas no dia 1º (saída da empresa de '
+                    'origem no último dia do mês anterior), para evitar que o colaborador '
+                    'apareça esperado em duas empresas na mesma competência. Revise as datas '
+                    'do vínculo encerrado e do novo vínculo se necessário.'
+                )
             messages.success(request, f'Transferência realizada com sucesso!')
             return redirect('funcionario-detail', pk=funcionario.pk)
         messages.error(request, 'Foram encontradas inconsistencias nas informacoes enviadas. Revise as informacoes.')

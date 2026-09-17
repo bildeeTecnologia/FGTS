@@ -6,6 +6,7 @@ from .models_relatorio import RelatorioPremium
 from .models import EmailLog
 from .models_leads import LeadEmailFlow
 from .models_grupo import TipoVinculo
+from . import admin_ajuste_admissao  # noqa: F401 registra a página de ajuste de data_admissao
 
 
 @admin.register(TipoVinculo)

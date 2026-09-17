@@ -5,6 +5,7 @@ from django.utils.html import format_html
 from lancamentos.models import Lancamento
 from lancamentos.models_relatorio import RelatorioTask
 from lancamentos.models_lacuna import LacunaJustificativa
+from lancamentos import admin_auditoria  # noqa: F401 registra a página "Recalcular auditoria"
 
 
 @admin.register(RelatorioTask)

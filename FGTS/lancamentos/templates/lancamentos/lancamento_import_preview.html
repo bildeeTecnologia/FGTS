@@ -118,11 +118,13 @@
                         </thead>
                         <tbody>
                             {% for row in pr.rows %}
-                            <tr class="{% if row.status == 'ok' %}table-success{% else %}table-danger{% endif %}" style="--bs-table-bg-type: transparent;">
+                            <tr class="{% if row.status == 'ok' %}table-success{% elif row.status == 'aviso_admissao' %}table-warning{% else %}table-danger{% endif %}" style="--bs-table-bg-type: transparent;">
                                 <td class="ps-3 text-muted">{{ row.row_idx }}</td>
                                 <td>
                                     {% if row.status == 'ok' %}
                                         <span class="badge bg-success-subtle text-success border border-success-subtle">✅ OK</span>
+                                    {% elif row.status == 'aviso_admissao' %}
+                                        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle">⚠️ Data admissão</span>
                                     {% else %}
                                         <span class="badge bg-danger-subtle text-danger border border-danger-subtle">❌ Erro</span>
                                     {% endif %}
@@ -166,6 +168,50 @@
                     </table>
                 </div>
             </div>
+
+            <!-- Sugestões de ajuste de data_admissao -->
+            {% if pr.sugestoes_data_admissao %}
+            <div class="card border-0 shadow-sm mb-4 border-warning">
+                <div class="card-body">
+                    <p class="small fw-semibold mb-2">
+                        <i class="bi bi-calendar-event me-1 text-warning"></i>
+                        Sugestão de ajuste de data de admissão
+                    </p>
+                    <p class="small text-muted mb-3">
+                        As competências abaixo, no arquivo, são anteriores à data de admissão
+                        cadastrada para o vínculo. Marque os vínculos para os quais deseja ajustar
+                        a data de admissão automaticamente antes de importar (o ajuste só é feito
+                        se você marcar e confirmar).
+                    </p>
+                    <div class="table-responsive mb-2">
+                        <table class="table table-sm align-middle mb-0" style="font-size:.82rem;">
+                            <thead class="table-light">
+                                <tr>
+                                    <th></th>
+                                    <th>Funcionário</th>
+                                    <th>Empresa</th>
+                                    <th>Data admissão atual</th>
+                                    <th>Data sugerida</th>
+                                    <th>Linhas afetadas</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for s in pr.sugestoes_data_admissao %}
+                                <tr>
+                                    <td><input type="checkbox" form="confirm-form" name="ajustar_admissao_vinculo_id" value="{{ s.vinculo_id }}"></td>
+                                    <td>{{ s.funcionario_nome }}</td>
+                                    <td>{{ s.empresa_nome }}</td>
+                                    <td>{{ s.data_admissao_atual|slice:":10" }}</td>
+                                    <td class="fw-semibold">{{ s.data_admissao_sugerida|slice:":10" }}</td>
+                                    <td>{{ s.qtd_linhas }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
 
             <!-- Aceite de Responsabilidade + Confirmação -->
             <div class="card border-0 shadow-sm mb-4">

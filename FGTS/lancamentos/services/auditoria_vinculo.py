@@ -118,13 +118,19 @@ def auditar_vinculo(vinculo, hoje=None, incluir_itens=True):
     esperadas = gerar_competencias_esperadas(vinculo, hoje=hoje)
     data_minima = data_minima_historico_contratado(vinculo.empresa, hoje=hoje)
 
-    realizados = {}
+    # 13º: casamento por ANO + Nº DA PARCELA, ignorando o mês do lançamento real —
+    # historicamente parcelas do 13º podem ter sido pagas fora de nov/dez/aniversário.
+    realizados_normais = {}
+    realizados_13 = {}
     for lanc in Lancamento.objects.filter(vinculo=vinculo).only('id', 'competencia', 'parcela_13', 'pago'):
         chave = _parse_competencia(lanc.competencia)
         if chave is None:
             continue
         mes, ano = chave
-        realizados[(ano, mes, lanc.parcela_13)] = lanc
+        if lanc.parcela_13:
+            realizados_13[(ano, lanc.parcela_13)] = lanc
+        else:
+            realizados_normais[(ano, mes)] = lanc
 
     justificativas = {}
     for just in LacunaJustificativa.objects.filter(vinculo=vinculo).select_related('usuario'):
@@ -142,9 +148,11 @@ def auditar_vinculo(vinculo, hoje=None, incluir_itens=True):
 
     for esperado in esperadas:
         mes, ano = _parse_competencia(esperado['competencia'])
-        key = (ano, mes, esperado['parcela_13'])
-        lancamento = realizados.get(key)
-        justificativa = justificativas.get(key)
+        if esperado['parcela_13']:
+            lancamento = realizados_13.get((ano, esperado['parcela_13']))
+        else:
+            lancamento = realizados_normais.get((ano, mes))
+        justificativa = justificativas.get((ano, mes, esperado['parcela_13']))
 
         if lancamento:
             status = 'ok'
@@ -218,3 +226,18 @@ def invalidar_cache_vinculos_empresa(empresa_id):
     from empresas.models_grupo import FuncionarioVinculo
     for vinculo_id in FuncionarioVinculo.objects.filter(empresa_id=empresa_id).values_list('pk', flat=True):
         invalidar_cache_vinculo(vinculo_id)
+
+
+def invalidar_cache_tudo():
+    """Limpa o cache de auditoria de TODOS os vínculos.
+
+    Usado pelo botão manual "Recalcular auditoria" no Django Admin — necessário porque
+    edições feitas direto no banco (fora do Django/Supabase SQL Editor) não passam pelos
+    signals de `lancamentos/signals_auditoria.py` e por isso não invalidam o cache sozinhas.
+    Retorna a quantidade de vínculos processados.
+    """
+    from empresas.models_grupo import FuncionarioVinculo
+    ids = list(FuncionarioVinculo.objects.values_list('pk', flat=True))
+    for vinculo_id in ids:
+        invalidar_cache_vinculo(vinculo_id)
+    return len(ids)

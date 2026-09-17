@@ -1,0 +1,93 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block title %}Ajuste de data de admissão pelo 1º lançamento{% endblock %}
+
+{% block content %}
+<style>
+  .conf-box   { border:2px solid var(--primary,#417690); border-radius:6px; padding:1rem 1.5rem; margin-bottom:1.5rem; background:color-mix(in srgb,var(--primary,#417690) 6%,var(--body-bg,#fff)); }
+  .conf-table { border-collapse:collapse; width:100%; font-size:.875em; margin-bottom:1rem; }
+  .conf-table th { background:var(--primary,#417690); color:var(--header-color,#fff); padding:.35rem .75rem; text-align:left; }
+  .conf-table td { padding:.35rem .75rem; border-bottom:1px solid var(--hairline-color,#e0e0e0); color:var(--body-fg,#333); background:var(--body-bg,#fff); }
+  .conf-table tr:nth-child(even) td { background:var(--darkened-bg,#f9f9f9); }
+  .btn-confirm { background:var(--primary,#417690); color:#fff; border:none; padding:.5rem 1.2rem; border-radius:4px; cursor:pointer; font-weight:bold; }
+  .btn-confirm:hover { background:var(--primary-fg,#205067); }
+</style>
+
+<div class="conf-box">
+  <h2 style="margin-top:0;">📅 Ajuste de data de admissão pelo 1º lançamento</h2>
+  <p>
+    Lista vínculos cuja <code>data_admissao</code> cadastrada é posterior à competência
+    do lançamento mais antigo já registrado (comum em transferências legadas onde a
+    data de admissão original foi mantida por engano). Marque os vínculos que deseja
+    corrigir e confirme.
+  </p>
+</div>
+
+{% if aplicaveis %}
+<h3>Sugestões aplicáveis ({{ aplicaveis|length }})</h3>
+<form method="post">
+  {% csrf_token %}
+  <div style="overflow-x:auto;max-height:500px;overflow-y:auto;border:1px solid var(--hairline-color,#e0e0e0);border-radius:4px;">
+  <table class="conf-table">
+    <thead>
+      <tr>
+        <th></th>
+        <th>Vínculo</th>
+        <th>Funcionário</th>
+        <th>Empresa</th>
+        <th>Data admissão atual</th>
+        <th>Data sugerida</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in aplicaveis %}
+      <tr>
+        <td><input type="checkbox" name="vinculo_id" value="{{ s.vinculo.pk }}"></td>
+        <td>#{{ s.vinculo.pk }}</td>
+        <td>{{ s.vinculo.funcionario.nome }}</td>
+        <td>{{ s.vinculo.empresa.nome }}</td>
+        <td>{{ s.data_atual|date:"d/m/Y" }}</td>
+        <td>{{ s.data_sugerida|date:"d/m/Y" }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+  <button type="submit" class="btn-confirm">✔ Aplicar ajustes selecionados</button>
+</form>
+{% else %}
+<p style="color:#2ecc71;font-weight:bold;">✔ Não há sugestões aplicáveis no momento.</p>
+{% endif %}
+
+{% if bloqueadas %}
+<h3 style="margin-top:2rem;color:#e74c3c;">Bloqueados — sobreporiam vínculo anterior ({{ bloqueadas|length }})</h3>
+<div style="overflow-x:auto;max-height:400px;overflow-y:auto;border:1px solid var(--hairline-color,#e0e0e0);border-radius:4px;">
+<table class="conf-table">
+  <thead>
+    <tr>
+      <th>Vínculo</th>
+      <th>Funcionário</th>
+      <th>Empresa</th>
+      <th>Data admissão atual</th>
+      <th>Data sugerida</th>
+      <th>Motivo do bloqueio</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for s in bloqueadas %}
+    <tr>
+      <td>#{{ s.vinculo.pk }}</td>
+      <td>{{ s.vinculo.funcionario.nome }}</td>
+      <td>{{ s.vinculo.empresa.nome }}</td>
+      <td>{{ s.data_atual|date:"d/m/Y" }}</td>
+      <td>{{ s.data_sugerida|date:"d/m/Y" }}</td>
+      <td>{{ s.motivo_bloqueio }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endif %}
+
+{% endblock %}

@@ -5,7 +5,15 @@ from fgtsweb.mixins import get_allowed_empresa_ids
 
 class TransferenciaFuncionarioForm(forms.Form):
     empresa_destino = forms.ModelChoiceField(queryset=Empresa.objects.none(), label="Empresa de Destino", widget=forms.Select(attrs={'class': 'form-select'}))
-    data_transferencia = forms.DateField(label="Data da Transferência", widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}))
+    data_transferencia = forms.DateField(
+        label="Data da Transferência",
+        help_text=(
+            "Recomendado: sempre dia 1º do mês. A saída da empresa de origem é "
+            "registrada no último dia do mês anterior, evitando que o colaborador "
+            "apareça esperado em duas empresas na mesma competência."
+        ),
+        widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+    )
     cargo = forms.CharField(label="Cargo na nova empresa", required=False, widget=forms.TextInput(attrs={'class': 'form-control'}))
     salario = forms.DecimalField(label="Salário na nova empresa", required=False, max_digits=12, decimal_places=2, widget=forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}))
     observacoes = forms.CharField(label="Observações", required=False, widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 2}))

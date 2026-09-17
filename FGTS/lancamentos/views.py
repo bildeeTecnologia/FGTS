@@ -2928,6 +2928,23 @@ class LancamentoImportConfirmView(LoginRequiredMixin, View):
         except Exception:
             pass  # audit log é não-crítico
 
+        # Aplica os ajustes de data_admissao que o usuário confirmou na pré-visualização
+        # (a data sugerida é lida do preview já calculado, nunca do POST, por segurança).
+        vinculo_ids_selecionados = {
+            int(v) for v in request.POST.getlist('ajustar_admissao_vinculo_id') if v.isdigit()
+        }
+        if vinculo_ids_selecionados:
+            from datetime import date as _date
+            sugestoes = (importacao.preview_resultado or {}).get('sugestoes_data_admissao', [])
+            ajustes = {
+                s['vinculo_id']: _date.fromisoformat(s['data_admissao_sugerida'])
+                for s in sugestoes
+                if s['vinculo_id'] in vinculo_ids_selecionados
+            }
+            if ajustes:
+                total_ajustado = LancamentoImportService.aplicar_sugestoes_data_admissao(ajustes)
+                messages.info(request, f'📅 {total_ajustado} vínculo(s) com data de admissão ajustada.')
+
         importacao.status = 'pending'
         importacao.save(update_fields=['status', 'atualizado_em'])
         threading.Thread(target=_process_importacao, args=(importacao.id,), daemon=True).start()
