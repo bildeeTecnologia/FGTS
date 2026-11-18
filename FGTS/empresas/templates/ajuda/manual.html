@@ -108,6 +108,7 @@
         <a href="#importacao-txt">Importação TXT (SEFIP)</a>
         <a href="#conferencia">Conferência de Lançamentos</a>
         <a href="#auditoria-lancamentos">Auditoria de Lançamentos</a>
+        <a href="#jam-total-pessoa">JAM Total por Pessoa</a>
         <div class="nav-section">Saídas</div>
         <a href="#relatorios">Relatórios</a>
         <a href="#exportacao">Exportações (CSV / PDF)</a>
@@ -452,6 +453,34 @@
         <div class="tip-box">
           <i class="bi bi-lightbulb me-1"></i> Essa tela não substitui a Conferência de Lançamentos — a Conferência valida se os <em>valores</em> de um lançamento existente estão corretos; a Auditoria de Lançamentos identifica <em>meses inteiros sem lançamento</em> no histórico do vínculo.
         </div>
+      </section>
+
+      <!-- ===================== JAM TOTAL POR PESSOA ===================== -->
+      <section id="jam-total-pessoa" class="doc-section mb-5">
+        <h2><i class="bi bi-calculator me-2"></i>JAM Total por Pessoa</h2>
+
+        <p>
+          Calcula o JAM atualizado de <strong>todas</strong> as competências lançadas de uma pessoa — pagas ou em aberto —
+          usando o mesmo motor do Relatório por competência. O Relatório normal considera apenas competências não pagas;
+          esta tela olha todo o histórico.
+        </p>
+
+        <h3>Como usar</h3>
+        <ul>
+          <li>Menu lateral → <strong>JAM Total por Pessoa</strong>.</li>
+          <li><strong>Empresa:</strong> uma empresa específica ou "Todas as empresas".</li>
+          <li><strong>Buscar por:</strong> Nome (parcial), CPF ou PIS. Deixe o termo em branco para listar todas as pessoas do filtro de empresa.</li>
+          <li><strong>Data de atualização:</strong> até que mês o JAM é composto. Padrão: última data-base de índices do sistema.</li>
+          <li>O resultado vem consolidado por pessoa e empresa (CNPJ); clique em <strong>Competências</strong> para ver o analítico mês a mês.</li>
+          <li><strong>Exportar XLSX</strong> gera as abas Consolidado, Analítico e Premissas.</li>
+        </ul>
+
+        <h3>Regras</h3>
+        <ul>
+          <li>JAM composto mês a mês, do mês seguinte à competência até o mês da data de atualização; competências sem coeficiente JAM cadastrado contam como zero (e ficam listadas).</li>
+          <li>A mesma pessoa é reunida pelo CPF, mesmo que tenha um cadastro de funcionário por empresa — cada vínculo aparece com a sua empresa/CNPJ.</li>
+          <li>Consultas sobre toda a base podem levar algumas dezenas de segundos.</li>
+        </ul>
       </section>
 
       <!-- ===================== RELATÓRIOS ===================== -->

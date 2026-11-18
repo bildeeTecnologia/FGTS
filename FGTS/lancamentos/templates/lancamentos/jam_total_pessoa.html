@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+
+{% block title %}JAM Total por Pessoa - FGTS Web{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-gradient-primary text-white py-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h4 class="mb-0 fw-bold"><i class="bi bi-calculator me-2"></i>JAM Total por Pessoa</h4>
+                    <small class="opacity-75">
+                        JAM atualizado de <strong>todas</strong> as competências (pagas ou em aberto), por pessoa e empresa do vínculo.
+                        <a href="{% url 'ajuda' %}#jam-total-pessoa" class="text-white text-decoration-underline">Saiba mais</a>
+                    </small>
+                </div>
+                {% if resultado and resultado.grupos %}
+                <a href="{% url 'jam-total-pessoa-export-xlsx' %}?{% for key, value in request.GET.items %}{% if key != 'page' and key != 'consultar' %}{{ key }}={{ value|urlencode }}&{% endif %}{% endfor %}"
+                   class="btn btn-light btn-sm">
+                    <i class="bi bi-file-earmark-excel me-1"></i>Exportar XLSX
+                </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card-body">
+            <form method="get" class="row g-3 mb-4" id="filtroJamForm">
+                <input type="hidden" name="consultar" value="1">
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold">Empresa</label>
+                    <select class="form-select" name="empresa">
+                        <option value="">-- Todas as empresas --</option>
+                        {% for e in empresas %}
+                        <option value="{{ e.pk }}" {% if filtros.empresa_id == e.pk|stringformat:"s" %}selected{% endif %}>{{ e.nome }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold">Buscar por</label>
+                    <select class="form-select" name="campo">
+                        {% for valor, label in campos_busca %}
+                        <option value="{{ valor }}" {% if filtros.campo == valor %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold">Termo <span class="text-muted fw-normal">(vazio = todas as pessoas)</span></label>
+                    <input type="text" class="form-control" name="q" value="{{ filtros.q }}" placeholder="Nome, CPF ou PIS">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold">Atualizar até</label>
+                    <input type="date" class="form-control" name="data" value="{{ filtros.data }}">
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100" id="btnConsultarJam">
+                        <i class="bi bi-search me-1"></i><span class="btn-label">Consultar</span>
+                    </button>
+                </div>
+            </form>
+
+            {% if erro %}
+            <div class="alert alert-warning"><i class="bi bi-exclamation-triangle me-1"></i>{{ erro }}</div>
+            {% elif not consultou %}
+            <div class="alert alert-info text-center">
+                <i class="bi bi-info-circle fs-3 d-block mb-2"></i>
+                <p class="mb-0">Escolha os filtros e clique em Consultar. Sem empresa e sem termo, a consulta abrange todas as pessoas.</p>
+            </div>
+            {% elif resultado %}
+                {% if resultado.grupos %}
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3">
+                        <div class="card border-0 bg-light"><div class="card-body text-center">
+                            <div class="fs-3 fw-bold text-primary">{{ resultado.totais.pessoas }}</div>
+                            <div class="text-muted small">Pessoas ({{ resultado.grupos|length }} vínculo(s)/empresa(s), {{ resultado.totais.qtd }} competências)</div>
+                        </div></div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card border-0 bg-light"><div class="card-body text-center">
+                            <div class="fs-3 fw-bold">R$ {{ resultado.totais.fgts|floatformat:2 }}</div>
+                            <div class="text-muted small">Soma FGTS devido</div>
+                        </div></div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card border-0 bg-light"><div class="card-body text-center">
+                            <div class="fs-3 fw-bold text-danger">R$ {{ resultado.totais.jam|floatformat:2 }}</div>
+                            <div class="text-muted small">JAM total (pagas R$ {{ resultado.totais.jam_pago|floatformat:2 }} · em aberto R$ {{ resultado.totais.jam_aberto|floatformat:2 }})</div>
+                        </div></div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card border-0 bg-light"><div class="card-body text-center">
+                            <div class="fs-3 fw-bold text-success">R$ {{ resultado.totais.total|floatformat:2 }}</div>
+                            <div class="text-muted small">FGTS + JAM (atualizado até {{ resultado.data_pagamento|date:"d/m/Y" }})</div>
+                        </div></div>
+                    </div>
+                </div>
+
+                {% if resultado.meses_sem_coef %}
+                <div class="alert alert-secondary small">
+                    <i class="bi bi-info-circle me-1"></i>
+                    Sem coeficiente JAM cadastrado (considerado 0):
+                    {% for m in resultado.meses_sem_coef %}{{ m|date:"m/Y" }}{% if not forloop.last %}, {% endif %}{% endfor %}.
+                </div>
+                {% endif %}
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Funcionário</th>
+                                <th>CPF</th>
+                                <th>Empresa (vínculo)</th>
+                                <th class="text-center">Comp.</th>
+                                <th class="text-end">FGTS devido</th>
+                                <th class="text-end">JAM pagas</th>
+                                <th class="text-end">JAM em aberto</th>
+                                <th class="text-end">JAM total</th>
+                                <th class="text-end">FGTS + JAM</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for g in page_obj %}
+                            <tr>
+                                <td>{{ g.nome }}</td>
+                                <td class="text-nowrap">{{ g.cpf }}</td>
+                                <td>{{ g.empresa }}<br><small class="text-muted">{{ g.cnpj }}</small></td>
+                                <td class="text-center">{{ g.qtd }}</td>
+                                <td class="text-end">{{ g.fgts|floatformat:2 }}</td>
+                                <td class="text-end">{{ g.jam_pago|floatformat:2 }}</td>
+                                <td class="text-end">{{ g.jam_aberto|floatformat:2 }}</td>
+                                <td class="text-end fw-bold text-danger">{{ g.jam|floatformat:2 }}</td>
+                                <td class="text-end">{{ g.total|floatformat:2 }}</td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-outline-primary" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#det{{ forloop.counter }}">
+                                        <i class="bi bi-list-ul me-1"></i>Competências
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr class="collapse" id="det{{ forloop.counter }}">
+                                <td colspan="10" class="bg-light">
+                                    <table class="table table-sm mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Competência</th><th>Matrícula</th><th>Pago?</th><th>Data pagto</th>
+                                                <th class="text-end">FGTS devido</th><th class="text-end">JAM</th><th class="text-end">FGTS + JAM</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for r in g.linhas %}
+                                            <tr>
+                                                <td>{{ r.comp|date:"m/Y" }}{% if r.parcela_13 %} (13º {{ r.parcela_13 }}ª){% endif %}</td>
+                                                <td>{{ r.matricula|default:"—" }}</td>
+                                                <td>{% if r.pago %}<span class="badge bg-success">Sim</span>{% else %}<span class="badge bg-danger">Não</span>{% endif %}</td>
+                                                <td>{{ r.data_pagto|date:"d/m/Y"|default:"—" }}</td>
+                                                <td class="text-end">{{ r.valor_fgts|floatformat:2 }}</td>
+                                                <td class="text-end">{{ r.jam|floatformat:2 }}</td>
+                                                <td class="text-end">{{ r.total|floatformat:2 }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {% if page_obj.paginator.num_pages > 1 %}
+                <nav aria-label="Paginação">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value|urlencode }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}">Anterior</a>
+                        </li>
+                        {% endif %}
+                        <li class="page-item active"><span class="page-link">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span></li>
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value|urlencode }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}">Próxima</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+                {% else %}
+                <div class="alert alert-info text-center">
+                    <i class="bi bi-info-circle fs-3 d-block mb-2"></i>
+                    <p class="mb-0">Nenhum lançamento encontrado com os filtros selecionados.</p>
+                </div>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%) !important;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('filtroJamForm');
+    const btn = document.getElementById('btnConsultarJam');
+    if (form && btn) {
+        form.addEventListener('submit', function () {
+            btn.disabled = true;
+            btn.querySelector('.btn-label').textContent = 'Calculando...';
+            btn.insertAdjacentHTML('afterbegin', '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>');
+        });
+    }
+});
+</script>
+{% endblock %}

@@ -26,6 +26,7 @@ from .views_auditoria import (
     AuditoriaExportListXlsxView, AuditoriaExportVinculoXlsxView,
     LacunaJustificarView, LacunaRemoverView,
 )
+from .views_jam_total import JamTotalPessoaView, JamTotalPessoaExportXlsxView
 
 urlpatterns = [
     path('', LancamentoListView.as_view(), name='lancamento-list'),
@@ -50,6 +51,10 @@ urlpatterns = [
     path('relatorio/recolhimento-funcionario/pdf', export_recolhimento_funcionario_pdf, name='recolhimento-funcionario-pdf'),
     path('relatorio/recolhimento-funcionario/xlsx', export_recolhimento_funcionario_xlsx, name='recolhimento-funcionario-xlsx'),
     path('bulk-delete/', LancamentoBulkDeleteView.as_view(), name='lancamento-bulk-delete'),
+
+    # JAM atualizado de todas as competências por pessoa/empresa
+    path('jam-total/', JamTotalPessoaView.as_view(), name='jam-total-pessoa'),
+    path('jam-total/export/xlsx/', JamTotalPessoaExportXlsxView.as_view(), name='jam-total-pessoa-export-xlsx'),
 
     # Auditoria de Lançamentos (lacunas esperado x realizado x justificado)
     path('auditoria/', AuditoriaLancamentosListView.as_view(), name='auditoria-lancamentos-list'),
